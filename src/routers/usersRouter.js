@@ -1,31 +1,43 @@
-const router = require("express").Router();
+const router = require('express').Router();
+const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const secret = 'c0d1fy@Pr0j3ct!Gr0up4';
 
-//const usersController = require('../controllers/usersController');
-const userSchemas = require('../schemas/userSchemas');
+const { sanitiseObj } = require('../utils/generalFunctions');
+const usersController = require('../controllers/usersController');
+const { user, signIn } = require('../schemas/usersSchemas');
 
-router.post('/signIn', async (req, res) => {
-    const userParams = req.body;
+router.post('/sign-up', async (req, res) => {
+  const validation = user.validate(req.body);
+  if (validation.error) {
+    return res.sendStatus(422);
+  }
+  const userData = sanitiseObj(req.body);
+  const checkExistingUser = await usersController.findUserByEmail(userData.email);
+  if (checkExistingUser) return res.sendStatus(403);
 
-    const { error } = userSchemas.signIn.validate(userParams);
-    if (error) return res.status(422).send({ error: error.details[0].message});
+  const hashedPassword = bcrypt.hashSync(userData.password, 10);
+  const savedUser = await usersController.saveUser(userData.name, userData.email, hashedPassword);
+  return res.send(savedUser).status(201);
+});
 
-    //const user = usersController.findByEmail(userParams.email);
-    //if(!user) return res.sendStatus(404);
-    const user = { id: 1, email: "teste@teste.com", password: "123456"}
+router.post('/sign-in', async (req, res) => {
+  const validation = signIn.validate(req.body);
+  if (validation.error) {
+    return res.status(422).send({ error: error.details[0].message});
+  }
 
-    //if(!bcrypt.compareSync(userInfo.password, user.password)) return res.sendStatus(422);
-    
-    var token = jwt.sign(user, secret, {expiresIn: 300});
- 
-    res.status(200).send({
-        success: true,
-        message: 'Token criado!!!',
-        token
-    });
+  const userData = sanitiseObj(req.body);
 
-    // create token
-})
+  let selectedUser = await usersController.findUserByEmail(userData.email);
+  if (!selectedUser) return res.sendStatus(404);
+
+  const valid = bcrypt.compareSync(userData.password, selectedUser.password);
+  if (!valid) return res.sendStatus(422);
+  selectedUser = selectedUser.dataValues;
+
+  const token = jwt.sign(selectedUser, process.env.SECRET);
+  res.cookie('token', token);
+  res.sendStatus(200);
+});
 
 module.exports = router;
