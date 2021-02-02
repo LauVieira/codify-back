@@ -10,7 +10,8 @@
     "test": "jest --runInBand",
     "dev": "npx nodemon src/server.js",
     "migrations": "npx sequelize-cli db:migrate",
-    "start": "node src/server.js"
+    "start": "node src/server.js",
+    "seed": "npx sequelize-cli db:seed"
   },
   "keywords": [],
   "author": "",
@@ -26,10 +27,10 @@
     "jsonwebtoken": "^8.5.1",
     "nodemon": "^2.0.7",
     "pg": "^8.5.1",
-    "sanitize-html": "^2.3.2",
     "sequelize": "^6.5.0",
     "sequelize-cli": "^6.2.0",
     "string-strip-html": "^8.1.0",
-    "supertest": "^6.1.3"
+    "supertest": "^6.1.3",
+    "winston": "^3.3.3"
   }
 }
