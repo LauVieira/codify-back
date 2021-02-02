@@ -1,4 +1,4 @@
-const stripHtml = require('string-strip-html');
+const { stripHtml } = require('string-strip-html');
 
 function sanitiseObj (obj) {
     if (obj === null || typeof(obj) !== 'object') return;
@@ -6,14 +6,15 @@ function sanitiseObj (obj) {
 
     const objEntries = Object.entries(obj);
     objEntries.forEach( entry => {
-        if (typeof(entry[1]) === 'string') {
-            const sanitisedString = stripHtml(entry[1]).result;
-            newObj[entry[0]] = sanitisedString;
-        } else if (typeof(entry[1]) === 'object') {
-            newObj[entry[0]] = sanitiseObj(entry[1]);
+        const [ key, value ] = entry;
+        if (typeof(value) === 'string') {
+            const sanitisedString = stripHtml(value).result;
+            newObj[key] = sanitisedString;
+        } else if (typeof(value) === 'object') {
+            newObj[key] = sanitiseObj(value);
         }
         else {
-            newObj[entry[0]] = entry[1];
+            newObj[key] = value;
         }
     });
 
@@ -21,4 +22,3 @@ function sanitiseObj (obj) {
 }
 
 module.exports = { sanitiseObj };
-
