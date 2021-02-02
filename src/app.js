@@ -11,6 +11,4 @@ const usersRouter = require('./routers/usersRouter');
 
 app.use('/users', usersRouter);
 
-
-
 module.exports = app;

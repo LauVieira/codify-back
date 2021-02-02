@@ -1,27 +1,16 @@
 const router = require('express').Router();
 const bcrypt = require('bcrypt');
 const usersController = require('../controllers/usersController');
-const { user } = require('../schemas/usersSchemas');
-const { sanitiseObj } = require('../utils/generalFunctions'); 
+const validateUser = require('../middlewares/validateUser');
 
-router.post('/sign-up', async (req,res) => {
-    const validation = user.validate(req.body);
-    if(validation.error) {
-        return res.sendStatus(422);
-    }
-    const userData = sanitiseObj(req.body);
-    const checkExistingUser = await usersController.findUserByEmail(userData.email);
-    if(checkExistingUser){
-        return res.sendStatus(403);
-    }
-
-    const hashedPassword = bcrypt.hashSync(userData.password, 10);
-    const savedUser = await usersController.saveUser(userData.name, userData.email, hashedPassword);
-    return res.send(savedUser).status(201);
-})
-
-
-
-
+router.post('/sign-up', validateUser, async (req, res) => {
+  const hashedPassword = bcrypt.hashSync(req.userData.password, 10);
+  const savedUser = await usersController.saveUser(
+    req.userData.name,
+    req.userData.email,
+    hashedPassword,
+  );
+  return res.status(201).send(savedUser);
+});
 
 module.exports = router;
