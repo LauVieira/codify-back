@@ -7,6 +7,7 @@ const cookieParser = require('cookie-parser');
 const express = require('express');
 const cors = require('cors');
 
+const { userAuthentication } = require('./middlewares')
 const usersRouter = require('./routers/usersRouter');
 const coursesRouter = require('./routers/coursesRouter');
 const NotFoundError = require('./errors/NotFoundError');
@@ -21,7 +22,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use('/users', usersRouter);
-app.use('/courses', coursesRouter);
+app.use('/courses', userAuthentication, coursesRouter);
 
 app.use((error, req, res, next) => {
   if (error instanceof NotFoundError) return res.sendStatus(404).send(error.message);

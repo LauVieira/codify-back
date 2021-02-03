@@ -11,7 +11,7 @@
     "dev": "npx nodemon src/server.js",
     "migrations": "npx sequelize-cli db:migrate",
     "start": "node src/server.js",
-    "seed": "npx sequelize-cli db:seed"
+    "seed": "npx sequelize-cli db:seed:all"
   },
   "keywords": [],
   "author": "",

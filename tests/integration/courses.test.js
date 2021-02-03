@@ -35,6 +35,7 @@ describe('GET /courses', () => {
       password: '123456',
     };
     const response = await agent.post('/users/sign-in').send(body);
+    /* eslint-disable-next-line no-console */
     console.log(response.req.headers);
     expect(response.status).toBe(200);
   });
