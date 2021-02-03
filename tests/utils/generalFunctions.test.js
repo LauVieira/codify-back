@@ -56,6 +56,6 @@ describe('sanitiseObj - function created to use the lib strip-html with any know
         const parameter = 'not object';
 
         const expected = generalFunctions.sanitiseObj(parameter);
-		expect(expected).toBe(undefined);
+		expect(expected).toBe(null);
     });
 });

@@ -13,5 +13,3 @@ async function userAuthentication(req, res, next) {
 }
 
 module.exports = userAuthentication;
-
-// no app: if (err instanceof UnauthorizedError) res.status(401).send(err.message);
