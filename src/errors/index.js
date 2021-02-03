@@ -1,3 +1,5 @@
-module.exports = {  
-    
+const UnauthorizedError = require('./UnauthorizedError');
+
+module.exports = {
+  UnauthorizedError,
 };
