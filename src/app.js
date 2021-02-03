@@ -13,8 +13,8 @@ app.use(cors());
 app.use(express.json());
 
 app.use((error, res, req, next) => {
-    console.error(error);
-    res.status(500).send({message: 'Internet server error'});
+  console.error(error);
+  res.status(500).send({ message: 'Internet server error' });
 });
 
 module.exports = app;

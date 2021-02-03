@@ -1,11 +1,11 @@
 const jwt = require('jsonwebtoken');
 const { UnauthorizedError } = require('../errors');
 
-function userAuthentication(req, res, next) {
+async function userAuthentication(req, res, next) {
   const { token } = req.headers;
   if (!token) throw new UnauthorizedError('Token not found');
 
-  jwt.verify(token, process.env.SECRET, (err, decoded) => {
+  await jwt.verify(token, process.env.SECRET, (err, decoded) => {
     if (err) throw new UnauthorizedError('Token invalid');
     req.user = decoded.selectedUser;
   });
