@@ -10,7 +10,7 @@ router.post('/sign-up', validateUser, async (req, res) => {
     req.userData.email,
     hashedPassword,
   );
-  return res.status(201).send(savedUser);
+  res.status(201).send(savedUser);
 });
 
 module.exports = router;
