@@ -25,8 +25,8 @@ describe('POST /users/sign-up', () => {
     const body = {
       name: 'test',
       email: 'test@test.com',
-      password: '123456',
-      confirmPassword: '123456',
+      password: '1Ju23123',
+      confirmPassword: '1Ju23123',
     };
     const response = await agent.post('/users/sign-up').send(body);
     expect(response.status).toBe(201);
@@ -45,12 +45,11 @@ describe('POST /users/sign-up', () => {
     const body = {
       name: 'test',
       email: 'test@test.com',
-      password: '123456',
-      confirmPassword: '123456',
+      password: '1Ju23123',
+      confirmPassword: '1Ju23123',
     };
     await db.query('INSERT INTO users (name, email, password) values ($1, $2, $3)', [body.name, body.email, body.password]);
     const response = await agent.post('/users/sign-up').send(body);
-    console.log(response);
     expect(response.status).toBe(409);
   });
 });
