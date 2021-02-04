@@ -13,20 +13,17 @@ module.exports = async (req, res, next) => {
   } catch (err) {
     if (err instanceof InvalidDataError) {
       console.error(err);
-      return res.status(422).json({
+      res.status(422).json({
         error: 'Não foi possível processar o formato dos dados',
         details: err.details,
       });
     }
     if (err instanceof ConflictError) {
-      return res.status(409).json({
+      console.error(err);
+      res.status(409).json({
         error: 'Email selecionado já existe na plataforma!',
         details: err.details,
       });
     }
-    console.error(err);
-    return res.status(500).json({
-      error: 'Erro interno do servidor!',
-    });
   }
 };
