@@ -6,7 +6,7 @@ describe('sanitiseObj - function created to use the lib strip-html with any know
             id: 1,
             secretKey: 'uuid_gerado_aleatoriamente',
             status: 'whitePlay',
-        }
+        };
 
         const expected = generalFunctions.sanitiseObj(obj);
 		expect(expected).toEqual(obj);
@@ -22,7 +22,7 @@ describe('sanitiseObj - function created to use the lib strip-html with any know
                 secretKey: 'uuid_gerado_aleatoriamente',
                 status: 'whitePlay',
             }
-        }
+        };
        
         const expected = generalFunctions.sanitiseObj(obj);
 		expect(expected).toEqual(obj);
@@ -33,12 +33,12 @@ describe('sanitiseObj - function created to use the lib strip-html with any know
             id: 3,
             secretKey: '<h1>malicious key</h1>',
             status: ['whitePlay', 2],
-        }
+        };
         const expectedObj = {
             id: 3,
             secretKey: 'malicious key',
             status: ['whitePlay', 2],
-        }
+        };
        
         const expected = generalFunctions.sanitiseObj(obj);
 		expect(expected).toEqual(expectedObj);
