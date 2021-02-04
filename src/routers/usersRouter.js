@@ -4,10 +4,11 @@ const usersController = require('../controllers/usersController');
 const validateUser = require('../middlewares/validateUser');
 
 router.post('/sign-up', validateUser, async (req, res) => {
-  const hashedPassword = bcrypt.hashSync(req.userData.password, 10);
+  const { name, email, password } = req.userData;
+  const hashedPassword = bcrypt.hashSync(password, 10);
   const savedUser = await usersController.saveUser(
-    req.userData.name,
-    req.userData.email,
+    name,
+    email,
     hashedPassword,
   );
   res.status(201).send(savedUser);
