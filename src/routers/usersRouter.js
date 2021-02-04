@@ -39,7 +39,7 @@ router.post('/sign-in', async (req, res) => {
   };
   const token = jwt.sign(selectedUser, process.env.SECRET);
   res.cookie('token', token);
-  res.sendStatus(200);
+  res.status(200).send(selectedUser);
 });
 
 module.exports = router;
