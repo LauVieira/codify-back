@@ -20,7 +20,7 @@ describe('saveUser', () => {
       email: 'test@test.com',
       password: '123456',
     };
-    User.create.mockResolvedValue(expectedObject);
+    User.create.mockResolvedValueOnce(expectedObject);
     const user = await usersController.saveUser(body.name, body.email, body.password);
     expect(user).toEqual(expectedObject);
   });

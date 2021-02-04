@@ -9,11 +9,14 @@ const agent = supertest(app);
 const db = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
-beforeAll(async () => {
+async function cleanDataBase() {
   await db.query('DELETE FROM users');
+}
+beforeAll(async () => {
+  await cleanDataBase;
 });
 afterAll(async () => {
-  await db.query('DELETE FROM users;');
+  await cleanDataBase;
   await sequelize.close();
   await db.end();
 });

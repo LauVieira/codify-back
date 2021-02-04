@@ -12,13 +12,12 @@ app.use(cookieParser());
 app.use(cors());
 app.use(express.json());
 
-
 const usersRouter = require('./routers/usersRouter');
 
 app.use('/users', usersRouter);
 app.use((error, res, req, next) => {
-    console.error(error);
-    res.status(500).send({message: 'Internet server error'});
+  console.error(error);
+  res.status(500).send({ message: 'Erro interno do servidor' });
 });
 
 module.exports = app;

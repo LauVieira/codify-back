@@ -1,8 +1,7 @@
 /* eslint-disable consistent-return */
 const { sanitiseObj } = require('../utils/generalFunctions');
 const UsersController = require('../controllers/usersController');
-const InvalidDataError = require('../errors/InvalidDataError');
-const ConflictError = require('../errors/ConflictError');
+const { ConflictError, InvalidDataError } = require('../errors');
 
 module.exports = async (req, res, next) => {
   try {
@@ -13,20 +12,21 @@ module.exports = async (req, res, next) => {
     next();
   } catch (err) {
     if (err instanceof InvalidDataError) {
+      console.error(err);
       return res.status(422).json({
-        error: 'Invalid body format!',
+        error: 'Não foi possível processar o formato dos dados',
         details: err.details,
       });
     }
     if (err instanceof ConflictError) {
       return res.status(409).json({
-        error: 'Conflict!',
+        error: 'Email selecionado já existe na plataforma!',
         details: err.details,
       });
     }
     console.error(err);
     return res.status(500).json({
-      error: 'Internal server error!',
+      error: 'Erro interno do servidor!',
     });
   }
 };
