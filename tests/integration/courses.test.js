@@ -30,7 +30,7 @@ afterAll(async () => {
   await db.end();
 });
 
-describe('GET /courses', () => {
+describe('GET /courses/suggestions', () => {
   let user = {};
 
   beforeEach(async () => {
@@ -38,12 +38,6 @@ describe('GET /courses', () => {
     const dbUser = await db.query(`INSERT INTO users (email, password, name)
       VALUES ($1, $2, $3) RETURNING *`, values);
     [user] = dbUser.rows;
-  });
-
-  it('should return 200 when requested with valid cookie', async () => {
-    const token = getToken(user);
-    const response = await agent.get('/courses/suggestions').set('Cookie', `token=${token}`);
-    expect(response.status).toBe(200);
   });
 
   it('should return 401 when cookie is invalid', async () => {
@@ -55,5 +49,17 @@ describe('GET /courses', () => {
   it('should return 401 when no cookie is sent', async () => {
     const response = await agent.get('/courses/suggestions');
     expect(response.status).toBe(401);
+  });
+
+  it('should return 200 when requested with valid cookie', async () => {
+    const token = getToken(user);
+    const response = await agent.get('/courses/suggestions').set('Cookie', `token=${token}`);
+    expect(response.status).toBe(200);
+  });
+
+  it('should return array when called', async () => {
+    const token = getToken(user);
+    const response = await agent.get('/courses/suggestions').set('Cookie', `token=${token}`);
+    expect(Array.isArray(response.body)).toBe(true);
   });
 });
