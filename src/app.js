@@ -17,9 +17,10 @@ app.use(cookieParser());
 
 app.use('/users', usersRouter);
 
+/* eslint-disable-next-line no-unused-vars */
 app.use((error, req, res, next) => {
   if (error instanceof NotFoundError) return res.sendStatus(404);
-  if (error instanceof InvalidDataError) return res.sendStatus(422);
+  if (error instanceof InvalidDataError) return res.status(422).send(error.message);
   if (error instanceof ConflictError) return res.sendStatus(409);
   return res.sendStatus(500);
 });
