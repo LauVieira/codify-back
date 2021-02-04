@@ -1,7 +1,5 @@
 /* eslint-disable no-undef */
-const dotenv = require('dotenv');
-
-dotenv.config();
+require('dotenv').config();
 const { Pool } = require('pg');
 const supertest = require('supertest');
 const app = require('../../src/app');
@@ -52,6 +50,7 @@ describe('POST /users/sign-up', () => {
     };
     await db.query('INSERT INTO users (name, email, password) values ($1, $2, $3)', [body.name, body.email, body.password]);
     const response = await agent.post('/users/sign-up').send(body);
+    console.log(response);
     expect(response.status).toBe(409);
   });
 });

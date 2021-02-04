@@ -22,7 +22,7 @@ describe('saveUser', () => {
     };
     User.create.mockResolvedValue(expectedObject);
     const user = await usersController.saveUser(body.name, body.email, body.password);
-    expect(user).toBe(expectedObject);
+    expect(user).toEqual(expectedObject);
   });
 });
 describe('findUserByEmail', () => {
@@ -31,8 +31,8 @@ describe('findUserByEmail', () => {
     const expectedObject = {
       id: 1, email, name: 'test', password: '123456',
     };
-    User.findOne.mockResolvedValue(expectedObject);
+    User.findOne.mockResolvedValueOnce(expectedObject);
     const user = await usersController.findUserByEmail(email);
-    expect(user).toBe(expectedObject);
+    expect(user).toEqual(expectedObject);
   });
 });

@@ -1,18 +1,32 @@
 /* eslint-disable consistent-return */
-const { user } = require('../schemas/usersSchemas');
 const { sanitiseObj } = require('../utils/generalFunctions');
-const usersController = require('../controllers/usersController');
+const UsersController = require('../controllers/usersController');
+const InvalidDataError = require('../errors/InvalidDataError');
+const ConflictError = require('../errors/ConflictError');
 
 module.exports = async (req, res, next) => {
-  const validation = user.validate(req.body);
-  if (validation.error) {
-    return res.sendStatus(422);
+  try {
+    const userData = sanitiseObj(req.body);
+    UsersController.validateUser(req.body);
+    await UsersController.checkExistingUser(userData.email);
+    req.userData = userData;
+    next();
+  } catch (err) {
+    if (err instanceof InvalidDataError) {
+      return res.status(422).json({
+        error: 'Invalid body format!',
+        details: err.details,
+      });
+    }
+    if (err instanceof ConflictError) {
+      return res.status(409).json({
+        error: 'Conflict!',
+        details: err.details,
+      });
+    }
+    console.error(err);
+    return res.status(500).json({
+      error: 'Internal server error!',
+    });
   }
-  const userData = sanitiseObj(req.body);
-  const checkExistingUser = await usersController.findUserByEmail(userData.email);
-  if (checkExistingUser) {
-    return res.sendStatus(409);
-  }
-  req.userData = userData;
-  next();
 };
