@@ -42,18 +42,18 @@ describe('GET /courses', () => {
 
   it('should return 200 when requested with valid cookie', async () => {
     const token = getToken(user);
-    const response = await agent.get('/courses').set('Cookie', `token=${token}`);
+    const response = await agent.get('/courses/suggestions').set('Cookie', `token=${token}`);
     expect(response.status).toBe(200);
   });
 
   it('should return 401 when cookie is invalid', async () => {
-    const token = 'lalala';
-    const response = await agent.get('/courses').set('Cookie', `token=${token}`);
+    const token = 'wrong_token';
+    const response = await agent.get('/courses/suggestions').set('Cookie', `token=${token}`);
     expect(response.status).toBe(401);
   });
 
   it('should return 401 when no cookie is sent', async () => {
-    const response = await agent.get('/courses');
+    const response = await agent.get('/courses/suggestions');
     expect(response.status).toBe(401);
   });
 });
