@@ -1,18 +1,21 @@
 require('express-async-errors');
 require('dotenv').config();
-require('express-async-errors');
-require('./utils/loadRelationships');
+// require('./utils/loadRelationships');
 
 const cookieParser = require('cookie-parser');
 const express = require('express');
 const cors = require('cors');
 
-const { userAuthentication } = require('./middlewares')
+const { userAuthentication } = require('./middlewares');
 const usersRouter = require('./routers/usersRouter');
 const coursesRouter = require('./routers/coursesRouter');
-const NotFoundError = require('./errors/NotFoundError');
-const InvalidDataError = require('./errors/InvalidDataError');
-const ConflictError = require('./errors/ConflictError');
+const {
+  ConflictError,
+  ForbbidenError,
+  InvalidDataError,
+  NotFoundError,
+  UnauthorizedError,
+} = require('./errors');
 
 const app = express();
 
@@ -25,9 +28,12 @@ app.use('/users', usersRouter);
 app.use('/courses', userAuthentication, coursesRouter);
 
 app.use((error, req, res, next) => {
-  if (error instanceof NotFoundError) return res.sendStatus(404).send(error.message);
-  if (error instanceof InvalidDataError) return res.sendStatus(422).send(error.message);
-  if (error instanceof ConflictError) return res.sendStatus(409).send(error.message);
+  if (error instanceof NotFoundError) return res.status(404).send(error.message);
+  if (error instanceof InvalidDataError) return res.status(422).send(error.message);
+  if (error instanceof ConflictError) return res.status(409).send(error.message);
+  if (error instanceof UnauthorizedError) return res.status(401).send(error.message);
+  /* eslint-disable-next-line no-console */
+  console.error(error);
   return res.sendStatus(500);
 });
 

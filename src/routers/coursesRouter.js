@@ -6,7 +6,9 @@ const router = require('express').Router();
 
 router.get('/', (req, res) => {
   const testing = { message: 'testing', user: req.user };
-  res.send(testing);
+  /* eslint-disable-next-line no-console */
+  console.log(testing);
+  res.sendStatus(200);
 });
 
 module.exports = router;
