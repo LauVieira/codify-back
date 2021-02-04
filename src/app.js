@@ -27,6 +27,7 @@ app.use(cookieParser());
 app.use('/users', usersRouter);
 app.use('/courses', userAuthentication, coursesRouter);
 
+/* eslint-disable-next-line no-unused-vars */
 app.use((error, req, res, next) => {
   if (error instanceof NotFoundError) return res.status(404).send(error.message);
   if (error instanceof InvalidDataError) return res.status(422).send(error.message);

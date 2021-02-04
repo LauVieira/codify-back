@@ -1,5 +1,4 @@
-/* global afterAll, it, describe, expect, jest */
-
+/* global afterAll, jest, describe, it, expect  */
 const dotenv = require('dotenv');
 
 dotenv.config();

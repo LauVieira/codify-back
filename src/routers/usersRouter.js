@@ -24,19 +24,22 @@ router.post('/sign-up', async (req, res) => {
 
 router.post('/sign-in', async (req, res) => {
   const validation = signIn.validate(req.body);
-  if (validation.error) throw new InvalidDataError();
+  if (validation.error) throw new InvalidDataError('Informações inválidas');
 
   const userData = sanitiseObj(req.body);
   let selectedUser = await usersController.findUserByEmail(userData.email);
-  if (!selectedUser) throw new NotFoundError();
+  if (!selectedUser) throw new NotFoundError('Usuário não encontrado');
 
   const valid = bcrypt.compareSync(userData.password, selectedUser.password);
-  if (!valid) throw new InvalidDataError();
-  selectedUser = selectedUser.dataValues;
-
+  if (!valid) throw new InvalidDataError('Senha incorreta');
+  selectedUser = {
+    id: selectedUser.id,
+    email: selectedUser.email,
+    name: selectedUser.name,
+  };
   const token = jwt.sign(selectedUser, process.env.SECRET);
   res.cookie('token', token);
-  res.sendStatus(200);
+  res.status(200).send(selectedUser);
 });
 
 module.exports = router;
