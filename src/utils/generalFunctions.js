@@ -1,6 +1,6 @@
 const { stripHtml } = require('string-strip-html');
 
-function sanitiseObj(obj) {
+function sanitiseObj (obj) {
   if (obj === null || typeof (obj) !== 'object') return;
   const newObj = Array.isArray(obj) ? [] : {};
 

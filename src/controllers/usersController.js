@@ -4,11 +4,11 @@ const User = require('../models/User');
 const { user } = require('../schemas/usersSchemas');
 
 class UsersControllers {
-  saveUser(name, email, password) {
+  saveUser (name, email, password) {
     return User.create({ name, email, password });
   }
 
-  findUserByEmail(email) {
+  findUserByEmail (email) {
     return User.findOne({
       where: {
         email,
@@ -16,7 +16,7 @@ class UsersControllers {
     });
   }
 
-  validateUser(userData) {
+  validateUser (userData) {
     const validation = user.validate(userData);
     if (validation.error) {
       throw new InvalidDataError(
@@ -25,13 +25,11 @@ class UsersControllers {
     }
   }
 
-  async checkExistingUser(email) {
+  async checkExistingUser (email) {
     const existingUser = await this.findUserByEmail(email);
     if (existingUser) {
       throw new ConflictError();
-    } else {
-      return existingUser;
-    }
+    } 
   }
 }
 

@@ -9,20 +9,21 @@ const agent = supertest(app);
 const db = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
-async function cleanDataBase() {
+async function cleanDataBase () {
   await db.query('DELETE FROM users');
 }
 beforeAll(async () => {
-  await cleanDataBase;
+  await cleanDataBase();
 });
 afterAll(async () => {
-  await cleanDataBase;
+  await cleanDataBase();
   await sequelize.close();
   await db.end();
 });
 jest.mock('bcrypt', () => ({
   hashSync: (password) => password,
 }));
+
 describe('POST /users/sign-up', () => {
   it('should return 201 when passed valid parameters', async () => {
     const body = {
@@ -34,6 +35,7 @@ describe('POST /users/sign-up', () => {
     const response = await agent.post('/users/sign-up').send(body);
     expect(response.status).toBe(201);
   });
+
   it('should return 422 when passed invalid parameters', async () => {
     const body = {
       name: 'test',
@@ -44,6 +46,7 @@ describe('POST /users/sign-up', () => {
     const response = await agent.post('/users/sign-up').send(body);
     expect(response.status).toBe(422);
   });
+  
   it('should return 409 when email already exists', async () => {
     const body = {
       name: 'test',

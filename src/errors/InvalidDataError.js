@@ -1,5 +1,5 @@
 class InvalidDataError extends Error {
-  constructor(details) {
+  constructor (details) {
     super();
     this.details = details;
   }

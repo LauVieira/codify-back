@@ -7,6 +7,7 @@ jest.mock('bcrypt', () => ({
 }));
 jest.mock('../../src/models/User');
 jest.mock('sequelize');
+
 describe('saveUser', () => {
   it('should return a user with id', async () => {
     const body = {
@@ -25,6 +26,7 @@ describe('saveUser', () => {
     expect(user).toEqual(expectedObject);
   });
 });
+
 describe('findUserByEmail', () => {
   it('should return the same object', async () => {
     const email = 'test@test.com';
