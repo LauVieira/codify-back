@@ -57,7 +57,7 @@ describe('GET /courses/suggestions', () => {
     expect(response.status).toBe(200);
   });
 
-  it('should return array when called', async () => {
+  it('should return an array when called', async () => {
     const token = getToken(user);
     const response = await agent.get('/courses/suggestions').set('Cookie', `token=${token}`);
     expect(Array.isArray(response.body)).toBe(true);

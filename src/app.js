@@ -1,6 +1,6 @@
 require('express-async-errors');
 require('dotenv').config();
-// require('./utils/loadRelationships');
+require('./utils/loadRelationships');
 
 const cookieParser = require('cookie-parser');
 const express = require('express');
