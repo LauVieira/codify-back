@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 const { sanitiseObj } = require('../utils/generalFunctions');
 const usersController = require('../controllers/usersController');
 const { user, signIn } = require('../schemas/usersSchemas');
-const NotFoundError = require('../errors/NotFoundError');
+const UnauthorizedError = require('../errors/UnauthorizedError');
 const InvalidDataError = require('../errors/InvalidDataError');
 
 router.post('/sign-up', async (req, res) => {
@@ -28,10 +28,10 @@ router.post('/sign-in', async (req, res) => {
 
   const userData = sanitiseObj(req.body);
   let selectedUser = await usersController.findUserByEmail(userData.email);
-  if (!selectedUser) throw new NotFoundError('Usuário não encontrado');
+  if (!selectedUser) throw new UnauthorizedError('Email ou senha incorretos');
 
   const valid = bcrypt.compareSync(userData.password, selectedUser.password);
-  if (!valid) throw new InvalidDataError('Senha incorreta');
+  if (!valid) throw new UnauthorizedError('Email ou senha incorretos');
   selectedUser = {
     id: selectedUser.id,
     email: selectedUser.email,
