@@ -23,6 +23,7 @@ function getToken(user) {
 
 beforeEach(async () => {
   await db.query('DELETE FROM users');
+  await db.query('DELETE FROM courses');
 });
 
 afterAll(async () => {
@@ -32,12 +33,19 @@ afterAll(async () => {
 
 describe('GET /courses/suggestions', () => {
   let user = {};
+  let courses = [];
 
   beforeEach(async () => {
-    const values = ['test@test.com', '123456', 'Test'];
+    const userValues = ['test@test.com', '123456', 'Test'];
+    const courseValues = ['Test title', 'Test description', 'Test icon', 'Test background'];
+
     const dbUser = await db.query(`INSERT INTO users (email, password, name)
-      VALUES ($1, $2, $3) RETURNING *`, values);
+      VALUES ($1, $2, $3) RETURNING *`, userValues);
+    const dbCourse = await db.query(`INSERT INTO courses (title, description, icon, background)
+      VALUES ($1, $2, $3, $4) RETURNING *`, courseValues);
+
     [user] = dbUser.rows;
+    courses = dbCourse.rows;
   });
 
   it('should return 401 when cookie is invalid', async () => {
@@ -60,6 +68,10 @@ describe('GET /courses/suggestions', () => {
   it('should return an array when called', async () => {
     const token = getToken(user);
     const response = await agent.get('/courses/suggestions').set('Cookie', `token=${token}`);
-    expect(Array.isArray(response.body)).toBe(true);
+    expect(response.body).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining(courses[0]),
+      ]),
+    );
   });
 });
