@@ -1,11 +1,11 @@
-const { userSchema } = require('../schemas/usersSchemas');
+/* eslint-disable consistent-return */
+const { sanitiseObj } = require('../utils/generalFunctions');
+const UsersController = require('../controllers/usersController');
 
-module.exports = (req, res, next) => {
-  const { error } = userSchema.validate(req.body);
-
-  if (error) {
-    return res.sendStatus(422);
-  }
-
+module.exports = async (req, res, next) => {
+  const userData = sanitiseObj(req.body);
+  UsersController.validateUser(req.body);
+  await UsersController.checkExistingUser(userData.email);
+  req.userData = userData;
   next();
 };
