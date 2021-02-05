@@ -1,13 +1,21 @@
 require('express-async-errors');
 require('dotenv').config();
-require('express-async-errors');
+// require('./utils/loadRelationships');
 
 const cookieParser = require('cookie-parser');
 const express = require('express');
 const cors = require('cors');
 
+const { userAuthentication } = require('./middlewares');
 const usersRouter = require('./routers/usersRouter');
-const { NotFoundError, InvalidDataError, ConflictError, UnauthorizedError, ForbiddenError } = require('./errors');
+const coursesRouter = require('./routers/coursesRouter');
+const {
+  ConflictError,
+  ForbbidenError,
+  InvalidDataError,
+  NotFoundError,
+  UnauthorizedError,
+} = require('./errors');
 
 const app = express();
 
@@ -17,6 +25,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use('/users', usersRouter);
+app.use('/courses', userAuthentication, coursesRouter);
 
 /* eslint-disable-next-line no-unused-vars */
 app.use((error, req, res, next) => {
