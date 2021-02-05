@@ -87,5 +87,5 @@ describe('POST /users/sign-in', () => {
       };
       const response = await agent.post('/users/sign-in').send(body);
       expect(response.status).toBe(404);
-    })
-})
+    });
+});
