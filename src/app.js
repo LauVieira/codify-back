@@ -1,6 +1,10 @@
 require('express-async-errors');
 require('dotenv').config();
+<<<<<<< HEAD
 // require('./utils/loadRelationships');
+=======
+require('express-async-errors');
+>>>>>>> main
 
 const cookieParser = require('cookie-parser');
 const express = require('express');
@@ -27,13 +31,22 @@ app.use(cookieParser());
 app.use('/users', usersRouter);
 app.use('/courses', userAuthentication, coursesRouter);
 
+/* eslint-disable-next-line no-unused-vars */
 app.use((error, req, res, next) => {
+<<<<<<< HEAD
   if (error instanceof NotFoundError) return res.status(404).send(error.message);
   if (error instanceof InvalidDataError) return res.status(422).send(error.message);
   if (error instanceof ConflictError) return res.status(409).send(error.message);
   if (error instanceof UnauthorizedError) return res.status(401).send(error.message);
   /* eslint-disable-next-line no-console */
   console.error(error);
+=======
+  if (error instanceof NotFoundError) return res.status(404).send(error.details);
+  if (error instanceof InvalidDataError) return res.status(422).send(error.details);
+  if (error instanceof ConflictError) return res.status(409).send(error.details);
+  if (error instanceof UnauthorizedError) return res.status(401).send(error.details);
+  if (error instanceof ForbiddenError) return res.status(403).send(error.details);
+>>>>>>> main
   return res.sendStatus(500);
 });
 
