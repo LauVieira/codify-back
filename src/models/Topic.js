@@ -1,5 +1,6 @@
 const { Sequelize } = require('sequelize');
 const sequelize = require('../utils/database');
+const Lesson = require('./Lesson');
 
 class Topic extends Sequelize.Model {
 
@@ -34,5 +35,7 @@ Topic.init({
   sequelize,
   modelName: 'topic',
 });
+
+Topic.hasMany(Lesson);
 
 module.exports = Topic;

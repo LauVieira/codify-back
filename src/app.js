@@ -6,6 +6,8 @@ const cookieParser = require('cookie-parser');
 const express = require('express');
 const cors = require('cors');
 
+const userAuthentication = require('./middlewares/userAuthentication');
+const coursesRouter = require('./routers/coursesRouter');
 const usersRouter = require('./routers/usersRouter');
 const { NotFoundError, InvalidDataError, ConflictError, UnauthorizedError, ForbiddenError } = require('./errors');
 
@@ -17,6 +19,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use('/users', usersRouter);
+app.use('/courses', userAuthentication, coursesRouter);
 
 /* eslint-disable-next-line no-unused-vars */
 app.use((error, req, res, next) => {
@@ -25,6 +28,7 @@ app.use((error, req, res, next) => {
   if (error instanceof ConflictError) return res.status(409).send(error.details);
   if (error instanceof UnauthorizedError) return res.status(401).send(error.details);
   if (error instanceof ForbiddenError) return res.status(403).send(error.details);
+  console.log(error);
   return res.sendStatus(500);
 });
 

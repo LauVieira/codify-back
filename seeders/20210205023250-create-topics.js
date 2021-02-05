@@ -2,26 +2,32 @@
 
 module.exports = {
   up: async (queryInterface) => {
+    const courses = await queryInterface.sequelize.query(
+      'SELECT id from COURSES;'
+    );
+
+    const coursesRows = courses[0];
+
     await queryInterface.bulkInsert('topics', [
       {
         name: 'Apresentação',
-        courseId: '1',
+        courseId: coursesRows[0].id,
       },
       {
         name: 'Preparando o ambiente',
-        courseId: '1',
+        courseId: coursesRows[0].id,
       },
       {
         name: 'Introdução à linguagem JS',
-        courseId: '1',
+        courseId: coursesRows[0].id,
       },
       {
         name: 'Variáveis e tipos de dados',
-        courseId: '1',
+        courseId: coursesRows[0].id,
       },
       {
         name: 'Estruturas lógicas e condicionais',
-        courseId: '1',
+        courseId: coursesRows[0].id,
       },
     ], {});
 
