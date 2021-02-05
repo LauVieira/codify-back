@@ -22,7 +22,7 @@ describe('getSuggestions', () => {
 
 // describe('getCourse', () => {
 //   it('should return a course', async () => {
-//     const id = 31;
+//     const id = 1;
 //     const spy = jest.spyOn(Course, 'findByPk');
 //     coursesController.getCourse(id);
 
