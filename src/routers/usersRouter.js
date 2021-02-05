@@ -26,10 +26,10 @@ router.post('/sign-in', async (req, res) => {
 
   const userData = sanitiseObj(req.body);
   let selectedUser = await usersController.findUserByEmail(userData.email);
-  if (!selectedUser) throw new UnauthorizedError(validation.error.details.map((e) => e.message));
+  if (!selectedUser) throw new UnauthorizedError('Usuário ou senha inválidos');
 
   const valid = bcrypt.compareSync(userData.password, selectedUser.password);
-  if (!valid) throw new UnauthorizedError(validation.error.details.map((e) => e.message));
+  if (!valid) throw new UnauthorizedError('Usuário ou senha inválidos');
   selectedUser = {
     id: selectedUser.id,
     email: selectedUser.email,
