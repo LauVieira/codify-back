@@ -2,7 +2,7 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    return queryInterface.bulkInsert('courses', [
+    queryInterface.bulkInsert('courses', [
       {
         title: 'JavaScript para Iniciantes',
         description: 'Aprenda JavaScript do zero hoje!',
