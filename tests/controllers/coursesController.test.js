@@ -19,3 +19,15 @@ describe('getSuggestions', () => {
     );
   });
 });
+
+// describe('getCourse', () => {
+//   it('should return a course', async () => {
+//     const id = 31;
+//     const spy = jest.spyOn(Course, 'findByPk');
+//     coursesController.getCourse(id);
+
+//     expect(spy).toHaveBeenCalled();
+//     expect(spy).toHaveBeenCalledWith(id),
+//     );
+//   });
+// });
