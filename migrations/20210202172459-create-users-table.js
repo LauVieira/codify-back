@@ -8,19 +8,6 @@ module.exports = {
         primaryKey: true,
       },
       email: {
-<<<<<<< HEAD
-        type: Sequelize.STRING(150),
-        allowNull: false,
-      },
-      password: {
-        type: Sequelize.STRING(150),
-        allowNull: false,
-      },
-      name: {
-        type: Sequelize.STRING(150),
-        allowNull: false,
-      },
-=======
         type: Sequelize.STRING,
         allowNull: false,
       },
@@ -40,7 +27,6 @@ module.exports = {
         type: Sequelize.DATE,
         allowNull: true,
       },
->>>>>>> main
     });
   },
   down: async (queryInterface) => {

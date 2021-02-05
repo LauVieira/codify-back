@@ -8,9 +8,6 @@ module.exports = {
     sourceType: 'module',
   },
   rules: {
-<<<<<<< HEAD
-    'consistent-return': 'off'
-=======
     'class-methods-use-this': 'off',
     'semi': [2, 'always'],
     'object-curly-spacing': ['error', 'always'],
@@ -21,6 +18,5 @@ module.exports = {
     'space-in-parens': ['error', 'never'],
     'eol-last': ['error', 'always'],
     'space-before-function-paren': ['error', 'always']
->>>>>>> main
   },
 };
