@@ -1,8 +1,8 @@
-class ConflictError extends Error {
+class NotFoundError extends Error {
   constructor (details) {
     super();
     this.details = details;
   }
 }
 
-module.exports = ConflictError;
+module.exports = NotFoundError;

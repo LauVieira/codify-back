@@ -1,8 +1,8 @@
-class ConflictError extends Error {
+class ForbiddenError extends Error {
   constructor (details) {
     super();
     this.details = details;
   }
 }
 
-module.exports = ConflictError;
+module.exports = ForbiddenError;

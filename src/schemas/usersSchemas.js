@@ -7,6 +7,12 @@ const user = joi.object({
   confirmPassword: joi.ref('password'),
 });
 
+const signIn = joi.object({
+  email: joi.string().email().required(),
+  password: joi.string().required(),
+});
+
 module.exports = {
   user,
+  signIn,
 };
