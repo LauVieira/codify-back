@@ -86,6 +86,6 @@ describe('POST /users/sign-in', () => {
         password: '123456',
       };
       const response = await agent.post('/users/sign-in').send(body);
-      expect(response.status).toBe(404);
+      expect(response.status).toBe(401);
     });
 });

@@ -1,15 +1,21 @@
 require('express-async-errors');
 require('dotenv').config();
-require('express-async-errors');
+require('./utils/loadRelationships');
 
 const cookieParser = require('cookie-parser');
 const express = require('express');
 const cors = require('cors');
 
-const userAuthentication = require('./middlewares/userAuthentication');
-const coursesRouter = require('./routers/coursesRouter');
+const { userAuthentication } = require('./middlewares');
 const usersRouter = require('./routers/usersRouter');
-const { NotFoundError, InvalidDataError, ConflictError, UnauthorizedError, ForbiddenError } = require('./errors');
+const coursesRouter = require('./routers/coursesRouter');
+const {
+  ConflictError,
+  ForbiddenError,
+  InvalidDataError,
+  NotFoundError,
+  UnauthorizedError,
+} = require('./errors');
 
 const app = express();
 
@@ -28,7 +34,7 @@ app.use((error, req, res, next) => {
   if (error instanceof ConflictError) return res.status(409).send(error.details);
   if (error instanceof UnauthorizedError) return res.status(401).send(error.details);
   if (error instanceof ForbiddenError) return res.status(403).send(error.details);
-  console.log(error);
+  console.error(error);
   return res.sendStatus(500);
 });
 

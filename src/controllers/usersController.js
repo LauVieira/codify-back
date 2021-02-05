@@ -28,7 +28,7 @@ class UsersControllers {
   async checkExistingUser (email) {
     const existingUser = await this.findUserByEmail(email);
     if (existingUser) {
-      throw new ConflictError();
+      throw new ConflictError('User already exists');
     } 
   }
 }

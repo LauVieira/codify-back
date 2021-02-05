@@ -14,6 +14,10 @@ const Lesson = require('../models/Lesson');
 const Exercise = require('../models/Exercise');
 
 class CoursesController {
+  getSuggestions (limit = null) {
+    return Course.findAll({ limit });
+  }
+
   async getCourse (id) {
     const course = await Course.findByPk(id);
     if (!course) throw new NotFoundError('Curso não encontrado');
@@ -26,8 +30,8 @@ class CoursesController {
         include: { 
         model: Exercise
         }
-      } });
+      } 
+    });
   }
 }
-
 module.exports = new CoursesController();

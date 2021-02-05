@@ -11,4 +11,9 @@ router.get('/:id', async (req, res) => {
   res.status(200).send({ course, program });
 });
 
+router.get('/suggestions', async (req, res) => {
+  const suggestions = await coursesController.getSuggestions();
+  res.status(200).send(suggestions);
+});
+
 module.exports = router;
