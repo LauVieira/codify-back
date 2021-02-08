@@ -10,6 +10,7 @@ module.exports = {
   },
 
   production: {
-    url: process.env.DATABASE_URL
+    url: process.env.DATABASE_URL,
+    dialectOptions: { ssl: { rejectUnauthorized: false } }
   }
 };
