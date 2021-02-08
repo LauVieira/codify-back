@@ -26,6 +26,7 @@ app.use(cookieParser());
 
 app.use('/users', usersRouter);
 app.use('/courses', userAuthentication, coursesRouter);
+app.use(cors({ origin: 'http://localhost:9000', credentials: true }));
 
 /* eslint-disable-next-line no-unused-vars */
 app.use((error, req, res, next) => {

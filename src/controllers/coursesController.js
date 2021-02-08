@@ -10,7 +10,7 @@ const {
 const Course = require('../models/Course');
 
 class CoursesController {
-  getSuggestions(limit = null) {
+  getSuggestions (limit = null) {
     return Course.findAll({ limit });
   }
 }
