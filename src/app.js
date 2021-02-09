@@ -18,14 +18,13 @@ const {
 } = require('./errors');
 
 const app = express();
+app.use(express.json());
 
 app.use(cookieParser());
 app.use(cors({ 
   credentials: true,
   origin: process.env.FRONT_URL || 'http://localhost:9000', 
 }));
-app.use(express.json());
-app.use(cookieParser());
 
 app.use('/users', usersRouter);
 app.use('/courses', userAuthentication, coursesRouter);

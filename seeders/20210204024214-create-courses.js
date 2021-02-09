@@ -25,10 +25,6 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-    queryInterface.bulkDelete('courses', [
-      { title: 'JavaScript para Iniciantes' },
-      { title: 'React para Iniciantes' },
-      { title: 'NodeJs para Iniciantes' },
-    ], {});
+    await queryInterface.bulkDelete('courses', null, {});
   },
 };
