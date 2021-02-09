@@ -11,7 +11,7 @@ Admin.init({
         primaryKey: true
     },
     password: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING,
         allowNull: false,
     },
     username: {
