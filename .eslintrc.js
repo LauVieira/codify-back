@@ -20,5 +20,6 @@ module.exports = {
     'space-before-function-paren': ['error', 'always'],
     'no-unused-vars': 'off',
     'no-console': 'off',
+    'no-return-await': 'off',
   },
 };
