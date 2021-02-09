@@ -20,10 +20,7 @@ const {
 const app = express();
 
 app.use(cookieParser());
-app.use(cors({ 
-  credentials: true,
-  origin: process.env.FRONT_URL || 'http://localhost:9000', 
-}));
+app.use(cors({ origin: 'http://localhost:9000', credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
 
