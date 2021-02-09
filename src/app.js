@@ -4,38 +4,31 @@ require('./utils/loadRelationships');
 
 const cookieParser = require('cookie-parser');
 const express = require('express');
-const cors = require('cors');
 
 const { userAuthentication } = require('./middlewares');
 const usersRouter = require('./routers/usersRouter');
 const coursesRouter = require('./routers/coursesRouter');
-const {
-  ConflictError,
-  ForbiddenError,
-  InvalidDataError,
-  NotFoundError,
-  UnauthorizedError,
-} = require('./errors');
+const Err = require('./errors');
 
 const app = express();
 
 app.use(cookieParser());
 app.use(cors({ origin: 'http://localhost:9000', credentials: true }));
 app.use(express.json());
-app.use(cookieParser());
 
 app.use('/users', usersRouter);
 app.use('/courses', userAuthentication, coursesRouter);
 
-/* eslint-disable-next-line no-unused-vars */
 app.use((error, req, res, next) => {
-  if (error instanceof NotFoundError) return res.status(404).send(error.details);
-  if (error instanceof InvalidDataError) return res.status(422).send(error.details);
-  if (error instanceof ConflictError) return res.status(409).send(error.details);
-  if (error instanceof UnauthorizedError) return res.status(401).send(error.details);
-  if (error instanceof ForbiddenError) return res.status(403).send(error.details);
   console.error(error);
-  return res.sendStatus(500);
+  const { message } = error;
+  if (error instanceof Err.NotFoundError) return res.status(404).send(message);
+  if (error instanceof Err.InvalidDataError) return res.status(422).send(message);
+  if (error instanceof Err.ConflictError) return res.status(409).send(message);
+  if (error instanceof Err.UnauthorizedError) return res.status(401).send(message);
+  if (error instanceof Err.ForbiddenError) return res.status(403).send(message);
+  
+  return res.status(500).send('Erro interno no servidor');
 });
 
 module.exports = app;
