@@ -14,7 +14,7 @@ const db = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
 
-function getToken(user) {
+function getToken (user) {
   const { id, email, name } = user;
   const userToSign = { id, email, name };
   const token = jwt.sign(userToSign, process.env.SECRET);

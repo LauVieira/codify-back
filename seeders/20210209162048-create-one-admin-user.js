@@ -7,15 +7,15 @@ const password = process.env.ADMIN_PASSWORD;
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.bulkInsert('admin', [{
+    await queryInterface.bulkInsert('admins', [{
       username,
       password: bcrypt.hashSync(password, 10),
-      createdAt: new Date.now(),
-      updatedAt: new Date.now(),
+      createdAt: new Date(Date.now()).toUTCString(),
+      updatedAt: new Date(Date.now()).toUTCString(),
     }]);
   },
 
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.bulkDelete('admin', { username }, {});
+    await queryInterface.bulkDelete('admins', { username }, {});
   }
 };

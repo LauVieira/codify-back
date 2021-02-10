@@ -14,7 +14,7 @@ class AdminController {
 
     async validateUserAndPassword (userData) {
         const { username, password } = userData;
-        const admin = await Admin.findOne({ username });
+        const admin = await Admin.findOne({ where: { username } });
 
         if (!admin) {
             throw new Err.UnauthorizedError('Username ou senha estão incorretos');
@@ -25,8 +25,8 @@ class AdminController {
             throw new Err.UnauthorizedError('Username ou senha estão incorretos');
         }
 
-        delete admin.password;
-        return admin;
+        const adminData = { id: admin.id, username: admin.username };
+        return adminData;
     }
 }
 

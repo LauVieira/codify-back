@@ -23,8 +23,8 @@ app.use('/courses', userAuthentication, coursesRouter);
 app.use('/admin', Routers.admin);
 
 app.use((error, req, res, next) => {
-  const { message } = error;
   console.error(error);
+  const { message } = error;
 
   if (error instanceof Err.NotFoundError) return res.status(404).send(message);
   if (error instanceof Err.InvalidDataError) return res.status(422).send(message);
@@ -32,7 +32,7 @@ app.use((error, req, res, next) => {
   if (error instanceof Err.UnauthorizedError) return res.status(401).send(message);
   if (error instanceof Err.ForbiddenError) return res.status(403).send(message);
   
-  return res.status(500).send('Erro interno no servidor');
+  res.status(500).send('Erro interno no servidor');
 });
 
 module.exports = app;
