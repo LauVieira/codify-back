@@ -63,3 +63,33 @@ describe('POST /admin/login', () => {
       expect(response.text).toEqual('Username ou senha estão incorretos');
   });
 });
+
+describe('POST /admin/logout', () => {
+  // Só vai funcionar o teste com o middleware de autentificação colocado no router
+  it('should return 401 when cookie is invalid', async () => {
+    const token = 'wrong_token';
+    const response = await agent.post('/admin/logout').set('Cookie', `token=${token}`);
+
+    expect(response.status).toBe(401);
+    expect(response.text).toEqual('Token inválido');
+  });
+
+  // Só vai funcionar o teste com o middleware de autentificação colocado no router
+  it('should return 401 when no cookie is sent', async () => {
+    const response = await agent.post('/admin/logout');
+
+    expect(response.status).toBe(401);
+    expect(response.text).toEqual('Token não encontrado');
+  });
+
+  it('should return 200 -> valid cookie, and destroy session', async () => {
+    const admin = await db.query('SELECT id, username FROM admins WHERE username=$1', [username]);
+    const token = jwt.sign(admin.rows[0], process.env.ADMIN_SECRET);
+
+    const response = await agent.post('/admin/logout').set('cookie', `token=${token}`);
+    
+    expect(response.status).toBe(200);
+    expect(response.text).toEqual('Logout efetuado com sucesso');
+    expect(response.headers['set-cookie'][0]).toContain('Expires');
+  });
+});
