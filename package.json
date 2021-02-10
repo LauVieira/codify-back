@@ -12,7 +12,8 @@
     "migrations": "npx sequelize-cli db:migrate",
     "start": "node src/server.js",
     "seeds": "npx sequelize-cli db:seed:all",
-    "eslint": "npx eslint --fix src"
+    "eslint": "npx eslint --fix src",
+    "eslint-tests": "npx eslint --fix tests"
   },
   "keywords": [],
   "author": "",

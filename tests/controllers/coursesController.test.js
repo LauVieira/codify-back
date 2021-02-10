@@ -1,17 +1,14 @@
 /* global jest, describe, it, expect  */
-
-const dotenv = require('dotenv');
-const coursesController = require('../../src/controllers/coursesController');
+require('dotenv').config();
+const CoursesController = require('../../src/controllers/CoursesController');
 const Course = require('../../src/models/Course');
 
 jest.mock('sequelize');
 
-dotenv.config();
-
 describe('getSuggestions', () => {
   it('should return an array', async () => {
     const spy = jest.spyOn(Course, 'findAll');
-    coursesController.getSuggestions(10);
+    CoursesController.getSuggestions(10);
 
     expect(spy).toHaveBeenCalled();
     expect(spy).toHaveBeenCalledWith(
@@ -24,7 +21,7 @@ describe('getSuggestions', () => {
 //   it('should return a course', async () => {
 //     const id = 1;
 //     const spy = jest.spyOn(Course, 'findByPk');
-//     coursesController.getCourse(id);
+//     CoursesController.getCourse(id);
 
 //     expect(spy).toHaveBeenCalled();
 //     expect(spy).toHaveBeenCalledWith(id),
