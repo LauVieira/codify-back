@@ -9,6 +9,7 @@ const { userAuthentication } = require('./middlewares');
 const usersRouter = require('./routers/usersRouter');
 const coursesRouter = require('./routers/coursesRouter');
 const Err = require('./errors');
+const cors = require('cors');
 
 const app = express();
 
@@ -17,7 +18,8 @@ app.use(cors({ origin: 'http://localhost:9000', credentials: true }));
 app.use(express.json());
 
 app.use('/users', usersRouter);
-app.use('/courses', userAuthentication, coursesRouter);
+// app.use('/courses', userAuthentication, coursesRouter);
+app.use('/courses', coursesRouter);
 
 app.use((error, req, res, next) => {
   console.error(error);
