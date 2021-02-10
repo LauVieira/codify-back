@@ -1,12 +1,4 @@
-/* eslint-disable class-methods-use-this */
-
-const {
-  ConflictError,
-  ForbbidenError,
-  InvalidDataError,
-  NotFoundError,
-  UnauthorizedError,
-} = require('../errors');
+const { NotFoundError } = require('../errors');
 
 const Course = require('../models/Course');
 const Topic = require('../models/Topic');

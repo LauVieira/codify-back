@@ -1,9 +1,7 @@
 /* global beforeEach, afterAll, it, describe, expect */
-
-const dotenv = require('dotenv');
+require('dotenv').config();
 const jwt = require('jsonwebtoken');
 
-dotenv.config();
 const { Pool } = require('pg');
 const supertest = require('supertest');
 const app = require('../../src/app');
@@ -14,7 +12,7 @@ const db = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
 
-function getToken(user) {
+function getToken (user) {
   const { id, email, name } = user;
   const userToSign = { id, email, name };
   const token = jwt.sign(userToSign, process.env.SECRET);
@@ -52,11 +50,13 @@ describe('GET /courses/suggestions', () => {
     const token = 'wrong_token';
     const response = await agent.get('/courses/suggestions').set('Cookie', `token=${token}`);
     expect(response.status).toBe(401);
+    expect(response.text).toEqual('Token inválido');
   });
 
   it('should return 401 when no cookie is sent', async () => {
     const response = await agent.get('/courses/suggestions');
     expect(response.status).toBe(401);
+    expect(response.text).toEqual('Token não encontrado');
   });
 
   it('should return 200 when requested with valid cookie', async () => {
