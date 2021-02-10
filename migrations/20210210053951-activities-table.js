@@ -10,7 +10,7 @@ module.exports = {
         primaryKey: true,
       },
       type: {
-        type: Sequelize.STRING(150),
+        type: Sequelize.ENUM('exercise', 'theory'),
         allowNull: false
       },
       topicId: {
