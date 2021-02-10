@@ -1,6 +1,5 @@
 const { Sequelize } = require('sequelize');
 const sequelize = require('../utils/database');
-const Topic = require('./Topic');
 
 class Course extends Sequelize.Model {
 
@@ -21,7 +20,7 @@ Course.init({
     type: Sequelize.STRING(150),
     allowNull: false,
   },
-  icon: {
+  photo: {
     type: Sequelize.STRING(150),
     allowNull: false,
   },
@@ -29,17 +28,9 @@ Course.init({
     type: Sequelize.STRING(150),
     allowNull: false,
   },
-  createdAt: {
-    type: Sequelize.DATE,
-  },
-  updatedAt: {
-    type: Sequelize.DATE,
-  },
 }, {
   sequelize,
   modelName: 'course',
 });
-
-Course.hasMany(Topic);
 
 module.exports = Course;

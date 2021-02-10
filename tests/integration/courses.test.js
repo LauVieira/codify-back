@@ -35,12 +35,12 @@ describe('GET /courses/suggestions', () => {
 
   beforeEach(async () => {
     const userValues = ['test@test.com', '123456', 'Test'];
-    const courseValues = ['Test title', 'Test description', 'Test icon', 'Test background'];
+    const courseValues = ['Test title', 'Test description', 'Test photo', 'Test alt', 'Test background'];
 
     const dbUser = await db.query(`INSERT INTO users (email, password, name)
       VALUES ($1, $2, $3) RETURNING *`, userValues);
-    const dbCourse = await db.query(`INSERT INTO courses (title, description, icon, background)
-      VALUES ($1, $2, $3, $4) RETURNING *`, courseValues);
+    const dbCourse = await db.query(`INSERT INTO courses (title, description, photo, alt, background)
+      VALUES ($1, $2, $3, $4, $5) RETURNING *`, courseValues);
 
     [user] = dbUser.rows;
     courses = dbCourse.rows;

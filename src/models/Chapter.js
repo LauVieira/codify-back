@@ -1,11 +1,11 @@
 const { Sequelize } = require('sequelize');
 const sequelize = require('../utils/database');
 
-class Topic extends Sequelize.Model {
+class Chapter extends Sequelize.Model {
 
 }
 
-Topic.init({
+Chapter.init({
   id: {
     type: Sequelize.INTEGER,
     autoIncrement: true,
@@ -13,17 +13,17 @@ Topic.init({
     primaryKey: true,
   },
   title: {
-    type: Sequelize.STRING,
+    type: Sequelize.STRING(150),
     allowNull: false,
     unique: true
   },
-  chapterId: {
+  courseId: {
     type: Sequelize.INTEGER,
-    allowNull: false
+    allowNull: false,
   },
 }, {
   sequelize,
-  modelName: 'topic',
+  modelName: 'chapter',
 });
 
-module.exports = Topic;
+module.exports = Chapter;

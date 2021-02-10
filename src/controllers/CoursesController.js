@@ -1,9 +1,9 @@
 const { NotFoundError } = require('../errors');
 
 const Course = require('../models/Course');
+const Chapter = require('../models/Chapter');
 const Topic = require('../models/Topic');
-const Lesson = require('../models/Lesson');
-const Exercise = require('../models/Exercise');
+const Activity = require('../models/Activity');
 
 class CoursesController {
   getSuggestions (limit = null) {
@@ -17,10 +17,10 @@ class CoursesController {
   }
 
   getProgram (courseId){
-    return Topic.findAll({ where: { courseId }, 
-      include: { model: Lesson, 
+    return Chapter.findAll({ where: { courseId }, 
+      include: { model: Topic, 
         include: { 
-        model: Exercise
+        model: Activity
         }
       } 
     });
