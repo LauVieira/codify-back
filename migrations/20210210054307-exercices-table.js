@@ -2,35 +2,27 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('topics', {
+    await queryInterface.createTable('exercices', {
       id: {
         type: Sequelize.INTEGER,
         autoIncrement: true,
         allowNull: false,
         primaryKey: true,
       },
-      name: {
-        type: Sequelize.STRING(150),
-        allowNull: false,
-        unique: true
-      },
-      courseId: {
+      activityId: {
         type: Sequelize.INTEGER,
+        allowNull: false,
         references: {
-					model: 'courses',
+					model: 'activities',
 					key: 'id'
 				}
       },
-      createdAt: {
-        type: Sequelize.DATE,
-      },
-      updatedAt: {
-        type: Sequelize.DATE,
-      },
+      createdAt: Sequelize.DATE,
+      updatedAt: Sequelize.DATE,
     });
   },
 
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('topics');
+    await queryInterface.dropTable('exercices');
   }
 };

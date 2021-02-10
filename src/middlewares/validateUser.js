@@ -1,10 +1,9 @@
-/* eslint-disable consistent-return */
 const { sanitiseObj } = require('../utils/generalFunctions');
-const UsersController = require('../controllers/usersController');
+const UsersController = require('../controllers/UsersController');
 
 module.exports = async (req, res, next) => {
   const userData = sanitiseObj(req.body);
-  UsersController.validateUser(req.body);
+  UsersController.validateUser(userData);
   await UsersController.checkExistingUser(userData.email);
   req.userData = userData;
   next();

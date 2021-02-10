@@ -15,6 +15,7 @@ User.init({
   email: {
     type: Sequelize.STRING(150),
     allowNull: false,
+    unique: true
   },
   password: {
     type: Sequelize.STRING(150),

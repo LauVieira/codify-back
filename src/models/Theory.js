@@ -1,29 +1,28 @@
 const { Sequelize } = require('sequelize');
 const sequelize = require('../utils/database');
 
-class Topic extends Sequelize.Model {
+class Theory extends Sequelize.Model {
 
 }
 
-Topic.init({
+Theory.init({
   id: {
     type: Sequelize.INTEGER,
     autoIncrement: true,
     allowNull: false,
     primaryKey: true,
   },
-  title: {
+  youtubeLink: {
     type: Sequelize.STRING,
     allowNull: false,
-    unique: true
   },
-  chapterId: {
+  activityId: {
     type: Sequelize.INTEGER,
-    allowNull: false
+    allowNull: false,
   },
 }, {
   sequelize,
-  modelName: 'topic',
+  modelName: 'theory',
 });
 
-module.exports = Topic;
+module.exports = Theory;

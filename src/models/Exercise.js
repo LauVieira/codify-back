@@ -12,27 +12,9 @@ Exercise.init({
     allowNull: false,
     primaryKey: true,
   },
-  name: {
-    type: Sequelize.STRING(150),
-    allowNull: false,
-    unique: true
-  },
-  description: {
-    type: Sequelize.STRING(150),
-    allowNull: false
-  },
-  lessonId: {
+  activityId: {
     type: Sequelize.INTEGER,
-    references: {
-      model: 'lessons',
-      key: 'id'
-    }
-  },
-  createdAt: {
-    type: Sequelize.DATE,
-  },
-  updatedAt: {
-    type: Sequelize.DATE,
+    allowNull: false,
   },
 }, {
   sequelize,
