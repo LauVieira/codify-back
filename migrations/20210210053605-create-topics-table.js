@@ -2,43 +2,32 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('lessons', {
+    await queryInterface.createTable('topics', {
       id: {
         type: Sequelize.INTEGER,
         autoIncrement: true,
         allowNull: false,
         primaryKey: true,
       },
-      name: {
+      title: {
         type: Sequelize.STRING(150),
         allowNull: false,
         unique: true
       },
-      description: {
-        type: Sequelize.STRING(150),
-        allowNull: false
-      },
-      videoLink: {
-        type: Sequelize.STRING(150),
-        allowNull: false
-      },
-      topicId: {
+      chapterId: {
         type: Sequelize.INTEGER,
+        allowNull: false,
         references: {
-					model: 'topics',
+					model: 'chapters',
 					key: 'id'
 				}
       },
-      createdAt: {
-        type: Sequelize.DATE,
-      },
-      updatedAt: {
-        type: Sequelize.DATE,
-      },
+      createdAt: Sequelize.DATE,
+      updatedAt: Sequelize.DATE,
     });
   },
 
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('lessons');
+    await queryInterface.dropTable('topics');
   }
 };
