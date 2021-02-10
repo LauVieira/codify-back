@@ -17,6 +17,8 @@ module.exports = {
     'keyword-spacing': ['error', { 'before': true, 'after': true }],
     'space-in-parens': ['error', 'never'],
     'eol-last': ['error', 'always'],
-    'space-before-function-paren': ['error', 'always']
+    'space-before-function-paren': ['error', 'always'],
+    'no-unused-vars': 'off',
+    'no-console': 'off'
   },
 };
