@@ -50,13 +50,13 @@ describe('GET /courses/suggestions', () => {
     const token = 'wrong_token';
     const response = await agent.get('/courses/suggestions').set('Cookie', `token=${token}`);
     expect(response.status).toBe(401);
-    expect(response.text).toEqual('Token inválido');
+    expect(response.body.message).toEqual('Token inválido');
   });
 
   it('should return 401 when no cookie is sent', async () => {
     const response = await agent.get('/courses/suggestions');
     expect(response.status).toBe(401);
-    expect(response.text).toEqual('Token não encontrado');
+    expect(response.body.message).toEqual('Token não encontrado');
   });
 
   it('should return 200 when requested with valid cookie', async () => {

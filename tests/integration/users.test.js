@@ -61,7 +61,7 @@ describe('POST /users/sign-up', () => {
     const response = await agent.post('/users/sign-up').send(body);
 
     expect(response.status).toBe(422);
-    expect(response.text).toEqual('Não foi possível processar o formato dos dados');
+    expect(response.body.message).toEqual('Não foi possível processar o formato dos dados');
   });
   
   it('should return 409 when email already exists', async () => {
@@ -76,7 +76,7 @@ describe('POST /users/sign-up', () => {
     const response = await agent.post('/users/sign-up').send(body);
 
     expect(response.status).toBe(409);
-    expect(response.text).toEqual('Email selecionado já existe na plataforma');
+    expect(response.body.message).toEqual('Email selecionado já existe na plataforma');
   });
 });
 
@@ -112,7 +112,7 @@ describe('POST /users/sign-in', () => {
 
     const response = await agent.post('/users/sign-in').send(body);
     expect(response.status).toBe(422);
-    expect(response.text).toEqual('Não foi possível processar o formato dos dados');
+    expect(response.body.message).toEqual('Não foi possível processar o formato dos dados');
   });
 
   it('should return 401 when email is wrong', async () => {
@@ -124,7 +124,7 @@ describe('POST /users/sign-in', () => {
     const response = await agent.post('/users/sign-in').send(body);
 
     expect(response.status).toBe(401);
-    expect(response.text).toEqual('Email ou senha estão incorretos');
+    expect(response.body.message).toEqual('Email ou senha estão incorretos');
   });
 
   it('should return 401 when password is wrong', async () => {
@@ -140,6 +140,6 @@ describe('POST /users/sign-in', () => {
     const response = await agent.post('/users/sign-in').send(body);
 
     expect(response.status).toBe(401);
-    expect(response.text).toEqual('Email ou senha estão incorretos');
+    expect(response.body.message).toEqual('Email ou senha estão incorretos');
   });
 });

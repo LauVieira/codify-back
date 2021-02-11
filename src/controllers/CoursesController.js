@@ -32,7 +32,7 @@ class CoursesController {
     return Chapter.findAll({ where: { courseId }, 
       include: { model: Topic, 
         include: { 
-        model: Activity
+          model: Activity
         }
       } 
     });

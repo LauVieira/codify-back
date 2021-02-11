@@ -13,7 +13,7 @@ Activity.init({
     primaryKey: true,
   },
   type: {
-    type: Sequelize.STRING,
+    type: Sequelize.ENUM('exercise', 'theory'),
     allowNull: false
   },
   topicId: {
