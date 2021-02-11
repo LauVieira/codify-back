@@ -18,8 +18,11 @@ module.exports = {
     'space-in-parens': ['error', 'never'],
     'eol-last': ['error', 'always'],
     'space-before-function-paren': ['error', 'always'],
+<<<<<<< HEAD
     'no-unused-vars': 'off',
     'no-console': 'off',
     'no-return-await': 'off',
+=======
+>>>>>>> resolveDeploy
   },
 };

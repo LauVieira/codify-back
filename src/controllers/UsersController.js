@@ -1,6 +1,6 @@
 const { ConflictError, InvalidDataError } = require('../errors');
 const User = require('../models/User');
-const { user } = require('../schemas/usersSchemas');
+const Schemas = require('../schemas');
 
 class UsersControllers {
   saveUser (name, email, password) {
@@ -16,10 +16,10 @@ class UsersControllers {
   }
 
   validateUser (userData) {
-    const validation = user.validate(userData);
+    const validation = Schemas.users.signUp.validate(userData);
     if (validation.error) {
       throw new InvalidDataError(
-        validation.error.details.map((e) => e.message),
+        'Não foi possível processar o formato dos dados'
       );
     }
   }
@@ -27,7 +27,7 @@ class UsersControllers {
   async checkExistingUser (email) {
     const existingUser = await this.findUserByEmail(email);
     if (existingUser) {
-      throw new ConflictError('User already exists');
+      throw new ConflictError('Email selecionado já existe na plataforma');
     } 
   }
 }
