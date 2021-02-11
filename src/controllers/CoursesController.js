@@ -16,6 +16,18 @@ class CoursesController {
     return course;
   }
 
+  async getTopic (id) {
+    const topic = await Topic.findByPk(id);
+    if (!topic) throw new NotFoundError('Tópico não encontrado');
+    return topic;
+  }
+
+  async getChapter (id) {
+    const chapter = await Chapter.findByPk(id);
+    if (!chapter) throw new NotFoundError('Capitulo não encontrado');
+    return chapter;
+  }
+
   getProgram (courseId){
     return Chapter.findAll({ where: { courseId }, 
       include: { model: Topic, 

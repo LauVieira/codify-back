@@ -16,4 +16,11 @@ router.get('/:id', async (req, res) => {
   res.status(200).send({ course, program });
 });
 
+router.get('/topic/:id', async (req, res) => {
+  const obj = req.params;
+  const topic = await CoursesController.getTopic(obj.id);
+  const chapter = await CoursesController.getChapter(topic.chapterId);
+  res.status(200).send({ topic, chapter });
+});
+
 module.exports = router;

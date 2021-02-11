@@ -20,8 +20,8 @@ app.use(cors({
 }));
 
 app.use('/users', Routers.users);
-app.use('/courses', userAuthentication, Routers.courses);
-//app.use('/courses', Routers.courses);
+//app.use('/courses', userAuthentication, Routers.courses);
+app.use('/courses', Routers.courses);
 
 app.use((error, req, res, next) => {
   console.error(error);
