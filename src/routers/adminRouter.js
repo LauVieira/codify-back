@@ -11,7 +11,7 @@ router.post('/login', adminLogin, (req, res) => {
     res.status(200).send(req.admin);
 });
 
-router.post('/logout', /* Middleware de Autentificação */ (req, res) => {
+router.post('/logout', /* Middleware de Autenticação */ (req, res) => {
     res.clearCookie('token');
     res.status(200).send('Logout efetuado com sucesso');
 });

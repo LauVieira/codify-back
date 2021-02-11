@@ -65,7 +65,7 @@ describe('POST /admin/login', () => {
 });
 
 describe('POST /admin/logout', () => {
-  // Só vai funcionar o teste com o middleware de autentificação colocado no router
+  // Só vai funcionar o teste com o middleware de autenticação colocado no router
   it('should return 401 when cookie is invalid', async () => {
     const token = 'wrong_token';
     const response = await agent.post('/admin/logout').set('Cookie', `token=${token}`);
@@ -74,7 +74,7 @@ describe('POST /admin/logout', () => {
     expect(response.text).toEqual('Token inválido');
   });
 
-  // Só vai funcionar o teste com o middleware de autentificação colocado no router
+  // Só vai funcionar o teste com o middleware de autenticação colocado no router
   it('should return 401 when no cookie is sent', async () => {
     const response = await agent.post('/admin/logout');
 
