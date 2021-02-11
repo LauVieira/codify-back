@@ -1,14 +1,9 @@
-<<<<<<< HEAD
 const courses = require('./coursesRouter');
 const users = require('./usersRouter');
+const adminRouter = require('./adminRouter');
 
 module.exports = {
     courses,
-    users
-=======
-const admin = require('./adminRouter');
-
-module.exports = {
-    admin
->>>>>>> sign-in-admin
+    users,
+    adminRouter
 };
