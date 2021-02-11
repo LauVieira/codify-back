@@ -38,7 +38,7 @@ describe('POST /admin/login', () => {
     const response = await agent.post('/admin/login').send(body);
 
     expect(response.status).toBe(422);
-    expect(response.text).toEqual('Não foi possível processar os dados enviados');
+    expect(response.body.message).toEqual('Não foi possível processar os dados enviados');
   });
 
   it('should return 401 when username does not match in DB', async () => {
@@ -49,7 +49,7 @@ describe('POST /admin/login', () => {
     const response = await agent.post('/admin/login').send(body);
 
     expect(response.status).toBe(401);
-    expect(response.text).toEqual('Username ou senha estão incorretos');
+    expect(response.body.message).toEqual('Username ou senha estão incorretos');
   });
 
   it('should return 401 when username is right, but password is not', async () => {
@@ -60,7 +60,7 @@ describe('POST /admin/login', () => {
       const response = await agent.post('/admin/login').send(body);
 
       expect(response.status).toBe(401);
-      expect(response.text).toEqual('Username ou senha estão incorretos');
+      expect(response.body.message).toEqual('Username ou senha estão incorretos');
   });
 });
 
@@ -71,7 +71,7 @@ describe('POST /admin/logout', () => {
     const response = await agent.post('/admin/logout').set('Cookie', `token=${token}`);
 
     expect(response.status).toBe(401);
-    expect(response.text).toEqual('Token inválido');
+    expect(response.body.message).toEqual('Token inválido');
   });
 
   // Só vai funcionar o teste com o middleware de autenticação colocado no router
@@ -79,7 +79,7 @@ describe('POST /admin/logout', () => {
     const response = await agent.post('/admin/logout');
 
     expect(response.status).toBe(401);
-    expect(response.text).toEqual('Token não encontrado');
+    expect(response.body.message).toEqual('Token não encontrado');
   });
 
   it('should return 200 -> valid cookie, and destroy session', async () => {
