@@ -11,7 +11,6 @@ const Routers = require('./routers');
 const Err = require('./errors');
 
 const app = express();
-app.use(express.json());
 
 app.use(cookieParser());
 app.use(express.json());
