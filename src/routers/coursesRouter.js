@@ -1,8 +1,5 @@
 const router = require('express').Router();
-
-// const { sanitiseObj } = require('../utils/generalFunctions');
 const CoursesController = require('../controllers/CoursesController');
-// const { NotFoundError, InvalidDataError } = require('../errors');
 
 router.get('/suggestions', async (req, res) => {
   const suggestions = await CoursesController.getSuggestions();
@@ -16,7 +13,7 @@ router.get('/:id', async (req, res) => {
   res.status(200).send({ course, program });
 });
 
-router.get('/topic/:id', async (req, res) => {
+router.get(':id/chapter/:chapterId/topic/:topicId', ,async (req, res) => {
   const obj = req.params;
   const topic = await CoursesController.getTopic(obj.id);
   const chapter = await CoursesController.getChapter(topic.chapterId);
