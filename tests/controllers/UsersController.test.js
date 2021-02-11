@@ -1,3 +1,4 @@
+/* global jest, describe, it, expect  */
 const UsersController = require('../../src/controllers/UsersController');
 const User = require('../../src/models/User');
 
