@@ -1,6 +1,7 @@
 class InvalidDataError extends Error {
-  constructor (details) {
-    super();
+  constructor (message, details) {
+    super(message);
+    this.name = 'InvalidDataError';
     this.details = details;
   }
 }

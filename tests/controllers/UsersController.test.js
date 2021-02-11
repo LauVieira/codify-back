@@ -1,5 +1,5 @@
-/* eslint-disable no-undef */
-const usersController = require('../../src/controllers/usersController');
+/* global jest, describe, it, expect  */
+const UsersController = require('../../src/controllers/UsersController');
 const User = require('../../src/models/User');
 
 jest.mock('bcrypt', () => ({
@@ -22,7 +22,7 @@ describe('saveUser', () => {
       password: '123456',
     };
     User.create.mockResolvedValueOnce(expectedObject);
-    const user = await usersController.saveUser(body.name, body.email, body.password);
+    const user = await UsersController.saveUser(body.name, body.email, body.password);
     expect(user).toEqual(expectedObject);
   });
 });
@@ -34,7 +34,7 @@ describe('findUserByEmail', () => {
       id: 1, email, name: 'test', password: '123456',
     };
     User.findOne.mockResolvedValueOnce(expectedObject);
-    const user = await usersController.findUserByEmail(email);
+    const user = await UsersController.findUserByEmail(email);
     expect(user).toEqual(expectedObject);
   });
 });
