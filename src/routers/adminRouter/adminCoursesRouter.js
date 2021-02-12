@@ -1,5 +1,8 @@
 const router = require('express').Router();
 const CoursesController = require('../../controllers/CoursesController');
+const { InvalidDataError } = require('../../errors');
+const schemas = require('../schemas');
+const { sanitiseObj } = require('../../utils/generalFunctions');
 
 router.get('/', async (req, res) => {
   let limit = null;
@@ -13,6 +16,7 @@ router.get('/', async (req, res) => {
 
   const courses = await CoursesController.getAll(limit, offset);
   const total = (await CoursesController.getAll()).length;
+  
   res.set({
     'Access-Control-Expose-Headers': 'Content-Range',
     'Content-Range': `${offset}-${courses.length}/${total}`
