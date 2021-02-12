@@ -1,6 +1,7 @@
 /* global afterAll, jest, describe, it, expect  */
 require('dotenv').config();
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 
 const app = require('../../src/app');
 const supertest = require('supertest');
@@ -12,25 +13,43 @@ const db = new Pool({
     connectionString: process.env.DATABASE_URL
 });
 
-afterAll(async () => {
-    await sequelize.close();
-    await db.end();
+async function cleanDataBase () {
+  await db.query('DELETE FROM admins');
+}
+
+beforeEach(async () => {
+  await cleanDataBase();
 });
 
-const username = process.env.ADMIN_USER;
-const password = process.env.ADMIN_PASSWORD;
+afterAll(async () => {
+  await cleanDataBase();
+  await sequelize.close();
+  await db.end();
+});
+
+jest.mock('bcrypt');
 
 describe('POST /admin/login', () => {
   it('should return 200 when passed valid parameters', async () => {
-    const body = { username, password };
+    const body = { 
+      username: 'testeUsername',
+      password: 'testePassword' 
+    };
+
+    bcrypt.compareSync.mockImplementationOnce(() => true);
+    
+    await db.query('INSERT INTO admins (username, password) values ($1, $2)', [body.username, body.password]);
     const response = await agent.post('/admin/login').send(body);
-      
+
+    const queryResult = await db.query('SELECT * FROM admins WHERE username=$1', [body.username]);
+    const admin = queryResult.rows[0];
+
     expect(response.headers).toHaveProperty('set-cookie');
     expect(response.status).toBe(200);
-    expect(response.body).toMatchObject({
-        id: expect.any(Number),
-        username
-    });
+    expect(response.body).toEqual(expect.objectContaining({
+      id: admin.id,
+      username: admin.username
+    }));
   });
 
   it('should return 422 when passed missing parameters', async () => {
@@ -44,7 +63,7 @@ describe('POST /admin/login', () => {
   it('should return 401 when username does not match in DB', async () => {
     const body = {
       username: 'unexistingUsername',
-      password,
+      password: '123456'
     };
     const response = await agent.post('/admin/login').send(body);
 
@@ -54,9 +73,14 @@ describe('POST /admin/login', () => {
 
   it('should return 401 when username is right, but password is not', async () => {
       const body = {
-        username,
+        username: 'testeUsername',
         password: '12345678',
       };
+      
+      bcrypt.compareSync.mockImplementationOnce(() => false);
+
+      await db.query('INSERT INTO admins (username, password) values ($1, $2)', [body.username, '1Ju23123']);
+
       const response = await agent.post('/admin/login').send(body);
 
       expect(response.status).toBe(401);
@@ -83,7 +107,7 @@ describe('POST /admin/logout', () => {
   });
 
   it('should return 200 -> valid cookie, and destroy session', async () => {
-    const admin = await db.query('SELECT id, username FROM admins WHERE username=$1', [username]);
+    const admin = await db.query('INSERT INTO admins (username, password) values ($1, $2) RETURNING *', ['admin', '1Ju23123']);
     const token = jwt.sign(admin.rows[0], process.env.ADMIN_SECRET);
 
     const response = await agent.post('/admin/logout').set('cookie', `token=${token}`);
