@@ -25,5 +25,9 @@ class CoursesController {
       } 
     });
   }
+
+  getAll (limit = null, offset = null) {
+    return Course.findAll({ limit, offset });
+  }
 }
 module.exports = new CoursesController();
