@@ -16,6 +16,11 @@ Exercise.init({
     type: Sequelize.INTEGER,
     allowNull: false,
   },
+  done: {
+    type: Sequelize.BOOLEAN,
+    defaultValue: false
+  },
+  title: Sequelize.STRING
 }, {
   sequelize,
   modelName: 'exercise',

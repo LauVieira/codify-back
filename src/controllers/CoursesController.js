@@ -4,6 +4,8 @@ const Course = require('../models/Course');
 const Chapter = require('../models/Chapter');
 const Topic = require('../models/Topic');
 const Activity = require('../models/Activity');
+const Theory = require('../models/Theory');
+const Exercise = require('../models/Exercise');
 
 class CoursesController {
   getSuggestions (limit = null) {
@@ -17,7 +19,17 @@ class CoursesController {
   }
 
   async getTopic (id) {
-    const topic = await Topic.findByPk(id);
+    const topic = await Topic.findByPk(id, { 
+      include: { 
+        model: Activity,
+        include: [{
+          model: Theory
+        }, {
+          model: Exercise
+        }]
+      } 
+    });
+
     if (!topic) throw new NotFoundError('Tópico não encontrado');
     return topic;
   }
