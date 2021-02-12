@@ -24,4 +24,14 @@ router.get('/', async (req, res) => {
   res.send(courses);
 });
 
+router.post('/', async (req, res) => {
+  const { error } = schemas.courses.post.validate(req.body);
+  if (error) throw new InvalidDataError('Não foi possível processar o formato dos dados');
+
+  const sanitisedCourse = sanitiseObj(req.body);
+  const createdCourse = await CoursesController.createCourse(sanitisedCourse);
+
+  res.status(201).send(createdCourse);
+});
+
 module.exports = router;
