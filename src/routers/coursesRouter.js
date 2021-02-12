@@ -15,9 +15,20 @@ router.get('/:id', async (req, res) => {
 
 router.get('/topics/:id', async (req, res) => {
   const obj = req.params;
+
   const topic = await CoursesController.getTopic(obj.id);
   const chapter = await CoursesController.getChapter(topic.chapterId);
+
   res.status(200).send({ topic, chapter });
+});
+
+router.post('/activities/:id', async (req, res) => {
+  const obj = req.params;
+
+  const activity = await CoursesController.getActivity(obj.id);
+  await CoursesController.activityDone(activity.id, req.user.id);
+  
+  res.status(200).send({ message: 'Atividade feita' });
 });
 
 module.exports = router;

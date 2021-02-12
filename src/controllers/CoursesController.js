@@ -34,10 +34,20 @@ class CoursesController {
     return topic;
   }
 
+  async getActivity (id) {
+    const activity = await Activity.findByPk(id);
+    if (!activity) throw new NotFoundError('Atividade não encontrada');
+    return activity;
+  }
+
   async getChapter (id) {
     const chapter = await Chapter.findByPk(id);
     if (!chapter) throw new NotFoundError('Capitulo não encontrado');
     return chapter;
+  }
+
+  activityDone (activityId, userId) {
+    return Activity.create({ activityId, userId, done: true });
   }
 
   getProgram (courseId){

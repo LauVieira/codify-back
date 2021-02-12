@@ -3,11 +3,11 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     const theories = await queryInterface.sequelize.query(
-      'SELECT id FROM activities WHERE type="theory";'
+      `SELECT id FROM activities WHERE type='theory';`
     );
 
     const exercises = await queryInterface.sequelize.query(
-      'SELECT id FROM activities WHERE type="exercise";'
+      `SELECT id FROM activities WHERE type='exercise';`
     );
 
     await queryInterface.bulkInsert('theories', [
@@ -18,6 +18,10 @@ module.exports = {
       {
         youtubeLink: 'https://www.youtube.com/watch?v=JaTf3dhx464',
         activityId: theories[0][1].id,
+      },
+      {
+        youtubeLink: 'https://www.youtube.com/watch?v=C_3qWjNVbPU',
+        activityId: theories[0][2].id,
       }
     ], {});
 
@@ -29,6 +33,10 @@ module.exports = {
       {
         title: 'Exercício 2',
         activityId: exercises[0][1].id,
+      },
+      {
+        title: 'Exercício 3',
+        activityId: exercises[0][2].id,
       }
     ], {});
   },
