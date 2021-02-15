@@ -1,3 +1,4 @@
+/* eslint-disable no-return-await */
 const { ConflictError, InvalidDataError } = require('../errors');
 const User = require('../models/User');
 const Schemas = require('../schemas');
