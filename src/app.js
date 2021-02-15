@@ -13,7 +13,6 @@ const Routers = require('./routers');
 const Err = require('./errors');
 
 const app = express();
-app.use(express.json());
 
 app.use(cookieParser());
 app.use(express.json());
@@ -29,11 +28,12 @@ app.use('/admin', Routers.adminRouter);
 app.use((error, req, res, next) => {
   console.error(error);
   const { message } = error;
-  if (error instanceof Err.NotFoundError) return res.status(404).send(message);
-  if (error instanceof Err.InvalidDataError) return res.status(422).send(message);
-  if (error instanceof Err.ConflictError) return res.status(409).send(message);
-  if (error instanceof Err.UnauthorizedError) return res.status(401).send(message);
-  if (error instanceof Err.ForbiddenError) return res.status(403).send(message);
+  
+  if (error instanceof Err.NotFoundError) return res.status(404).send({ message });
+  if (error instanceof Err.InvalidDataError) return res.status(422).send({ message, details: error.details });
+  if (error instanceof Err.ConflictError) return res.status(409).send({ message });
+  if (error instanceof Err.UnauthorizedError) return res.status(401).send({ message });
+  if (error instanceof Err.ForbiddenError) return res.status(403).send({ message });
   
   res.status(500).send('Erro interno no servidor');
 });

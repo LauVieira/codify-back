@@ -18,8 +18,5 @@ module.exports = {
     'space-in-parens': ['error', 'never'],
     'eol-last': ['error', 'always'],
     'space-before-function-paren': ['error', 'always'],
-    'no-unused-vars': 'off',
-    'no-console': 'off',
-    'no-return-await': 'off',
   },
 };
