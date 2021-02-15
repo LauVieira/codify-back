@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const CoursesController = require('../../controllers/CoursesController');
 const { InvalidDataError } = require('../../errors');
-const schemas = require('../schemas');
+const schemas = require('../../schemas');
 const { sanitiseObj } = require('../../utils/generalFunctions');
 
 router.get('/', async (req, res) => {
