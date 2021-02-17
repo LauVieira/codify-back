@@ -5,5 +5,5 @@ const courses = require('./coursesSchemas');
 module.exports = {
     users,
     admin,
-    courses,   
+    courses,  
 };
