@@ -6,7 +6,6 @@ const post = Joi.object({
   description: Joi.string().required(),
   photo: Joi.string().required(),
   title: Joi.string().required(),
-  type: Joi.string().required(),
   createdAt: Joi.date(),
   updatedAt: Joi.date(),
 });
