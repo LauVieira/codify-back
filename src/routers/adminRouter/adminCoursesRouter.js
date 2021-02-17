@@ -48,7 +48,7 @@ router.put('/:id', async (req, res) => {
 
   const { id } = req.params;
   const sanitisedCourse = sanitiseObj(req.body);
-  const updatedCourse = await categoriesController.editCourse(id, sanitisedCourse);
+  const updatedCourse = await CoursesController.editCourse(id, sanitisedCourse);
   res.status(200).send(updatedCourse);
 });
 
