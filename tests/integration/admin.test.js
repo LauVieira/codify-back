@@ -1,4 +1,5 @@
 /* global afterAll, jest, describe, it, expect  */
+/* eslint-disable quotes*/
 require('dotenv').config();
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
@@ -115,5 +116,66 @@ describe('POST /admin/logout', () => {
     expect(response.status).toBe(200);
     expect(response.text).toEqual('Logout efetuado com sucesso');
     expect(response.headers['set-cookie'][0]).toContain('Expires');
+  });
+});
+
+describe('GET /admin/courses/', () => {
+  let courses = [];
+
+  beforeEach(async () => {
+    const courseValues = ['Test title', 'Test description', 'Test photo', 'Test alt', 'Test background'];
+
+    const dbCourse = await db.query(`INSERT INTO courses 
+      (title, description, photo, alt, background)
+      VALUES ($1, $2, $3, $4, $5) 
+      RETURNING *`, 
+    courseValues);
+
+    courses = dbCourse.rows;
+  });
+
+  afterEach(async () => {
+    await db.query(`DELETE FROM courses WHERE title = 'Test title'`);
+
+    courses = [];
+  });
+
+  it('should return an array with courses when called', async () => {
+    const response = await agent.get('/admin/courses/');
+
+    expect(response.body).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining(courses[0]),
+      ]),
+    );
+  });
+});
+
+describe('POST /admin/courses/', () => {
+  let body = {
+    alt: 'Test alt',
+    background: 'Test background',
+    description: 'Test description',
+    photo: 'Test photo',
+    title: 'Test title',
+  };
+
+  afterEach(async () => {
+    await db.query(`DELETE FROM courses WHERE title = 'Test title'`);
+  });
+
+  it('should return an object like body when called with right parameters and status 201', async () => {
+    const response = await agent.post('/admin/courses/').send(body);
+
+    expect(response.body).toEqual(body);
+    expect(response.status).toBe(201);
+  });
+
+  it('should return 422 when called with wrong parameters', async () => {
+    const wrongBody = { ...body };
+    wrongBody.title = 111;
+    const response = await agent.post('/admin/courses/').send(wrongBody);
+
+    expect(response.status).toBe(422);
   });
 });

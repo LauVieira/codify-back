@@ -11,4 +11,3 @@ module.exports = {
   NotFoundError,
   UnauthorizedError
 };
-

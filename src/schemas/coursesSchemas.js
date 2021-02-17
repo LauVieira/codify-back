@@ -5,7 +5,7 @@ const post = Joi.object({
   background: Joi.string().required(),
   description: Joi.string().required(),
   photo: Joi.string().required(),
-  type: Joi.string().required(),
+  title: Joi.string().required(),
   createdAt: Joi.date(),
   updatedAt: Joi.date(),
 });
