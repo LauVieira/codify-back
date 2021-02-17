@@ -7,11 +7,11 @@ const router = express.Router();
 router.post('/login', adminLogin, (req, res) => {
     const token = jwt.sign(req.admin, process.env.ADMIN_SECRET);
 
-    res.cookie('token', token);
+    res.cookie('adminToken', token);
     res.status(200).send(req.admin);
 });
 
-router.post('/logout', /* Middleware de Autentificação */ (req, res) => {
+router.post('/logout', /* Middleware de Autenticação */ (req, res) => {
     res.clearCookie('token');
     res.status(200).send('Logout efetuado com sucesso');
 });

@@ -7,8 +7,6 @@ const cors = require('cors');
 const express = require('express');
 
 const { userAuthentication } = require('./middlewares');
-const usersRouter = require('./routers/usersRouter');
-const coursesRouter = require('./routers/coursesRouter');
 const Routers = require('./routers');
 const Err = require('./errors');
 
@@ -21,9 +19,9 @@ app.use(cors({
   credentials: true 
 }));
 
-app.use('/users', usersRouter);
-app.use('/courses', userAuthentication, coursesRouter);
-app.use('/admin', Routers.adminRouter);
+app.use('/users', Routers.users);
+app.use('/courses', userAuthentication, Routers.courses);
+app.use('/admin', Routers.admin);
 
 app.use((error, req, res, next) => {
   console.error(error);
