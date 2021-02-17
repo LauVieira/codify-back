@@ -48,8 +48,15 @@ router.put('/:id', async (req, res) => {
 
   const { id } = req.params;
   const sanitisedCourse = sanitiseObj(req.body);
-  const updatedCourse = await categoriesController.editCourse(id, sanitisedCourse);
+  const updatedCourse = await CoursesController.editCourse(id, sanitisedCourse);
   res.status(200).send(updatedCourse);
+});
+
+router.delete('/:id', async (req, res) => {
+  const { id } = req.params;
+
+  await CoursesController.deleteCourse(id);
+  res.sendStatus(204);
 });
 
 module.exports = router;

@@ -2,6 +2,7 @@ const { NotFoundError } = require('../errors');
 const Err = require('../errors');
 
 const Course = require('../models/Course');
+const CourseUser = require('../models/CourseUser');
 const Chapter = require('../models/Chapter');
 const Topic = require('../models/Topic');
 const Activity = require('../models/Activity');
@@ -55,5 +56,15 @@ class CoursesController {
     await course.save();
     return course;
   }
+
+  async deleteCourse (id) {
+    const course = await Course.findByPk(id);
+    if (course === null) throw new Err.NotFoundError('Curso não encontrado');
+    
+    CourseUser.destroy({ where: { courseId: id } });
+
+    await course.destroy();
+  }
 }
+
 module.exports = new CoursesController();
