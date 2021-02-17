@@ -16,6 +16,7 @@ Exercise.init({
     type: Sequelize.INTEGER,
     allowNull: false,
   },
+  title: Sequelize.STRING
 }, {
   sequelize,
   modelName: 'exercise',
