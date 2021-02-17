@@ -21,6 +21,7 @@ app.use(cors({
 
 app.use('/users', Routers.users);
 app.use('/courses', userAuthentication, Routers.courses);
+app.use('/admin', Routers.admin);
 
 app.use((error, req, res, next) => {
   console.error(error);
