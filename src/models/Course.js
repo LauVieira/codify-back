@@ -28,6 +28,9 @@ Course.init({
     type: Sequelize.STRING(150),
     allowNull: false,
   },
+  alt: {
+    type: Sequelize.STRING(150),
+  },
 }, {
   sequelize,
   modelName: 'course',

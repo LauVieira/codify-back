@@ -1,8 +1,8 @@
 const router = require('express').Router();
 
-// const { sanitiseObj } = require('../utils/generalFunctions');
+const { sanitiseObj } = require('../utils/generalFunctions');
 const CoursesController = require('../controllers/CoursesController');
-// const { NotFoundError, InvalidDataError } = require('../errors');
+const { NotFoundError, InvalidDataError } = require('../errors');
 
 router.get('/suggestions', async (req, res) => {
   const suggestions = await CoursesController.getSuggestions();
