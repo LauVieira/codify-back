@@ -32,19 +32,28 @@ class CoursesController {
   }
 
   async getById (id) {
-    const course = await Course.findOne({ where: { id } });
-    if (course === null) throw new Err.NotFoundError('Course not found');
+    const course = await Course.findByPk(id);
+    if (course === null) throw new Err.NotFoundError('Curso não encontrado');
 
     return course;
   }
 
   async createCourse (courseData) {
     const course = await Course.findOne({ where: { title: courseData.title } });
-    if (course !== null) throw new Err.ConflictError('Course already exists');
+    if (course !== null) throw new Err.ConflictError('Curso já existe');
 
     const createdCourse = await Course.create(courseData);
     
     return createdCourse;
+  }
+
+  async editCourse (id, courseData) {
+    const course = await Course.findByPk(id);
+    if (course === null) throw new Err.NotFoundError('Curso não encontrado');
+
+    Object.assign(course, courseData);
+    await course.save();
+    return course;
   }
 }
 module.exports = new CoursesController();
