@@ -1,6 +1,7 @@
 const Joi = require('joi');
 
 const post = Joi.object({
+  id: Joi.number(),
   alt: Joi.string(),
   background: Joi.string().required(),
   description: Joi.string().required(),
