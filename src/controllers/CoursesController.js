@@ -1,4 +1,5 @@
 const { NotFoundError } = require('../errors');
+const Err = require('../errors');
 
 const Course = require('../models/Course');
 const Chapter = require('../models/Chapter');
@@ -28,6 +29,22 @@ class CoursesController {
 
   getAll (limit = null, offset = null) {
     return Course.findAll({ limit, offset });
+  }
+
+  async getById (id) {
+    const course = await Course.findOne({ where: { id } });
+    if (course === null) throw new Err.NotFoundError('Course not found');
+
+    return course;
+  }
+
+  async createCourse (courseData) {
+    const course = await Course.findOne({ where: { title: courseData.title } });
+    if (course !== null) throw new Err.ConflictError('Course already exists');
+
+    const createdCourse = await Course.create(courseData);
+    
+    return createdCourse;
   }
 }
 module.exports = new CoursesController();

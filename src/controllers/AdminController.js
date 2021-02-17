@@ -1,4 +1,5 @@
 const Admin = require('../models/Admin');
+const Course = require('../models/Course');
 const Schemas = require('../schemas');
 const bcrypt = require('bcrypt');
 const Err = require('../errors');
