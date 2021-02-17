@@ -23,24 +23,20 @@ beforeEach(async () => {
 });
 
 afterAll(async () => {
-  await cleanDataBase();
   await sequelize.close();
   await db.end();
 });
 
-jest.mock('bcrypt');
-
-describe('POST /admin/login', () => {
+describe('POST /admin/users/login', () => {
   it('should return 200 when passed valid parameters', async () => {
     const body = { 
       username: 'testeUsername',
       password: 'testePassword' 
     };
-
-    bcrypt.compareSync.mockImplementationOnce(() => true);
+    const password = bcrypt.hashSync(body.password, 10);
     
-    await db.query('INSERT INTO admins (username, password) values ($1, $2)', [body.username, body.password]);
-    const response = await agent.post('/admin/login').send(body);
+    await db.query('INSERT INTO admins (username, password) values ($1, $2)', [body.username, password]);
+    const response = await agent.post('/admin/users/login').send(body);
 
     const queryResult = await db.query('SELECT * FROM admins WHERE username=$1', [body.username]);
     const admin = queryResult.rows[0];
@@ -55,7 +51,7 @@ describe('POST /admin/login', () => {
 
   it('should return 422 when passed missing parameters', async () => {
     const body = { username: 'teste' };
-    const response = await agent.post('/admin/login').send(body);
+    const response = await agent.post('/admin/users/login').send(body);
 
     expect(response.status).toBe(422);
     expect(response.body.message).toEqual('Não foi possível processar os dados enviados');
@@ -66,7 +62,7 @@ describe('POST /admin/login', () => {
       username: 'unexistingUsername',
       password: '123456'
     };
-    const response = await agent.post('/admin/login').send(body);
+    const response = await agent.post('/admin/users/login').send(body);
 
     expect(response.status).toBe(401);
     expect(response.body.message).toEqual('Username ou senha estão incorretos');
@@ -75,33 +71,31 @@ describe('POST /admin/login', () => {
   it('should return 401 when username is right, but password is not', async () => {
       const body = {
         username: 'testeUsername',
-        password: '12345678',
+        password: '1234567890',
       };
+
+      const password = bcrypt.hashSync('123456', 10);
       
-      bcrypt.compareSync.mockImplementationOnce(() => false);
+      await db.query('INSERT INTO admins (username, password) values ($1, $2)', [body.username, password]);
 
-      await db.query('INSERT INTO admins (username, password) values ($1, $2)', [body.username, '1Ju23123']);
-
-      const response = await agent.post('/admin/login').send(body);
+      const response = await agent.post('/admin/users/login').send(body);
 
       expect(response.status).toBe(401);
       expect(response.body.message).toEqual('Username ou senha estão incorretos');
   });
 });
 
-describe('POST /admin/logout', () => {
-  // Só vai funcionar o teste com o middleware de autenticação colocado no router
+describe('POST /admin/users/logout', () => {
   it('should return 401 when cookie is invalid', async () => {
-    const token = 'wrong_token';
-    const response = await agent.post('/admin/logout').set('Cookie', `token=${token}`);
+    const adminToken = 'wrong_token';
+    const response = await agent.post('/admin/users/logout').set('Cookie', `adminToken=${adminToken}`);
 
     expect(response.status).toBe(401);
     expect(response.body.message).toEqual('Token inválido');
   });
 
-  // Só vai funcionar o teste com o middleware de autenticação colocado no router
   it('should return 401 when no cookie is sent', async () => {
-    const response = await agent.post('/admin/logout');
+    const response = await agent.post('/admin/users/logout');
 
     expect(response.status).toBe(401);
     expect(response.body.message).toEqual('Token não encontrado');
@@ -109,12 +103,12 @@ describe('POST /admin/logout', () => {
 
   it('should return 200 -> valid cookie, and destroy session', async () => {
     const admin = await db.query('INSERT INTO admins (username, password) values ($1, $2) RETURNING *', ['admin', '1Ju23123']);
-    const token = jwt.sign(admin.rows[0], process.env.ADMIN_SECRET);
+    const adminToken = jwt.sign(admin.rows[0], process.env.ADMIN_SECRET);
 
-    const response = await agent.post('/admin/logout').set('cookie', `token=${token}`);
+    const response = await agent.post('/admin/users/logout').set('Cookie', `adminToken=${adminToken}`);
     
     expect(response.status).toBe(200);
-    expect(response.text).toEqual('Logout efetuado com sucesso');
+    expect(response.body.message).toEqual('Logout efetuado com sucesso');
     expect(response.headers['set-cookie'][0]).toContain('Expires');
   });
 });
