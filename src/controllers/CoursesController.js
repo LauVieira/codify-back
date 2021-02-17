@@ -65,6 +65,65 @@ class CoursesController {
 
     await course.destroy();
   }
+
+  getAllTopics (limit = null, offset = null) {
+    return Topic.findAll({ limit, offset });
+  }
+
+  async getTopicById (id) {
+    const topic = await Topic.findByPk(id);
+    if (topic === null) throw new Err.NotFoundError('Topic não encontrado');
+
+    return topic;
+  }
+
+  async createTopic (topicData) {
+    const topic = await Topic.findOne({ where: { title: topicData.title } });
+    if (topic !== null) throw new Err.ConflictError('Topico já existe');
+
+    const createdTopic = await Topic.create(topicData);
+    
+    return createdTopic;
+  }
+
+  async editTopic (id, topicData) {
+    const topic = await Topic.findByPk(id);
+    if (topic === null) throw new Err.NotFoundError('Topico não encontrado');
+
+    Object.assign(topic, topicData);
+    await topic.save();
+    return topic;
+  }
+
+  getAllChapters (limit = null, offset = null) {
+    return Chapter.findAll({ limit, offset });
+  }
+
+  async getChapterById (id) {
+    const chapter = await Chapter.findByPk(id);
+    if (chapter === null) throw new Err.NotFoundError('Capitulo não encontrado');
+
+    return chapter;
+  }
+
+  async createChapter (chapterData) {
+    const chapter = await Chapter.findOne({ where: { title: chapterData.title } });
+    if (chapter !== null) throw new Err.ConflictError('Capitulo já existe');
+
+    const createdChapter = await Chapter.create(chapterData);
+    
+    return createdChapter;
+  }
+
+  async editChapter (id, chapterData) {
+    const chapter = await Chapter.findByPk(id);
+    if (chapter === null) throw new Err.NotFoundError('Capitulo não encontrado');
+
+    Object.assign(chapter, chapterData);
+    await chapter.save();
+    return chapter;
+  }
+
 }
 
 module.exports = new CoursesController();

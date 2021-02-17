@@ -11,6 +11,22 @@ const post = Joi.object({
   updatedAt: Joi.date(),
 });
 
+const postTopic = Joi.object({
+  title: Joi.string().required(),
+  chapterId: Joi.number().required(),
+  createdAt: Joi.date(),
+  updatedAt: Joi.date(),
+});
+
+const postChapter = Joi.object({
+  title: Joi.string().required(),
+  courseId: Joi.number().required(),
+  createdAt: Joi.date(),
+  updatedAt: Joi.date(),
+});
+
 module.exports = {
-  post
+  post,
+  postTopic,
+  postChapter
 };
