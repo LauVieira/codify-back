@@ -127,3 +127,31 @@ describe('POST /users/sign-in', () => {
     expect(response.body.message).toEqual('Email ou senha estão incorretos');
   });
 });
+
+describe('POST /users/sign-out', () => {
+  it('should return 401 when token cookie is invalid', async () => {
+    const token = 'wrong_token';
+    const response = await agent.post('/users/sign-out').set('Cookie', `token=${token}`);
+
+    expect(response.status).toBe(401);
+    expect(response.body.message).toEqual('Token inválido');
+  });
+
+  it('should return 401 when no cookie is sent', async () => {
+    const response = await agent.post('/users/sign-out');
+
+    expect(response.status).toBe(401);
+    expect(response.body.message).toEqual('Token não encontrado');
+  });
+
+  it('should return 200 -> valid cookie, and destroy session', async () => {
+    const user = await createUser();
+    const token = await createToken(user);
+
+    const response = await agent.post('/users/sign-out').set('Cookie', `token=${token}`);
+
+    expect(response.status).toBe(200);
+    expect(response.body.message).toEqual('Sign-out efetuado com sucesso');
+    expect(response.headers['set-cookie'][0]).toContain('Expires');
+  });
+});

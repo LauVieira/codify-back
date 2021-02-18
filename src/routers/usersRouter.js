@@ -46,4 +46,10 @@ router.post('/sign-in', async (req, res) => {
   res.status(200).send(selectedUser);
 });
 
+router.post('/sign-out', userAuthentication, (req, res) => {
+  res.clearCookie('token', { secure: true, sameSite: 'none' });
+  
+  res.status(200).send({ message: 'Sign-out efetuado com sucesso' });
+});
+
 module.exports = router;
