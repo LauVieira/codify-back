@@ -1,6 +1,6 @@
 /* global afterAll, jest, describe, it, expect  */
 /* eslint-disable quotes*/
-require('dotenv').config();
+require('dotenv-flow').config();
 
 const app = require('../../src/app');
 const supertest = require('supertest');

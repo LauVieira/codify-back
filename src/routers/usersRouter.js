@@ -42,12 +42,19 @@ router.post('/sign-in', async (req, res) => {
   delete selectedUser.password;
   const token = jwt.sign(selectedUser, process.env.SECRET);
 
-  res.cookie('token', token, { secure: true, sameSite: 'none' });
+  const cookieOptions = {};
+
+  if (process.env.NODE_ENV === 'production') {
+      cookieOptions.secure = true;
+      cookieOptions.sameSite = 'none';
+  }
+
+  res.cookie('token', token, cookieOptions);
   res.status(200).send(selectedUser);
 });
 
 router.post('/sign-out', userAuthentication, (req, res) => {
-  res.clearCookie('token', { secure: true, sameSite: 'none' });
+  res.clearCookie('token');
   
   res.status(200).send({ message: 'Sign-out efetuado com sucesso' });
 });

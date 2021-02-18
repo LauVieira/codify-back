@@ -1,5 +1,4 @@
 /* global jest, describe, it, expect  */
-require('dotenv').config();
 const CoursesController = require('../../src/controllers/CoursesController');
 const Course = require('../../src/models/Course');
 

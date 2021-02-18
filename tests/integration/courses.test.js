@@ -1,5 +1,5 @@
 /* global beforeEach, afterAll, it, describe, expect */
-require('dotenv').config();
+require('dotenv-flow').config();
 const jwt = require('jsonwebtoken');
 
 const { Pool } = require('pg');
