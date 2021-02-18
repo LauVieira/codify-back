@@ -1,9 +1,15 @@
-const admin = require('./adminRouter');
-const courses = require('./coursesRouter');
-const users = require('./usersRouter');
+const express = require('express');
 
-module.exports = {
-    courses,
-    users,
-    admin
-};
+const { userAuthentication } = require('../middlewares');
+
+const adminRouter = require('./adminRouter');
+const coursesRouter = require('./coursesRouter');
+const usersRouter = require('./usersRouter');
+
+const router = express.Router();
+
+router.use('/users', usersRouter);
+router.use('/courses', userAuthentication, coursesRouter);
+router.use('/admin', adminRouter);
+
+module.exports = router;
