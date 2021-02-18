@@ -38,14 +38,13 @@ describe('POST /admin/users/login', () => {
     await db.query('INSERT INTO admins (username, password) values ($1, $2)', [body.username, password]);
     const response = await agent.post('/admin/users/login').send(body);
 
-    const queryResult = await db.query('SELECT * FROM admins WHERE username=$1', [body.username]);
-    const admin = queryResult.rows[0];
-
     expect(response.headers).toHaveProperty('set-cookie');
     expect(response.status).toBe(200);
     expect(response.body).toEqual(expect.objectContaining({
-      id: admin.id,
-      username: admin.username
+      id: expect.any(Number),
+      username: body.username,
+      createdAt: expect.any(String),
+      updatedAt: expect.any(String)
     }));
   });
 
