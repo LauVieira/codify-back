@@ -1,4 +1,6 @@
 /* global beforeEach, afterAll, it, describe, expect */
+/* eslint-disable quotes*/
+
 require('dotenv').config();
 const jwt = require('jsonwebtoken');
 
@@ -21,7 +23,7 @@ function getToken (user) {
 
 beforeEach(async () => {
   await db.query('DELETE FROM users');
-  await db.query('DELETE FROM courses');
+  await db.query(`DELETE FROM courses WHERE title = 'Test title'`);
 });
 
 afterAll(async () => {
