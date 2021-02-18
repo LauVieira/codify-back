@@ -2,7 +2,6 @@ const jwt = require('jsonwebtoken');
 const { UnauthorizedError } = require('../errors');
 
 async function userAuthentication (req, res, next) {
-  console.log(req.cookies);
   const { token } = req.cookies;
   if (!token) throw new UnauthorizedError('Token não encontrado');
 
