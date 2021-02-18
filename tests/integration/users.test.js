@@ -1,28 +1,21 @@
 /* global afterAll, jest, describe, it, expect  */
+/* eslint-disable quotes*/
 require('dotenv').config();
-const bcrypt = require('bcrypt');
 
 const supertest = require('supertest');
 const app = require('../../src/app');
 const agent = supertest(app);
 
-const { Pool } = require('pg');
 const sequelize = require('../../src/utils/database');
-const db = new Pool({
-  connectionString: process.env.DATABASE_URL,
-});
 
-async function cleanDataBase () {
-  await db.query('DELETE FROM users');
-}
+const { eraseDatabase, createUser, createToken } = require('../Helpers');
 
 beforeEach(async () => {
-  await cleanDataBase();
+  await eraseDatabase();
 });
 
 afterAll(async () => {
   await sequelize.close();
-  await db.end();
 });
 
 describe('POST /users/sign-up', () => {
@@ -41,8 +34,8 @@ describe('POST /users/sign-up', () => {
       id: expect.any(Number),
       email: body.email,
       name: body.name,
-      createdAt: expect.any(Date),
-      updatedAt: expect.any(Date)
+      createdAt: expect.any(String),
+      updatedAt: expect.any(String)
     }));
   });
 
@@ -68,7 +61,7 @@ describe('POST /users/sign-up', () => {
       confirmPassword: '1Ju23123',
     };
 
-    await db.query('INSERT INTO users (name, email, password) values ($1, $2, $3)', [body.name, body.email, body.password]);
+    await createUser();
     const response = await agent.post('/users/sign-up').send(body);
 
     expect(response.status).toBe(409);
@@ -82,9 +75,8 @@ describe('POST /users/sign-in', () => {
       email: 'test@test.com',
       password: '123456',
     };
-    const password = bcrypt.hashSync(body.password, 10);
-
-    await db.query('INSERT INTO users (name, email, password) values ($1, $2, $3)', ['teste', body.email, password]);
+    
+    await createUser();
     
     const response = await agent.post('/users/sign-in').send(body);
 
@@ -94,8 +86,8 @@ describe('POST /users/sign-in', () => {
       id: expect.any(Number),
       email: body.email,
       name: expect.any(String),
-      createdAt: expect.any(Date),
-      updatedAt: expect.any(Date)
+      createdAt: expect.any(String),
+      updatedAt: expect.any(String)
     }));
   });
 
@@ -127,9 +119,7 @@ describe('POST /users/sign-in', () => {
       password: '1Ju23123xxx',
     };
 
-    const password = bcrypt.hashSync('123456', 10);
-
-    await db.query('INSERT INTO users (name, email, password) values ($1, $2, $3)', ['teste', body.email, password]);
+    await createUser();
 
     const response = await agent.post('/users/sign-in').send(body);
 

@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 
 const { sanitiseObj } = require('../utils/generalFunctions');
 const UsersController = require('../controllers/UsersController');
-const { validateUser } = require('../middlewares');
+const { validateUser, userAuthentication } = require('../middlewares');
 const Schemas = require('../schemas');
 const { InvalidDataError, UnauthorizedError } = require('../errors/');
 
@@ -38,11 +38,8 @@ router.post('/sign-in', async (req, res) => {
     throw new UnauthorizedError('Email ou senha estão incorretos');
   }
 
-  selectedUser = {
-    id: selectedUser.id,
-    email: selectedUser.email,
-    name: selectedUser.name,
-  };
+  selectedUser = selectedUser.dataValues;
+  delete selectedUser.password;
   const token = jwt.sign(selectedUser, process.env.SECRET);
 
   res.cookie('token', token, { secure: true, sameSite: 'none' });
