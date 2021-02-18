@@ -10,12 +10,10 @@ module.exports = {
     await queryInterface.bulkInsert('admins', [{
       username,
       password: bcrypt.hashSync(password, 10),
-      createdAt: new Date(),
-      updatedAt: new Date(),
     }]);
   },
 
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.bulkDelete('admins', { username }, {});
+    await queryInterface.bulkDelete('admins', { username });
   }
 };

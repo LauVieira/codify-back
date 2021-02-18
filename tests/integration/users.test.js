@@ -21,12 +21,9 @@ beforeEach(async () => {
 });
 
 afterAll(async () => {
-  await cleanDataBase();
   await sequelize.close();
   await db.end();
 });
-
-jest.mock('bcrypt');
 
 describe('POST /users/sign-up', () => {
   it('should return 201 when passed valid parameters', async () => {
@@ -37,16 +34,15 @@ describe('POST /users/sign-up', () => {
       confirmPassword: '1Ju23123',
     };
 
-    bcrypt.hashSync.mockImplementationOnce((password) => password);
-
     const response = await agent.post('/users/sign-up').send(body);
-    const queryResult = await db.query('SELECT * FROM users WHERE email=$1', [body.email]);
-    const user = queryResult.rows[0];
 
     expect(response.status).toBe(201);
-    expect(user).toEqual(expect.objectContaining({
+    expect(response.body).toEqual(expect.objectContaining({
+      id: expect.any(Number),
       email: body.email,
-      name: body.name
+      name: body.name,
+      createdAt: expect.any(Date),
+      updatedAt: expect.any(Date)
     }));
   });
 
@@ -86,22 +82,20 @@ describe('POST /users/sign-in', () => {
       email: 'test@test.com',
       password: '123456',
     };
+    const password = bcrypt.hashSync(body.password, 10);
 
-    bcrypt.compareSync.mockImplementationOnce(() => true);
-    
-    await db.query('INSERT INTO users (name, email, password) values ($1, $2, $3)', ['teste', body.email, body.password]);
+    await db.query('INSERT INTO users (name, email, password) values ($1, $2, $3)', ['teste', body.email, password]);
     
     const response = await agent.post('/users/sign-in').send(body);
-
-    const queryResult = await db.query('SELECT * FROM users WHERE email=$1', [body.email]);
-    const user = queryResult.rows[0];
 
     expect(response.headers).toHaveProperty('set-cookie');
     expect(response.status).toBe(200);
     expect(response.body).toEqual(expect.objectContaining({
-      id: user.id,
-      email: user.email,
-      name: user.name
+      id: expect.any(Number),
+      email: body.email,
+      name: expect.any(String),
+      createdAt: expect.any(Date),
+      updatedAt: expect.any(Date)
     }));
   });
 
@@ -133,9 +127,9 @@ describe('POST /users/sign-in', () => {
       password: '1Ju23123xxx',
     };
 
-    bcrypt.compareSync.mockImplementationOnce(() => false);
+    const password = bcrypt.hashSync('123456', 10);
 
-    await db.query('INSERT INTO users (name, email, password) values ($1, $2, $3)', ['teste', body.email, '1Ju23123']);
+    await db.query('INSERT INTO users (name, email, password) values ($1, $2, $3)', ['teste', body.email, password]);
 
     const response = await agent.post('/users/sign-in').send(body);
 

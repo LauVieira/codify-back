@@ -16,6 +16,8 @@ router.post('/sign-up', validateUser, async (req, res) => {
     email,
     hashedPassword,
   );
+  
+  delete savedUser.password;
   res.status(201).send(savedUser);
 });
 

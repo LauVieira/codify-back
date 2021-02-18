@@ -1,19 +1,20 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
-const { adminLogin } = require('../../middlewares'); 
+const { adminLogin, adminAuthentication } = require('../../middlewares');
 
 const router = express.Router();
 
 router.post('/login', adminLogin, (req, res) => {
-    const token = jwt.sign(req.admin, process.env.ADMIN_SECRET);
+    const adminToken = jwt.sign(req.admin, process.env.ADMIN_SECRET);
 
-    res.cookie('adminToken', token);
+    res.cookie('adminToken', adminToken);
     res.status(200).send(req.admin);
 });
 
-router.post('/logout', /* Middleware de Autenticação */ (req, res) => {
-    res.clearCookie('token');
-    res.status(200).send('Logout efetuado com sucesso');
+router.post('/logout', adminAuthentication, (req, res) => {
+    res.clearCookie('adminToken');
+
+    res.status(200).send({ message: 'Logout efetuado com sucesso' });
 });
 
 module.exports = router;
