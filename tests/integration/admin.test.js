@@ -33,8 +33,8 @@ describe('POST /admin/users/login', () => {
     await createAdmin();
     const response = await agent.post('/admin/users/login').send(body);
 
-    expect(response.headers).toHaveProperty('set-cookie');
     expect(response.status).toBe(200);
+    expect(response.headers['set-cookie'][0]).toContain('adminToken');
     expect(response.body).toEqual(expect.objectContaining({
       id: expect.any(Number),
       username: body.username,

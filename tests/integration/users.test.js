@@ -80,8 +80,8 @@ describe('POST /users/sign-in', () => {
     
     const response = await agent.post('/users/sign-in').send(body);
 
-    expect(response.headers).toHaveProperty('set-cookie');
     expect(response.status).toBe(200);
+    expect(response.headers['set-cookie'][0]).toContain('token');
     expect(response.body).toEqual(expect.objectContaining({
       id: expect.any(Number),
       email: body.email,
