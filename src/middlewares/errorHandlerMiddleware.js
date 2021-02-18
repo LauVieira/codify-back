@@ -4,7 +4,7 @@ const {
   ConflictError,
   UnauthorizedError,
   ForbiddenError
-} = require('./errors');
+} = require('../errors');
 
 /* eslint-disable-next-line no-unused-vars */
 function errorHandlerMiddleware (error, req, res, next) {
