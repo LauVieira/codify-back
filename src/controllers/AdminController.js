@@ -1,5 +1,4 @@
 const Admin = require('../models/Admin');
-const Course = require('../models/Course');
 const Schemas = require('../schemas');
 const bcrypt = require('bcrypt');
 const Err = require('../errors');
@@ -26,8 +25,7 @@ class AdminController {
             throw new Err.UnauthorizedError('Username ou senha estão incorretos');
         }
 
-        const adminData = { id: admin.id, username: admin.username };
-        return adminData;
+        return admin.dataValues;
     }
 }
 
