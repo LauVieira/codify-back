@@ -10,8 +10,8 @@ module.exports = {
     await queryInterface.bulkInsert('admins', [{
       username,
       password: bcrypt.hashSync(password, 10),
-      createdAt: new Date(Date.now()).toUTCString(),
-      updatedAt: new Date(Date.now()).toUTCString(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
     }]);
   },
 
