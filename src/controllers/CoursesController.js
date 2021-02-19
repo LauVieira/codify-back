@@ -54,8 +54,18 @@ class CoursesController {
     return chapter;
   }
 
-  activityDone (activityId, userId) {
-    return ActivityUser.create({ activityId, userId, done: true });
+  async activityDone (activityId, userId) {
+    let activityUser = await ActivityUser.findOne({ where: { activityId, userId } });
+
+    if (!activityUser) {
+      activityUser = await ActivityUser.create({ activityId, userId, done: true });
+      return activityUser;
+    }
+
+    activityUser.done = !activityUser.done;
+    await activityUser.save();
+
+    return activityUser;
   }
 
   getProgram (courseId){

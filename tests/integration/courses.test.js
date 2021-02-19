@@ -30,7 +30,7 @@ afterAll(async () => {
   await db.end();
 });
 
-/*describe('GET /courses/suggestions', () => {
+describe('GET /courses/suggestions', () => {
   let user = {};
   let courses = [];
 
@@ -75,7 +75,7 @@ afterAll(async () => {
       ]),
     );
   });
-});*/
+});
 
 // describe('GET /courses/:id', () => {
 //   let user = {};
@@ -219,6 +219,17 @@ describe('GET /courses/chapters/:chapterId/topics/:id/activities', () => {
 });
 
 describe('POST /courses/activities/:id', () => {
+  let token, activityTh, user, activityUser;
+
+  beforeEach(async () => {
+    user = await Helpers.createUser();
+    token = await Helpers.createToken(user);
+    const course = await Helpers.createCourse();
+    const chapter = await Helpers.createChapter(course.id);
+    const topic = await Helpers.createTopic(chapter.id);
+    activityTh = (await Helpers.createActivityTheory(topic.id)).activityTh;
+  });
+
   it('should return 401 when cookie is invalid', async () => {
     const token = 'wrong_token';
     const response = await agent.post('/courses/activities/0').set('Cookie', `token=${token}`);
@@ -235,23 +246,13 @@ describe('POST /courses/activities/:id', () => {
   });
 
   it('should return 404 when activity id is not found', async () => {
-    const user = await Helpers.createUser();
-    const token = await Helpers.createToken(user);
-
     const response = await agent.post('/courses/activities/0').set('Cookie', `token=${token}`);
 
     expect(response.status).toBe(404);
     expect(response.body.message).toEqual('Atividade não encontrada');
   });
 
-  it('should return the activity completed', async () => {
-    const user = await Helpers.createUser();
-    const token = await Helpers.createToken(user);
-    const course = await Helpers.createCourse();
-    const chapter = await Helpers.createChapter(course.id);
-    const topic = await Helpers.createTopic(chapter.id);
-    const { activityTh } = await Helpers.createActivityTheory(topic.id);
-
+  it('should return the activity completed when dont exist in DB', async () => {
     const response = await agent.post(`/courses/activities/${activityTh.id}`).set('Cookie', `token=${token}`);
 
     expect(response.status).toBe(201);
@@ -262,6 +263,22 @@ describe('POST /courses/activities/:id', () => {
       done: true,
       createdAt: expect.any(String),
       updatedAt: expect.any(String)
+    }));
+  });
+
+  it('should return the activity done equal to false', async () => {
+    activityUser = await Helpers.createActivityUsers(user.id, activityTh.id);
+
+    const response = await agent.post(`/courses/activities/${activityTh.id}`).set('Cookie', `token=${token}`);
+
+    delete activityUser.done;
+    delete activityUser.updatedAt;
+
+    expect(response.status).toBe(201);
+    expect(response.body).toEqual(expect.objectContaining({
+      ...activityUser,
+      done: false,
+      updatedAt: expect.any(String),
     }));
   });
 });

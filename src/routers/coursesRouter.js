@@ -17,7 +17,7 @@ router.get('/chapters/:chapterId/topics/:topicId/activities', async (req, res) =
   const params = req.params;
 
   const chapter = await CoursesController.getChapter(params.chapterId);
-  const topic = await CoursesController.getTopic(params.topicId, 150);
+  const topic = await CoursesController.getTopic(params.topicId, req.user.id);
   
   res.status(200).send({ topic, chapter });
 });

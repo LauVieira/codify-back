@@ -7,6 +7,7 @@ const Activity = require('../../src/models/Activity');
 const ActivityUser = require('../../src/models/ActivityUser');
 const Err = require('../../src/errors');
 
+jest.mock('../../src/models/ActivityUser');
 jest.mock('sequelize');
 
 describe('getSuggestions', () => {
@@ -96,16 +97,27 @@ describe('getActivity', () => {
 });
 
 describe('activityDone', () => {
-  it('should create one activityDone data', () => {
+  it('should create one activityDone data when dont exist in DB', async () => {
     const activityId = 1;
     const userId = 1;
     const done = true;
 
+    ActivityUser.findOne.mockImplementationOnce(() => null);
     const spy = jest.spyOn(ActivityUser, 'create');
-    CoursesController.activityDone(activityId, userId);
-
+    await CoursesController.activityDone(activityId, userId);
+    
     expect(spy).toHaveBeenCalled();
     expect(spy).toHaveBeenCalledWith({ activityId, userId, done });
+  });
+
+  it('should toggle activityDone data when exist in DB', async () => {
+    const activityId = 1;
+    const userId = 1;
+
+    ActivityUser.findOne.mockResolvedValueOnce({ done: true, save: async function () {} });
+    const response = await CoursesController.activityDone(activityId, userId);
+    
+    expect(response).toMatchObject({ done: false });
   });
 });
 
