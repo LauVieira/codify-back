@@ -1,32 +1,22 @@
 /* global afterAll, jest, describe, it, expect  */
-require('dotenv').config();
-const bcrypt = require('bcrypt');
+/* eslint-disable quotes*/
+require('dotenv-flow').config();
 
 const supertest = require('supertest');
 const app = require('../../src/app');
 const agent = supertest(app);
 
-const { Pool } = require('pg');
 const sequelize = require('../../src/utils/database');
-const db = new Pool({
-  connectionString: process.env.DATABASE_URL,
-});
 
-async function cleanDataBase () {
-  await db.query('DELETE FROM users');
-}
+const { eraseDatabase, createUser, createToken } = require('../Helpers');
 
 beforeEach(async () => {
-  await cleanDataBase();
+  await eraseDatabase();
 });
 
 afterAll(async () => {
-  await cleanDataBase();
   await sequelize.close();
-  await db.end();
 });
-
-jest.mock('bcrypt');
 
 describe('POST /users/sign-up', () => {
   it('should return 201 when passed valid parameters', async () => {
@@ -37,16 +27,15 @@ describe('POST /users/sign-up', () => {
       confirmPassword: '1Ju23123',
     };
 
-    bcrypt.hashSync.mockImplementationOnce((password) => password);
-
     const response = await agent.post('/users/sign-up').send(body);
-    const queryResult = await db.query('SELECT * FROM users WHERE email=$1', [body.email]);
-    const user = queryResult.rows[0];
 
     expect(response.status).toBe(201);
-    expect(user).toEqual(expect.objectContaining({
+    expect(response.body).toEqual(expect.objectContaining({
+      id: expect.any(Number),
       email: body.email,
-      name: body.name
+      name: body.name,
+      createdAt: expect.any(String),
+      updatedAt: expect.any(String)
     }));
   });
 
@@ -72,7 +61,7 @@ describe('POST /users/sign-up', () => {
       confirmPassword: '1Ju23123',
     };
 
-    await db.query('INSERT INTO users (name, email, password) values ($1, $2, $3)', [body.name, body.email, body.password]);
+    await createUser();
     const response = await agent.post('/users/sign-up').send(body);
 
     expect(response.status).toBe(409);
@@ -86,23 +75,15 @@ describe('POST /users/sign-in', () => {
       email: 'test@test.com',
       password: '123456',
     };
-
-    bcrypt.compareSync.mockImplementationOnce(() => true);
     
-    await db.query('INSERT INTO users (name, email, password) values ($1, $2, $3)', ['teste', body.email, body.password]);
+    const user = await createUser();
+    delete user.password;
     
     const response = await agent.post('/users/sign-in').send(body);
 
-    const queryResult = await db.query('SELECT * FROM users WHERE email=$1', [body.email]);
-    const user = queryResult.rows[0];
-
-    expect(response.headers).toHaveProperty('set-cookie');
     expect(response.status).toBe(200);
-    expect(response.body).toEqual(expect.objectContaining({
-      id: user.id,
-      email: user.email,
-      name: user.name
-    }));
+    expect(response.headers['set-cookie'][0]).toContain('token');
+    expect(response.body).toMatchObject(user);
   });
 
   it('should return 422 when passed missing parameters', async () => {
@@ -133,13 +114,39 @@ describe('POST /users/sign-in', () => {
       password: '1Ju23123xxx',
     };
 
-    bcrypt.compareSync.mockImplementationOnce(() => false);
-
-    await db.query('INSERT INTO users (name, email, password) values ($1, $2, $3)', ['teste', body.email, '1Ju23123']);
+    await createUser();
 
     const response = await agent.post('/users/sign-in').send(body);
 
     expect(response.status).toBe(401);
     expect(response.body.message).toEqual('Email ou senha estão incorretos');
+  });
+});
+
+describe('POST /users/sign-out', () => {
+  it('should return 401 when token cookie is invalid', async () => {
+    const token = 'wrong_token';
+    const response = await agent.post('/users/sign-out').set('Cookie', `token=${token}`);
+
+    expect(response.status).toBe(401);
+    expect(response.body.message).toEqual('Token inválido');
+  });
+
+  it('should return 401 when no cookie is sent', async () => {
+    const response = await agent.post('/users/sign-out');
+
+    expect(response.status).toBe(401);
+    expect(response.body.message).toEqual('Token não encontrado');
+  });
+
+  it('should return 200 -> valid cookie, and destroy session', async () => {
+    const user = await createUser();
+    const token = await createToken(user);
+
+    const response = await agent.post('/users/sign-out').set('Cookie', `token=${token}`);
+
+    expect(response.status).toBe(200);
+    expect(response.body.message).toEqual('Sign-out efetuado com sucesso');
+    expect(response.headers['set-cookie'][0]).toContain('Expires');
   });
 });

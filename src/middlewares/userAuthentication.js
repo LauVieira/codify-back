@@ -7,7 +7,8 @@ async function userAuthentication (req, res, next) {
 
   jwt.verify(token, process.env.SECRET, (err, decoded) => {
     if (err) throw new UnauthorizedError('Token inválido');
-    req.user = decoded.selectedUser;
+    req.user = decoded;
+    
     next();
   });
 }

@@ -15,7 +15,6 @@ Topic.init({
   title: {
     type: Sequelize.STRING,
     allowNull: false,
-    unique: true
   },
   chapterId: {
     type: Sequelize.INTEGER,

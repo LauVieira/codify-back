@@ -8,12 +8,19 @@ router.post('/login', adminLogin, (req, res) => {
     delete req.admin.password;
     const adminToken = jwt.sign(req.admin, process.env.ADMIN_SECRET);
 
-    res.cookie('adminToken', adminToken, { secure: true, sameSite: 'none' });
+    const cookieOptions = {};
+
+    if (process.env.NODE_ENV === 'production') {
+        cookieOptions.secure = true;
+        cookieOptions.sameSite = 'none';
+    }
+    
+    res.cookie('adminToken', adminToken, cookieOptions);
     res.status(200).send(req.admin);
 });
 
 router.post('/logout', adminAuthentication, (req, res) => {
-    res.clearCookie('adminToken', { secure: true, sameSite: 'none' });
+    res.clearCookie('adminToken');
 
     res.status(200).send({ message: 'Logout efetuado com sucesso' });
 });
