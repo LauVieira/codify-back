@@ -11,4 +11,6 @@ router.use('/courses', adminCoursesRouter);
 router.use('/topics', adminTopicsRouter);
 router.use('/chapters', adminChaptersRouter);
 //adminAuthentication
+//router.use('/courses', adminAuthentication, adminCoursesRouter);
+
 module.exports = router;
