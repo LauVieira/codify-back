@@ -167,7 +167,6 @@ class CoursesController {
     await chapter.save();
     return chapter;
   }
-
 }
 
 module.exports = new CoursesController();
