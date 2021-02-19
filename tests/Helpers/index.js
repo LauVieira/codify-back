@@ -1,32 +1,137 @@
 require('dotenv-flow').config();
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-const { Pool } = require('pg');
 
-const database = new Pool({
-  connectionString: process.env.DATABASE_URL,
-});
+const database = require('../../src/utils/database');
+
+function convertToJson (entity) {
+  entity[0][0].createdAt = entity[0][0].createdAt.toJSON();
+  entity[0][0].updatedAt = entity[0][0].updatedAt.toJSON();
+
+  return entity[0][0];
+}
 
 class Helpers {
   async createUser () {
     const hashedPassword = bcrypt.hashSync('123456', 10);
-    const userValues = ['teste', 'test@test.com', hashedPassword];
+    const values = ['teste', 'test@test.com', hashedPassword];
   
-    const user = await database.query(`
-      INSERT INTO users (name, email, password) values ($1, $2, $3) RETURNING *`, userValues
-    );
-  
-    return user.rows[0];
+    let user = await database.query(`
+      INSERT INTO users (name, email, password) values ('${values[0]}', '${values[1]}', '${values[2]}') RETURNING *;
+    `);
+    
+    user = convertToJson(user);
+    return user;
   }
 
   async createAdmin () {
     const hashedPassword = bcrypt.hashSync('123456', 10);
-    const adminValues = ['admin', hashedPassword];
-    const admin = await database.query(`
-      INSERT INTO admins (username, password) values ($1, $2) RETURNING *`, adminValues
+    const values = ['admin', hashedPassword];
+
+    let admin = await database.query(`
+      INSERT INTO admins (username, password) values ('${values[0]}', '${values[1]}') RETURNING *;
+    `);
+
+    admin = convertToJson(admin);
+
+    return admin;
+  }
+
+  async createCourse () {
+    const values = ['Course title', 'Course description', 'Course photo', 'Course alt', 'Course background'];
+    let course = await database.query(`
+      INSERT INTO courses (title, description, photo, alt, background) VALUES ('${values[0]}', '${values[1]}', '${values[2]}', '${values[3]}', '${values[4]}') RETURNING *;
+    `);
+
+    course = convertToJson(course);
+
+    return course;
+  }
+
+  async createChapter (courseId) {
+    const values = ['Chapter title', courseId];
+    let chapter = await database.query(`
+      INSERT INTO chapters (title, "courseId") VALUES ('${values[0]}', '${values[1]}') RETURNING *;
+    `);
+    
+    chapter = convertToJson(chapter);
+
+    return chapter;
+  }
+
+  async createTopic (chapterId) {
+    const values = ['Topic title', chapterId];
+    let topic = await database.query(`
+      INSERT INTO topics (title, "chapterId") VALUES ('${values[0]}', '${values[1]}') RETURNING *;
+    `);
+    
+    topic = convertToJson(topic);
+
+    return topic;
+  }
+
+  async createActivityExercise (topicId) {
+    let values = ['exercise', topicId, 2];
+    let activityEx = await database.query(`
+      INSERT INTO activities (type, "topicId", "order") VALUES ('${values[0]}', '${values[1]}', '${values[2]}') RETURNING *;
+    `);
+
+    activityEx = convertToJson(activityEx);
+    values = ['Title exercise', activityEx.id];
+
+    let exercise = await database.query(`
+      INSERT INTO exercises ("title", "activityId") VALUES ('${values[0]}', '${values[1]}') RETURNING *;
+    `);
+    exercise = convertToJson(exercise);
+
+    return { activityEx, exercise };
+  }
+
+  async createActivityTheory (topicId) {
+    let values = ['theory', topicId, 1];
+    let activityTh = await database.query(`
+      INSERT INTO activities (type, "topicId", "order") VALUES ('${values[0]}', '${values[1]}', '${values[2]}') RETURNING *;`
     );
+
+    activityTh = convertToJson(activityTh);
+    values = ['Test youtube', activityTh.id];
+
+    let theory = await database.query(`
+      INSERT INTO theories ("youtubeLink", "activityId") VALUES ('${values[0]}', '${values[1]}') RETURNING *;
+    `);
+    theory = convertToJson(theory);
+
+    return { activityTh, theory };
+  }
+
+  async createCourseUsers (userId, courseId) {
+    let courseUser = await database.query(`
+      INSERT INTO "courseUsers" ("userId", "courseId") VALUES ('${userId}', '${courseId}') RETURNING *;
+    `);
+    
+    courseUser = convertToJson(courseUser);
+
+    return courseUser;
+  }
+
+  async createActivityUsers (userId, activityId) {
+    let activityUser = await database.query(`
+      INSERT INTO "activityUsers" (title, "chapterId") VALUES ('${userId}', '${activityId}') RETURNING *;
+    `);
+    
+    activityUser = convertToJson(activityUser);
+
+    return activityUser;
+  }
   
-    return admin.rows[0];
+  createAdminToken (admin) {
+    delete admin.password;
+    const adminToken = jwt.sign(
+      admin,
+      process.env.ADMIN_SECRET
+    );
+
+    return adminToken;
   }
 
   createToken (user) {
@@ -37,44 +142,6 @@ class Helpers {
     );
 
     return token;
-  }
-
-  async createCourses () {
-    const values = ['Test title', 'Test description', 'Test photo', 'Test alt', 'Test background'];
-    const course = await db.query(`
-      INSERT INTO courses (title, description, photo, alt, background) VALUES ($1, $2, $3, $4, $5) RETURNING *`, [values]
-    );
-
-    return course.rows[0];
-  }
-
-  async createTopics () {
-    const values = ['Test title', 'Test description', 'Test photo', 'Test alt', 'Test background'];
-    const course = await db.query(`
-      INSERT INTO courses (title, description, photo, alt, background) VALUES ($1, $2, $3, $4, $5) RETURNING *`, [values]
-    );
-
-    return course.rows[0];
-  }
-
-  async createCourses () {
-    const values = ['Test title', 'Test description', 'Test photo', 'Test alt', 'Test background'];
-    const course = await db.query(`
-      INSERT INTO courses (title, description, photo, alt, background) VALUES ($1, $2, $3, $4, $5) RETURNING *`, [values]
-    );
-
-    return course[0].rows;
-  }
-  
-
-  createAdminToken (admin) {
-    delete admin.password;
-    const adminToken = jwt.sign(
-      admin,
-      process.env.ADMIN_SECRET
-    );
-
-    return adminToken;
   }
 
   eraseDatabase () {

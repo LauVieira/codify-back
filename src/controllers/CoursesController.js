@@ -23,12 +23,13 @@ class CoursesController {
     const topic = await Topic.findByPk(id, { 
       include: { 
         model: Activity,
+        order: ['order', 'ASC'],
         include: [{
           model: Theory
         }, {
           model: Exercise
         }]
-      } 
+      },
     });
 
     if (!topic) throw new NotFoundError('Tópico não encontrado');
@@ -43,7 +44,7 @@ class CoursesController {
 
   async getChapter (id) {
     const chapter = await Chapter.findByPk(id);
-    if (!chapter) throw new NotFoundError('Capitulo não encontrado');
+    if (!chapter) throw new NotFoundError('Capítulo não encontrado');
     return chapter;
   }
 

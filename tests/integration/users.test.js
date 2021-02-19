@@ -76,19 +76,14 @@ describe('POST /users/sign-in', () => {
       password: '123456',
     };
     
-    await createUser();
+    const user = await createUser();
+    delete user.password;
     
     const response = await agent.post('/users/sign-in').send(body);
 
     expect(response.status).toBe(200);
     expect(response.headers['set-cookie'][0]).toContain('token');
-    expect(response.body).toEqual(expect.objectContaining({
-      id: expect.any(Number),
-      email: body.email,
-      name: expect.any(String),
-      createdAt: expect.any(String),
-      updatedAt: expect.any(String)
-    }));
+    expect(response.body).toMatchObject(user);
   });
 
   it('should return 422 when passed missing parameters', async () => {

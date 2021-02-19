@@ -30,17 +30,14 @@ describe('POST /admin/users/login', () => {
       password: '123456' 
     };
     
-    await createAdmin();
+    const admin = await createAdmin();
+    delete admin.password;
+    
     const response = await agent.post('/admin/users/login').send(body);
 
     expect(response.status).toBe(200);
     expect(response.headers['set-cookie'][0]).toContain('adminToken');
-    expect(response.body).toEqual(expect.objectContaining({
-      id: expect.any(Number),
-      username: body.username,
-      createdAt: expect.any(String),
-      updatedAt: expect.any(String)
-    }));
+    expect(response.body).toMatchObject(admin);
   });
 
   it('should return 422 when passed missing parameters', async () => {

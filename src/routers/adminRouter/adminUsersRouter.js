@@ -14,7 +14,7 @@ router.post('/login', adminLogin, (req, res) => {
         cookieOptions.secure = true;
         cookieOptions.sameSite = 'none';
     }
-
+    
     res.cookie('adminToken', adminToken, cookieOptions);
     res.status(200).send(req.admin);
 });

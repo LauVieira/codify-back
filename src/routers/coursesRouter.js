@@ -13,12 +13,12 @@ router.get('/:id', async (req, res) => {
   res.status(200).send({ course, program });
 });
 
-router.get('/topics/:id', async (req, res) => {
-  const obj = req.params;
+router.get('/chapters/:chapterId/topics/:topicId/activities', async (req, res) => {
+  const params = req.params;
 
-  const topic = await CoursesController.getTopic(obj.id);
-  const chapter = await CoursesController.getChapter(topic.chapterId);
-
+  const chapter = await CoursesController.getChapter(params.chapterId);
+  const topic = await CoursesController.getTopic(params.topicId);
+  
   res.status(200).send({ topic, chapter });
 });
 
