@@ -52,11 +52,4 @@ router.put('/:id', async (req, res) => {
   res.status(200).send(updatedChapter);
 });
 
-// router.delete('/:id', async (req, res) => {
-//   const { id } = req.params;
-
-//   await CoursesController.deleteCourse(id);
-//   res.sendStatus(204);
-// });
-
 module.exports = router;
