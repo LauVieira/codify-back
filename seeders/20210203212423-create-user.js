@@ -13,8 +13,8 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.bulkDelete('users', [
-      { email: 'test@test.com' },
-    ]);
+    await queryInterface.bulkDelete('users', 
+      { email: 'test@test.com' }
+    );
   },
 };

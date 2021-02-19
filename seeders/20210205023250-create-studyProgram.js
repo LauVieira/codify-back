@@ -63,7 +63,14 @@ module.exports = {
   },
 
   down: async (queryInterface) => {
-    await queryInterface.bulkDelete('topics', null, {});
-    await queryInterface.bulkDelete('chapters',  null, {});    
+    await queryInterface.bulkDelete('topics', [
+      { chapterId: chapters[0][0].id },
+      { chapterId: chapters[0][1].id },
+      { chapterId: chapters[0][2].id },
+      { chapterId: chapters[0][3].id },
+      { chapterId: chapters[0][4].id }
+    ]);
+    
+    await queryInterface.bulkDelete('chapters', { courseId });    
   }
 };

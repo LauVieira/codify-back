@@ -110,8 +110,27 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.bulkDelete('theories');
-    await queryInterface.bulkDelete('exercises'); 
-    await queryInterface.bulkDelete('activities');
+    await queryInterface.bulkDelete('theories', [
+      { ativityId: theories[0][0].id },
+      { ativityId: theories[0][1].id },
+      { ativityId: theories[0][2].id },
+      { ativityId: theories[0][3].id },
+      { ativityId: theories[0][4].id }
+    ]);
+    await queryInterface.bulkDelete('exercises', [
+      { activityId: exercises[0][0] },
+      { activityId: exercises[0][1] },
+      { activityId: exercises[0][2] },
+      { activityId: exercises[0][3] },
+      { activityId: exercises[0][4] },
+      { activityId: exercises[0][5] }
+    ]); 
+    await queryInterface.bulkDelete('activities', [
+      { topicId: topics[0][0].id },
+      { topicId: topics[0][1].id },
+      { topicId: topics[0][2].id },
+      { topicId: topics[0][3].id },
+      { topicId: topics[0][4].id },
+    ]);
   }
 };
