@@ -82,13 +82,6 @@ class CoursesController {
     return Course.findAll({ limit, offset });
   }
 
-  async getById (id) {
-    const course = await Course.findByPk(id);
-    if (course === null) throw new Err.NotFoundError('Curso não encontrado');
-
-    return course;
-  }
-
   async createCourse (courseData) {
     const course = await Course.findOne({ where: { title: courseData.title } });
     if (course !== null) throw new Err.ConflictError('Curso já existe');

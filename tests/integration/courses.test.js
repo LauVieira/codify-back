@@ -1,5 +1,6 @@
 /* global beforeEach, afterAll, it, describe, expect */
-require('dotenv-flow').config();
+/* eslint-disable quotes*/
+require('dotenv').config();
 const jwt = require('jsonwebtoken');
 
 const { Pool } = require('pg');

@@ -5,6 +5,6 @@ const adminCoursesRouter = require('./adminCoursesRouter');
 const adminAuthentication = require('../../middlewares/adminAuthentication');
 
 router.use('/users', adminUsersRouter);
-router.use('/courses', adminCoursesRouter);
-//adminAuthentication
+router.use('/courses', adminAuthentication, adminCoursesRouter);
+
 module.exports = router;
