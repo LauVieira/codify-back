@@ -184,6 +184,7 @@ describe('GET /courses/chapters/:chapterId/topics/:id/activities', () => {
     const topic = await Helpers.createTopic(chapter.id);
     const { activityTh, theory } = await Helpers.createActivityTheory(topic.id);
     const { activityEx, exercise } = await Helpers.createActivityExercise(topic.id);
+    const activityUser = await Helpers.createActivityUsers(user.id, activityTh.id);
     
     const response = await agent.get(`/courses/chapters/${chapter.id}/topics/${topic.id}/activities`).set('Cookie', `token=${token}`);;
 
@@ -198,6 +199,9 @@ describe('GET /courses/chapters/:chapterId/topics/:id/activities', () => {
               ...theory
             }),
             exercise: null,
+            activityUsers: [expect.objectContaining({
+              ...activityUser
+            })]
           }),
           expect.objectContaining({
             ...activityEx,
@@ -205,6 +209,7 @@ describe('GET /courses/chapters/:chapterId/topics/:id/activities', () => {
               ...exercise
             }),
             theory: null,
+            activityUsers: []
           }),
         ])
       }),

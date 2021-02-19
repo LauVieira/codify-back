@@ -116,7 +116,7 @@ class Helpers {
 
   async createActivityUsers (userId, activityId) {
     let activityUser = await database.query(`
-      INSERT INTO "activityUsers" (title, "chapterId") VALUES ('${userId}', '${activityId}') RETURNING *;
+      INSERT INTO "activityUsers" ("userId", "activityId") VALUES ('${userId}', '${activityId}') RETURNING *;
     `);
     
     activityUser = convertToJson(activityUser);

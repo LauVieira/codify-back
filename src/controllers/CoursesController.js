@@ -30,6 +30,10 @@ class CoursesController {
           model: Theory
         }, {
           model: Exercise
+        }, {
+          model: ActivityUser,
+          where: { userId },
+          required: false
         }]
       },
     });
