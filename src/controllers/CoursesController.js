@@ -21,7 +21,7 @@ class CoursesController {
     return course;
   }
 
-  async getTopic (id, userId = 150) {
+  async getTopic (id, userId) {
     const topic = await Topic.findByPk(id, { 
       include: { 
         model: Activity,
