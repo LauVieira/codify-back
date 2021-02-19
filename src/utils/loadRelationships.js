@@ -17,6 +17,7 @@ Topic.hasMany(Activity);
 
 Activity.hasOne(Theory);
 Activity.hasOne(Exercise);
+Activity.hasMany(ActivityUser);
 
 Activity.belongsToMany(User, { through: ActivityUser });
 User.belongsToMany(Activity, { through: ActivityUser });

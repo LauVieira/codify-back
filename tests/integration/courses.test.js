@@ -30,7 +30,7 @@ afterAll(async () => {
   await db.end();
 });
 
-describe('GET /courses/suggestions', () => {
+/*describe('GET /courses/suggestions', () => {
   let user = {};
   let courses = [];
 
@@ -75,7 +75,7 @@ describe('GET /courses/suggestions', () => {
       ]),
     );
   });
-});
+});*/
 
 // describe('GET /courses/:id', () => {
 //   let user = {};
@@ -209,6 +209,54 @@ describe('GET /courses/chapters/:chapterId/topics/:id/activities', () => {
         ])
       }),
       chapter: expect.objectContaining(chapter)
+    }));
+  });
+});
+
+describe('POST /courses/activities/:id', () => {
+  it('should return 401 when cookie is invalid', async () => {
+    const token = 'wrong_token';
+    const response = await agent.post('/courses/activities/0').set('Cookie', `token=${token}`);
+
+    expect(response.status).toBe(401);
+    expect(response.body.message).toEqual('Token inválido');
+  });
+
+  it('should return 401 when no cookie is sent', async () => {
+    const response = await agent.post('/courses/activities/0');
+
+    expect(response.status).toBe(401);
+    expect(response.body.message).toEqual('Token não encontrado');
+  });
+
+  it('should return 404 when activity id is not found', async () => {
+    const user = await Helpers.createUser();
+    const token = await Helpers.createToken(user);
+
+    const response = await agent.post('/courses/activities/0').set('Cookie', `token=${token}`);
+
+    expect(response.status).toBe(404);
+    expect(response.body.message).toEqual('Atividade não encontrada');
+  });
+
+  it('should return the activity completed', async () => {
+    const user = await Helpers.createUser();
+    const token = await Helpers.createToken(user);
+    const course = await Helpers.createCourse();
+    const chapter = await Helpers.createChapter(course.id);
+    const topic = await Helpers.createTopic(chapter.id);
+    const { activityTh } = await Helpers.createActivityTheory(topic.id);
+
+    const response = await agent.post(`/courses/activities/${activityTh.id}`).set('Cookie', `token=${token}`);
+
+    expect(response.status).toBe(201);
+    expect(response.body).toEqual(expect.objectContaining({
+      id: expect.any(Number),
+      userId: user.id,
+      activityId: activityTh.id,
+      done: true,
+      createdAt: expect.any(String),
+      updatedAt: expect.any(String)
     }));
   });
 });

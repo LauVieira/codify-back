@@ -4,6 +4,7 @@ const Course = require('../../src/models/Course');
 const Topic = require('../../src/models/Topic');
 const Chapter = require('../../src/models/Chapter');
 const Activity = require('../../src/models/Activity');
+const ActivityUser = require('../../src/models/ActivityUser');
 const Err = require('../../src/errors');
 
 jest.mock('sequelize');
@@ -100,7 +101,7 @@ describe('activityDone', () => {
     const userId = 1;
     const done = true;
 
-    const spy = jest.spyOn(Activity, 'create');
+    const spy = jest.spyOn(ActivityUser, 'create');
     CoursesController.activityDone(activityId, userId);
 
     expect(spy).toHaveBeenCalled();

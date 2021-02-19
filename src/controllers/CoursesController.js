@@ -5,6 +5,8 @@ const Course = require('../models/Course');
 const Chapter = require('../models/Chapter');
 const Topic = require('../models/Topic');
 const Activity = require('../models/Activity');
+const ActivityUser = require('../models/ActivityUser');
+const User = require('../models/User');
 const Theory = require('../models/Theory');
 const Exercise = require('../models/Exercise');
 
@@ -19,7 +21,7 @@ class CoursesController {
     return course;
   }
 
-  async getTopic (id) {
+  async getTopic (id, userId = 150) {
     const topic = await Topic.findByPk(id, { 
       include: { 
         model: Activity,
@@ -49,7 +51,7 @@ class CoursesController {
   }
 
   activityDone (activityId, userId) {
-    return Activity.create({ activityId, userId, done: true });
+    return ActivityUser.create({ activityId, userId, done: true });
   }
 
   getProgram (courseId){
