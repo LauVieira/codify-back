@@ -29,7 +29,7 @@ module.exports = {
         title: 'Estruturas lógicas e condicionais',
         courseId
       },
-    ], {});
+    ]);
 
     const chapters = await queryInterface.sequelize.query(
       'SELECT id FROM chapters;'
@@ -59,10 +59,20 @@ module.exports = {
         title: 'Aula 7',
         chapterId: chapters[0][4].id,
       },
-    ], {});
+    ]);
   },
 
   down: async (queryInterface) => {
+    /*const courses = await queryInterface.sequelize.query(
+      'SELECT id from COURSES;'
+    );
+
+    const chapters = await queryInterface.sequelize.query(
+      'SELECT id FROM chapters;'
+    );
+
+    const courseId = courses[0][0].id;
+    
     await queryInterface.bulkDelete('topics', [
       { chapterId: chapters[0][0].id },
       { chapterId: chapters[0][1].id },
@@ -70,7 +80,10 @@ module.exports = {
       { chapterId: chapters[0][3].id },
       { chapterId: chapters[0][4].id }
     ]);
-    
-    await queryInterface.bulkDelete('chapters', { courseId });    
+
+    await queryInterface.bulkDelete('chapters', { courseId });*/
+
+    await queryInterface.bulkDelete('topics');
+    await queryInterface.bulkDelete('chapters');
   }
 };

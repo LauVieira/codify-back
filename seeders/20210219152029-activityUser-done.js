@@ -4,7 +4,7 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     const user = await queryInterface.sequelize.query(
-      `SELECT id FROM users WHERE email='test@test.com'';`
+      `SELECT id FROM users WHERE email='test@test.com';`
     );
 
     const userId = user[0][0].id;
@@ -13,7 +13,7 @@ module.exports = {
       `SELECT id FROM activities;`
     );
 
-    await queryInterface.bulkInsert('activities', [
+    await queryInterface.bulkInsert('activityUsers', [
       {
         done: true,
         userId,
@@ -43,6 +43,12 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
+    const user = await queryInterface.sequelize.query(
+      `SELECT id FROM users WHERE email='test@test.com';`
+    );
+
+    const userId = user[0][0].id;
+
     await queryInterface.bulkDelete('activityUsers', { userId });
   }
 };
