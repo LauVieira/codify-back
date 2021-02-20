@@ -113,3 +113,68 @@ describe('POST /admin/chapters', () => {
     }));
   });
 });
+
+describe('PUT /admin/chapters/:id', () => {
+  let admin, adminToken, course;
+
+  beforeEach(async () => {
+    admin = await Helpers.createAdmin();
+    adminToken = await Helpers.createAdminToken(admin);
+    course = await Helpers.createCourse();
+  });
+
+  it('should return 401 when cookie is invalid', async () => {
+    const wrongAdminToken = 'wrong_token';
+    const response = await agent.put('/admin/chapters/0').set('Cookie', `adminToken=${wrongAdminToken}`);
+
+    expect(response.status).toBe(401);
+    expect(response.body.message).toEqual('Token inválido');
+  });
+
+  it('should return 401 when no cookie is sent', async () => {
+    const response = await agent.put('/admin/chapters/0');
+
+    expect(response.status).toBe(401);
+    expect(response.body.message).toEqual('Token não encontrado');
+  });
+
+  it('should return 422 when called with invalid chapter data', async () => {
+    const body = { data: 'invalid' };
+    const response = await agent.put('/admin/chapters/0').send(body).set('Cookie', `adminToken=${adminToken}`);
+  
+    expect(response.status).toBe(422);
+    expect(response.body.message).toEqual('Não foi possível processar o formato dos dados');
+  });
+
+  it('should return 404 when courseId is not associate to any course in DB', async () => {
+    const body = { title: 'title updated chapter', courseId: 0 };
+    const response = await agent.put('/admin/chapters/0').send(body).set('Cookie', `adminToken=${adminToken}`);
+
+    expect(response.status).toBe(404);
+    expect(response.body.message).toEqual('Curso não encontrado');
+  });
+
+  it('should return 404 when chapterId is not found', async () => {
+    const body = { title: 'title updated chapter', courseId: course.id };
+    const response = await agent.put('/admin/chapters/0').send(body).set('Cookie', `adminToken=${adminToken}`);
+
+    expect(response.status).toBe(404);
+    expect(response.body.message).toEqual('Capítulo não encontrado');
+  });
+
+  it('should return the chapter updated with valid cookie', async () => {
+    const chapter = await Helpers.createChapter(course.id);
+    const body = { title: 'title updated chapter', courseId: course.id };
+
+    const response = await agent.put(`/admin/chapters/${chapter.id}`).send(body).set('Cookie', `adminToken=${adminToken}`);
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual(expect.objectContaining({
+      id: chapter.id,
+      title: body.title,
+      courseId: body.courseId,
+      createdAt: chapter.createdAt,
+      updatedAt: expect.any(String),
+    }));
+  });
+});
