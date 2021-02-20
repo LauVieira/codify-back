@@ -140,14 +140,14 @@ describe('GET /courses/chapters/:chapterId/topics/:id/activities', () => {
   });
 
   it('should return 404 when chapter id is not found', async () => {
-    const response = await agent.get('/courses/chapters/0/topics/0/activities').set('Cookie', `token=${token}`);;
+    const response = await agent.get('/courses/chapters/0/topics/0/activities').set('Cookie', `token=${token}`);
 
     expect(response.status).toBe(404);
     expect(response.body.message).toEqual('Capítulo não encontrado');
   });
 
   it('should return 404 when topic id is not found', async () => {
-    const response = await agent.get(`/courses/chapters/${chapter.id}/topics/0/activities`).set('Cookie', `token=${token}`);;
+    const response = await agent.get(`/courses/chapters/${chapter.id}/topics/0/activities`).set('Cookie', `token=${token}`);
 
     expect(response.status).toBe(404);
     expect(response.body.message).toEqual('Tópico não encontrado');
@@ -159,7 +159,7 @@ describe('GET /courses/chapters/:chapterId/topics/:id/activities', () => {
     const { activityEx, exercise } = await Helpers.createActivityExercise(topic.id);
     const activityUser = await Helpers.createActivityUsers(user.id, activityTh.id);
     
-    const response = await agent.get(`/courses/chapters/${chapter.id}/topics/${topic.id}/activities`).set('Cookie', `token=${token}`);;
+    const response = await agent.get(`/courses/chapters/${chapter.id}/topics/${topic.id}/activities`).set('Cookie', `token=${token}`);
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual(expect.objectContaining({

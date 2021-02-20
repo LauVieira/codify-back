@@ -1,8 +1,8 @@
 const router = require('express').Router();
+
 const CoursesController = require('../../controllers/CoursesController');
-const { InvalidDataError } = require('../../errors');
-const schemas = require('../../schemas');
-const { sanitiseObj } = require('../../utils/generalFunctions');
+const { schemaMiddleware } = require('../../middlewares');
+const schemas = require('../../schemas/coursesSchemas');
 
 router.get('/', async (req, res) => {
   let limit = null;
@@ -21,34 +21,27 @@ router.get('/', async (req, res) => {
     'Access-Control-Expose-Headers': 'Content-Range',
     'Content-Range': `${offset}-${chapters.length}/${total}`
   });
-  res.send(chapters);
+  res.status(200).send(chapters);
 });
 
 router.get('/:id', async (req, res) => {
   const { id } = req.params;
 
-  const chapter = await CoursesController.getChapterById(id);
+  const chapter = await CoursesController.getChapter(id);
   
   res.status(200).send(chapter);
 });
 
-router.post('/', async (req, res) => {
-  const { error } = schemas.courses.postChapter.validate(req.body);
-  if (error) throw new InvalidDataError('Não foi possível processar o formato dos dados');
+router.post('/', schemaMiddleware(schemas.postChapter), async (req, res) => {
+    const createdChapter = await CoursesController.createChapter(req.body);
 
-  const sanitisedChapter = sanitiseObj(req.body);
-  const createdChapter = await CoursesController.createChapter(sanitisedChapter);
-
-  res.status(201).send(createdChapter);
+    res.status(201).send(createdChapter);
 });
 
-router.put('/:id', async (req, res) => {
-  const { error } = schemas.courses.postChapter.validate(req.body);
-  if (error) throw new InvalidDataError('Não foi possível processar o formato dos dados');
-
+router.put('/:id', schemaMiddleware(schemas.putChapter), async (req, res) => {
   const { id } = req.params;
-  const sanitisedChapter = sanitiseObj(req.body);
-  const updatedChapter = await CoursesController.editChapter(id, sanitisedChapter);
+
+  const updatedChapter = await CoursesController.editChapter(id, req.body);
   res.status(200).send(updatedChapter);
 });
 

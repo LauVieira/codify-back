@@ -7,7 +7,6 @@ const Chapter = require('../models/Chapter');
 const Topic = require('../models/Topic');
 const Activity = require('../models/Activity');
 const ActivityUser = require('../models/ActivityUser');
-const User = require('../models/User');
 const Theory = require('../models/Theory');
 const Exercise = require('../models/Exercise');
 
@@ -41,32 +40,6 @@ class CoursesController {
 
     if (!topic) throw new NotFoundError('Tópico não encontrado');
     return topic;
-  }
-
-  async getActivity (id) {
-    const activity = await Activity.findByPk(id);
-    if (!activity) throw new NotFoundError('Atividade não encontrada');
-    return activity;
-  }
-
-  async getChapter (id) {
-    const chapter = await Chapter.findByPk(id);
-    if (!chapter) throw new NotFoundError('Capítulo não encontrado');
-    return chapter;
-  }
-
-  async activityDone (activityId, userId) {
-    let activityUser = await ActivityUser.findOne({ where: { activityId, userId } });
-
-    if (!activityUser) {
-      activityUser = await ActivityUser.create({ activityId, userId, done: true });
-      return activityUser;
-    }
-
-    activityUser.done = !activityUser.done;
-    await activityUser.save();
-
-    return activityUser;
   }
 
   getProgram (courseId){
@@ -115,15 +88,15 @@ class CoursesController {
   }
 
   async getTopicById (id) {
+    console.log(id, 'ID');
     const topic = await Topic.findByPk(id);
-    if (topic === null) throw new Err.NotFoundError('Topic não encontrado');
+    if (!topic) throw new Err.NotFoundError('Tópico não encontrado');
 
     return topic;
   }
 
   async createTopic (topicData) {
-    const topic = await Topic.findOne({ where: { title: topicData.title } });
-    if (topic !== null) throw new Err.ConflictError('Topico já existe');
+    await this.getChapter(topicData.chapterId);
 
     const createdTopic = await Topic.create(topicData);
     
@@ -131,28 +104,28 @@ class CoursesController {
   }
 
   async editTopic (id, topicData) {
-    const topic = await Topic.findByPk(id);
-    if (topic === null) throw new Err.NotFoundError('Topico não encontrado');
-
+    await this.getChapter(topicData.chapterId);
+    
+    const topic = await this.getTopicById(id);
     Object.assign(topic, topicData);
+
     await topic.save();
     return topic;
+  }
+
+  async getChapter (id) {
+    const chapter = await Chapter.findByPk(id);
+
+    if (!chapter) throw new NotFoundError('Capítulo não encontrado');
+    return chapter;
   }
 
   getAllChapters (limit = null, offset = null) {
     return Chapter.findAll({ limit, offset });
   }
 
-  async getChapterById (id) {
-    const chapter = await Chapter.findByPk(id);
-    if (chapter === null) throw new Err.NotFoundError('Capitulo não encontrado');
-
-    return chapter;
-  }
-
   async createChapter (chapterData) {
-    const chapter = await Chapter.findOne({ where: { title: chapterData.title } });
-    if (chapter !== null) throw new Err.ConflictError('Capitulo já existe');
+    await this.getCourse(chapterData.courseId);
 
     const createdChapter = await Chapter.create(chapterData);
     
@@ -160,12 +133,34 @@ class CoursesController {
   }
 
   async editChapter (id, chapterData) {
-    const chapter = await Chapter.findByPk(id);
-    if (chapter === null) throw new Err.NotFoundError('Capitulo não encontrado');
+    await this.getCourse(chapterData.courseId);
+
+    const chapter = await this.getChapter(id);
 
     Object.assign(chapter, chapterData);
     await chapter.save();
     return chapter;
+  }
+
+  async getActivity (id) {
+    const activity = await Activity.findByPk(id);
+
+    if (!activity) throw new NotFoundError('Atividade não encontrada');
+    return activity;
+  }
+
+  async activityDone (activityId, userId) {
+    let activityUser = await ActivityUser.findOne({ where: { activityId, userId } });
+
+    if (!activityUser) {
+      activityUser = await ActivityUser.create({ activityId, userId, done: true });
+      return activityUser;
+    }
+
+    activityUser.done = !activityUser.done;
+    await activityUser.save();
+
+    return activityUser;
   }
 }
 

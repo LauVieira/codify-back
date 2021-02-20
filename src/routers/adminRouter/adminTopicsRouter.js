@@ -1,8 +1,8 @@
 const router = require('express').Router();
+
 const CoursesController = require('../../controllers/CoursesController');
-const { InvalidDataError } = require('../../errors');
-const schemas = require('../../schemas');
-const { sanitiseObj } = require('../../utils/generalFunctions');
+const { schemaMiddleware } = require('../../middlewares');
+const schemas = require('../../schemas/coursesSchemas');
 
 router.get('/', async (req, res) => {
   let limit = null;
@@ -32,31 +32,17 @@ router.get('/:id', async (req, res) => {
   res.status(200).send(topic);
 });
 
-router.post('/', async (req, res) => {
-  const { error } = schemas.courses.postTopic.validate(req.body);
-  if (error) throw new InvalidDataError('Não foi possível processar o formato dos dados');
-
-  const sanitisedTopic = sanitiseObj(req.body);
-  const createdTopic = await CoursesController.createTopic(sanitisedTopic);
+router.post('/', schemaMiddleware(schemas.postTopic) , async (req, res) => {
+  const createdTopic = await CoursesController.createTopic(req.body);
 
   res.status(201).send(createdTopic);
 });
 
-router.put('/:id', async (req, res) => {
-  const { error } = schemas.courses.postTopic.validate(req.body);
-  if (error) throw new InvalidDataError('Não foi possível processar o formato dos dados');
-
+router.put('/:id', schemaMiddleware(schemas.putTopic), async (req, res) => {
   const { id } = req.params;
-  const sanitisedTopic = sanitiseObj(req.body);
-  const updatedTopic = await CoursesController.editTopic(id, sanitisedTopic);
+
+  const updatedTopic = await CoursesController.editTopic(id, req.body);
   res.status(200).send(updatedTopic);
 });
-
-// router.delete('/:id', async (req, res) => {
-//   const { id } = req.params;
-
-//   await CoursesController.deleteCourse(id);
-//   res.sendStatus(204);
-// });
 
 module.exports = router;

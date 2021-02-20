@@ -24,7 +24,7 @@ router.post('/sign-up', validateUser, async (req, res) => {
 router.post('/sign-in', async (req, res) => {
   const validation = Schemas.users.signIn.validate(req.body);
   if (validation.error) {
-    throw new InvalidDataError('Não foi possível processar o formato dos dados');
+    throw new InvalidDataError();
   }
 
   const userData = sanitiseObj(req.body);

@@ -8,8 +8,8 @@ const adminAuthentication = require('../../middlewares/adminAuthentication');
 
 router.use('/users', adminUsersRouter);
 router.use('/courses', adminCoursesRouter);
-router.use('/topics', adminTopicsRouter);
-router.use('/chapters', adminChaptersRouter);
+router.use('/topics', adminAuthentication, adminTopicsRouter);
+router.use('/chapters', adminAuthentication, adminChaptersRouter);
 //adminAuthentication
 //router.use('/courses', adminAuthentication, adminCoursesRouter);
 

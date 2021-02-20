@@ -34,7 +34,7 @@ router.get('/:id', async (req, res) => {
 
 router.post('/', async (req, res) => {
   const { error } = schemas.courses.post.validate(req.body);
-  if (error) throw new InvalidDataError('Não foi possível processar o formato dos dados');
+  if (error) throw new InvalidDataError();
 
   const sanitisedCourse = sanitiseObj(req.body);
   const createdCourse = await CoursesController.createCourse(sanitisedCourse);
@@ -44,7 +44,7 @@ router.post('/', async (req, res) => {
 
 router.put('/:id', async (req, res) => {
   const { error } = schemas.courses.post.validate(req.body);
-  if (error) throw new InvalidDataError('Não foi possível processar o formato dos dados');
+  if (error) throw new InvalidDataError();
 
   const { id } = req.params;
   const sanitisedCourse = sanitiseObj(req.body);
