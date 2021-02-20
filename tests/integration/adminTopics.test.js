@@ -58,3 +58,60 @@ describe('GET /admin/topics/:id', () => {
     expect(response.body).toMatchObject(topic);
   });
 });
+
+describe('POST /admin/topics', () => {
+  let admin, adminToken, chapter;
+
+  beforeEach(async () => {
+    admin = await Helpers.createAdmin();
+    adminToken = await Helpers.createAdminToken(admin);
+    const course = await Helpers.createCourse();
+    chapter = await Helpers.createChapter(course.id);
+  });
+
+  it('should return 401 when cookie is invalid', async () => {
+    const wrongAdminToken = 'wrong_token';
+    const response = await agent.post('/admin/topics').set('Cookie', `adminToken=${wrongAdminToken}`);
+
+    expect(response.status).toBe(401);
+    expect(response.body.message).toEqual('Token inválido');
+  });
+
+  it('should return 401 when no cookie is sent', async () => {
+    const response = await agent.post('/admin/topics');
+
+    expect(response.status).toBe(401);
+    expect(response.body.message).toEqual('Token não encontrado');
+  });
+
+  it('should return 422 when called with invalid topic data', async () => {
+    const body = { title: 'title topic' };
+    const response = await agent.post('/admin/topics').send(body).set('Cookie', `adminToken=${adminToken}`);
+  
+    expect(response.status).toBe(422);
+    expect(response.body.message).toEqual('Não foi possível processar o formato dos dados');
+  });
+
+  it('should return 404 when chapterId is not associated to any chapter in DB', async () => {
+    const body = { title: 'title topic', chapterId: 0 };
+    const response = await agent.post('/admin/topics').send(body).set('Cookie', `adminToken=${adminToken}`);
+
+    expect(response.status).toBe(404);
+    expect(response.body.message).toEqual('Capítulo não encontrado');
+  });
+
+  it('should return the chapter created with valid cookie', async () =>{
+    const body = { title: 'title topic', chapterId: chapter.id };
+
+    const response = await agent.post('/admin/topics').send(body).set('Cookie', `adminToken=${adminToken}`);
+
+    expect(response.status).toBe(201);
+    expect(response.body).toEqual(expect.objectContaining({
+      id: expect.any(Number),
+      title: body.title,
+      chapterId: body.chapterId,
+      createdAt: expect.any(String),
+      updatedAt: expect.any(String),
+    }));
+  });
+});

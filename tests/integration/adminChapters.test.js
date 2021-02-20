@@ -57,3 +57,59 @@ describe('GET /admin/chapters/:id', () => {
     expect(response.body).toMatchObject(chapter);
   });
 });
+
+describe('POST /admin/chapters', () => {
+  let admin, adminToken, course;
+
+  beforeEach(async () => {
+    admin = await Helpers.createAdmin();
+    adminToken = await Helpers.createAdminToken(admin);
+    course = await Helpers.createCourse();
+  });
+
+  it('should return 401 when cookie is invalid', async () => {
+    const wrongAdminToken = 'wrong_token';
+    const response = await agent.post('/admin/chapters').set('Cookie', `adminToken=${wrongAdminToken}`);
+
+    expect(response.status).toBe(401);
+    expect(response.body.message).toEqual('Token inválido');
+  });
+
+  it('should return 401 when no cookie is sent', async () => {
+    const response = await agent.post('/admin/chapters');
+
+    expect(response.status).toBe(401);
+    expect(response.body.message).toEqual('Token não encontrado');
+  });
+
+  it('should return 422 when called with invalid chapter data', async () => {
+    const body = { title: 'title chapter' };
+    const response = await agent.post('/admin/chapters').send(body).set('Cookie', `adminToken=${adminToken}`);
+  
+    expect(response.status).toBe(422);
+    expect(response.body.message).toEqual('Não foi possível processar o formato dos dados');
+  });
+
+  it('should return 404 when courseId is not associate to any course in DB', async () => {
+    const body = { title: 'title chapter', courseId: 0 };
+    const response = await agent.post('/admin/chapters').send(body).set('Cookie', `adminToken=${adminToken}`);
+
+    expect(response.status).toBe(404);
+    expect(response.body.message).toEqual('Curso não encontrado');
+  });
+
+  it('should return the chapter created with valid cookie', async () =>{
+    const body = { title: 'title chapter', courseId: course.id };
+
+    const response = await agent.post('/admin/chapters').send(body).set('Cookie', `adminToken=${adminToken}`);
+
+    expect(response.status).toBe(201);
+    expect(response.body).toEqual(expect.objectContaining({
+      id: expect.any(Number),
+      title: body.title,
+      courseId: body.courseId,
+      createdAt: expect.any(String),
+      updatedAt: expect.any(String),
+    }));
+  });
+});
