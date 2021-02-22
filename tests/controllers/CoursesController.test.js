@@ -1,5 +1,5 @@
 /* global jest, describe, it, expect  */
-require('dotenv-flow').config();
+require('dotenv-flow').config({ silent: true });
 
 const CoursesController = require('../../src/controllers/CoursesController');
 const Course = require('../../src/models/Course');

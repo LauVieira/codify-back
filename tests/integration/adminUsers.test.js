@@ -1,5 +1,5 @@
 /* global afterAll, jest, describe, it, expect  */
-require('dotenv-flow').config();
+require('dotenv-flow').config({ silent: true });
 
 const app = require('../../src/app');
 const supertest = require('supertest');
@@ -39,7 +39,7 @@ describe('POST /admin/users/login', () => {
     const response = await agent.post('/admin/users/login').send(body);
 
     expect(response.status).toBe(422);
-    expect(response.body.message).toEqual('Não foi possível processar os dados enviados');
+    expect(response.body.message).toEqual('Não foi possível processar o formato dos dados');
   });
 
   it('should return 401 when username does not match in DB', async () => {

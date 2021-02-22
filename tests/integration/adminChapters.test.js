@@ -1,5 +1,5 @@
 /* global afterAll, jest, describe, it, expect  */
-require('dotenv-flow').config();
+require('dotenv-flow').config({ silent: true });
 
 const app = require('../../src/app');
 const supertest = require('supertest');

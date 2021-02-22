@@ -1,6 +1,6 @@
 /* global afterAll, jest, describe, it, expect  */
 /* eslint-disable quotes*/
-require('dotenv-flow').config();
+require('dotenv-flow').config({ silent: true });
 const jwt = require('jsonwebtoken');
 
 const app = require('../../src/app');
@@ -43,6 +43,10 @@ describe('GET /admin/courses/', () => {
     );
 
     courses = dbCourse.rows;
+
+    courses[0].createdAt = courses[0].createdAt.toJSON();
+    courses[0].updatedAt = courses[0].updatedAt.toJSON();
+
     adminToken = jwt.sign(admin.rows[0], process.env.ADMIN_SECRET);
   });
 
@@ -146,6 +150,9 @@ describe('PUT /admin/courses/:id', () => {
     );
 
     courses = dbCourse.rows;
+    courses[0].createdAt = courses[0].createdAt.toJSON();
+    courses[0].updatedAt = courses[0].updatedAt.toJSON();
+
     courseId = dbCourse.rows[0].id;
     adminToken = jwt.sign(admin.rows[0], process.env.ADMIN_SECRET);
   });

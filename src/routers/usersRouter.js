@@ -45,8 +45,8 @@ router.post('/sign-in', async (req, res) => {
   const cookieOptions = {};
 
   if (process.env.NODE_ENV === 'production') {
-      cookieOptions.secure = true;
-      cookieOptions.sameSite = 'none';
+    cookieOptions.secure = true;
+    cookieOptions.sameSite = 'none';
   }
 
   res.cookie('token', token, cookieOptions);
