@@ -8,7 +8,6 @@ const {
 
 /* eslint-disable-next-line no-unused-vars */
 function errorHandlerMiddleware (error, req, res, next) {
-  console.error(error);
   const { message } = error;
   
   if (error instanceof NotFoundError) { 
@@ -32,6 +31,7 @@ function errorHandlerMiddleware (error, req, res, next) {
   }
   
   res.status(500).send({ message: 'Erro interno no servidor' });
+  console.error(error);
 }
 
 module.exports = errorHandlerMiddleware;

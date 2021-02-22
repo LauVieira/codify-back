@@ -63,7 +63,7 @@ module.exports = {
   },
 
   down: async (queryInterface) => {
-    /*const courses = await queryInterface.sequelize.query(
+    const courses = await queryInterface.sequelize.query(
       'SELECT id from COURSES;'
     );
 
@@ -73,17 +73,12 @@ module.exports = {
 
     const courseId = courses[0][0].id;
     
-    await queryInterface.bulkDelete('topics', [
-      { chapterId: chapters[0][0].id },
-      { chapterId: chapters[0][1].id },
-      { chapterId: chapters[0][2].id },
-      { chapterId: chapters[0][3].id },
-      { chapterId: chapters[0][4].id }
-    ]);
+    await queryInterface.bulkDelete('topics', { chapterId: chapters[0][0].id });
+    await queryInterface.bulkDelete('topics', { chapterId: chapters[0][1].id });
+    await queryInterface.bulkDelete('topics', { chapterId: chapters[0][2].id });
+    await queryInterface.bulkDelete('topics', { chapterId: chapters[0][3].id });
+    await queryInterface.bulkDelete('topics', { chapterId: chapters[0][4].id });
 
-    await queryInterface.bulkDelete('chapters', { courseId });*/
-
-    await queryInterface.bulkDelete('topics');
-    await queryInterface.bulkDelete('chapters');
+    await queryInterface.bulkDelete('chapters', { courseId });
   }
 };

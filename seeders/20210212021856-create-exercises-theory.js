@@ -97,20 +97,20 @@ module.exports = {
         title: 'Exercício C',
         activityId: exercises[0][2].id,
       }, {
-        title: 'Exercício C',
+        title: 'Exercício D',
         activityId: exercises[0][3].id,
       }, {
-        title: 'Exercício C',
+        title: 'Exercício E',
         activityId: exercises[0][4].id,
       }, {
-        title: 'Exercício C',
+        title: 'Exercício F',
         activityId: exercises[0][5].id,
       },
     ]);
   },
 
   down: async (queryInterface, Sequelize) => {
-    /*const topics = await queryInterface.sequelize.query(
+    const topics = await queryInterface.sequelize.query(
       'SELECT id FROM topics;'
     );
 
@@ -120,34 +120,25 @@ module.exports = {
 
     const exercises = await queryInterface.sequelize.query(
       `SELECT id FROM activities WHERE type='exercise';`
-    );*/
-    await queryInterface.bulkDelete('theories');
-    await queryInterface.bulkDelete('exercises');
-    await queryInterface.bulkDelete('activities');
-
-    /*await queryInterface.bulkDelete('exercises', [
-      { activityId: exercises[0][0].id },
-      { activityId: exercises[0][1].id },
-      { activityId: exercises[0][2].id },
-      { activityId: exercises[0][3].id },
-      { activityId: exercises[0][4].id },
-      { activityId: exercises[0][5].id }
-    ]);
+    );
     
-    await queryInterface.bulkDelete('theories', [
-      { activityId: theories[0][0].id },
-      { activityId: theories[0][1].id },
-      { activityId: theories[0][2].id },
-      { activityId: theories[0][3].id },
-      { activityId: theories[0][4].id }
-    ]); 
+    await queryInterface.bulkDelete('exercises', { activityId: exercises[0][0].id });
+    await queryInterface.bulkDelete('exercises', { activityId: exercises[0][1].id });
+    await queryInterface.bulkDelete('exercises', { activityId: exercises[0][2].id });
+    await queryInterface.bulkDelete('exercises', { activityId: exercises[0][3].id });
+    await queryInterface.bulkDelete('exercises', { activityId: exercises[0][4].id });
+    await queryInterface.bulkDelete('exercises', { activityId: exercises[0][5].id });
+    
+    await queryInterface.bulkDelete('theories', { activityId: theories[0][0].id });
+    await queryInterface.bulkDelete('theories', { activityId: theories[0][1].id });
+    await queryInterface.bulkDelete('theories', { activityId: theories[0][2].id });
+    await queryInterface.bulkDelete('theories', { activityId: theories[0][3].id });
+    await queryInterface.bulkDelete('theories', { activityId: theories[0][4].id });
 
-    await queryInterface.bulkDelete('activities', [
-      { topicId: topics[0][0].id },
-      { topicId: topics[0][1].id },
-      { topicId: topics[0][2].id },
-      { topicId: topics[0][3].id },
-      { topicId: topics[0][4].id },
-    ]);*/
+    await queryInterface.bulkDelete('activities', { topicId: topics[0][0].id });
+    await queryInterface.bulkDelete('activities', { topicId: topics[0][1].id });
+    await queryInterface.bulkDelete('activities', { topicId: topics[0][2].id });
+    await queryInterface.bulkDelete('activities', { topicId: topics[0][3].id });
+    await queryInterface.bulkDelete('activities', { topicId: topics[0][4].id });
   }
 };
