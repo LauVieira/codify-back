@@ -88,7 +88,6 @@ class CoursesController {
   }
 
   async getTopicById (id) {
-    console.log(id, 'ID');
     const topic = await Topic.findByPk(id);
     if (!topic) throw new Err.NotFoundError('Tópico não encontrado');
 

@@ -153,6 +153,7 @@ describe('getProgram', () => {
 
     expect(spy).toHaveBeenCalled();
     expect(spy).toHaveBeenCalledWith(expect.objectContaining({ where: { courseId } }));
+  });
 });
 
 describe('getAll', () => {
@@ -248,5 +249,77 @@ describe('editCourse', () => {
     expect(request).toEqual(
       expect.objectContaining(expectedObject)
     );
+  });
+});
+
+describe('editChapter', () => {
+  it('should return the object updated to chapter', async () => {
+    const save = jest.fn();
+    const oldObject = { title: 'mockedTitle Old', save };
+    const expectedObject = { title: 'mockedTitle New' };
+
+    jest.spyOn(CoursesController, 'getCourse').mockResolvedValueOnce({});
+    jest.spyOn(CoursesController, 'getChapter').mockResolvedValueOnce(oldObject);
+
+    const request = await CoursesController.editChapter(2, expectedObject);
+    
+    expect(save).toHaveBeenCalled();
+    expect(request).toEqual(
+      expect.objectContaining(expectedObject)
+    );
+  });
+});
+
+describe('editTopic', () => {
+  it('should return the object updated to topic', async () => {
+    const save = jest.fn();
+    const oldObject = { title: 'mockedTitle Old', save };
+    const expectedObject = { title: 'mockedTitle New' };
+
+    jest.spyOn(CoursesController, 'getChapter').mockResolvedValueOnce({});
+    jest.spyOn(CoursesController, 'getTopicById').mockResolvedValueOnce(oldObject);
+
+    const request = await CoursesController.editTopic(2, expectedObject);
+    
+    expect(save).toHaveBeenCalled();
+    expect(request).toEqual(
+      expect.objectContaining(expectedObject)
+    );
+  });
+});
+
+describe('createChapter', () => {
+  it('should create a chapter', async () => {
+    const newObject = { name: 'mockedObj' };
+    const expectedObject = { name: 'mockedObj', id: 1 };
+
+    jest.spyOn(CoursesController, 'getCourse').mockResolvedValueOnce({});
+    Chapter.create.mockResolvedValueOnce(expectedObject);
+  
+    const spy = jest.spyOn(Chapter, 'create');
+  
+    const request = await CoursesController.createChapter(newObject);
+    
+    expect(spy).toHaveBeenCalled();
+    expect(spy).toHaveBeenCalledWith(newObject);
+    expect(request).toEqual(expectedObject);
+  });
+});
+
+describe('createTopic', () => {
+  it('should create a topic', async () => {
+    const newObject = { name: 'mockedObj' };
+    const expectedObject = { name: 'mockedObj', id: 1 };
+
+    jest.spyOn(CoursesController, 'getChapter').mockResolvedValueOnce({});
+    Topic.create.mockResolvedValueOnce(expectedObject);
+  
+    const spy = jest.spyOn(Chapter, 'create');
+  
+    const request = await CoursesController.createTopic(newObject);
+    
+    expect(spy).toHaveBeenCalled();
+    expect(spy).toHaveBeenCalledWith(newObject);
+    expect(request).toEqual(expectedObject);
   });
 });
