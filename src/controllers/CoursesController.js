@@ -84,7 +84,7 @@ class CoursesController {
   }
 
   getAllTopics (limit = null, offset = null) {
-    return Topic.findAll({ limit, offset });
+    return Topic.findAndCountAll({ limit, offset });
   }
 
   async getTopicById (id) {
@@ -105,7 +105,7 @@ class CoursesController {
 
   async editTopic (id, topicData) {
     await this.getChapter(topicData.chapterId);
-    
+
     const topic = await this.getTopicById(id);
     Object.assign(topic, topicData);
 
@@ -121,7 +121,7 @@ class CoursesController {
   }
 
   getAllChapters (limit = null, offset = null) {
-    return Chapter.findAll({ limit, offset });
+    return Chapter.findAndCountAll({ limit, offset });
   }
 
   async createChapter (chapterData) {

@@ -5,8 +5,7 @@ const { schemaMiddleware } = require('../../middlewares');
 const schemas = require('../../schemas/coursesSchemas');
 
 router.get('/', async (req, res) => {
-  let limit = null;
-  let offset = null;
+  let limit, offset = null;
 
   if (req.query.range) {
     const range = JSON.parse(req.query.range);
@@ -14,12 +13,11 @@ router.get('/', async (req, res) => {
     offset = range[0];
   }
 
-  const topics = await CoursesController.getAllTopics(limit, offset);
-  const total = (await CoursesController.getAllTopics()).length;
+  const { count: total, rows: topics } = await CoursesController.getAllTopics(limit, offset);
   
   res.set({
     'Access-Control-Expose-Headers': 'Content-Range',
-    'Content-Range': `${offset}-${topics.length}/${total}`
+    'Content-Range': `${offset || 0}-${topics.length}/${total}`
   });
   res.send(topics);
 });

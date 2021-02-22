@@ -50,6 +50,7 @@ describe('GET /courses/suggestions', () => {
     const course = await Helpers.createCourse();
     const response = await agent.get('/courses/suggestions').set('Cookie', `token=${token}`);
 
+    expect(response.status).toBe(200);
     expect(response.body).toEqual(
       expect.arrayContaining([
         expect.objectContaining(course),

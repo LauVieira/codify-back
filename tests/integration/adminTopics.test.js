@@ -181,3 +181,45 @@ describe('PUT /admin/topics/:id', () => {
     }));
   });
 });
+
+describe('GET /admin/topics', () => {
+  let admin, adminToken;
+
+  beforeEach(async () => {
+    admin = await Helpers.createAdmin();
+    adminToken = await Helpers.createAdminToken(admin);
+  });
+
+  it('should return 401 when cookie is invalid', async () => {
+    const wrongAdminToken = 'wrong_token';
+    const response = await agent.get('/admin/topics').set('Cookie', `adminToken=${wrongAdminToken}`);
+
+    expect(response.status).toBe(401);
+    expect(response.body.message).toEqual('Token inválido');
+  });
+
+  it('should return 401 when no cookie is sent', async () => {
+    const response = await agent.get('/admin/topics');
+
+    expect(response.status).toBe(401);
+    expect(response.body.message).toEqual('Token não encontrado');
+  });
+
+  it('should return the array and the headers expected with valid cookie', async () => {
+    const course = await Helpers.createCourse();
+    const chapter = await Helpers.createChapter(course.id);
+    const topic = await Helpers.createTopic(chapter.id);
+
+    const response = await agent.get('/admin/topics').set('Cookie', `adminToken=${adminToken}`);
+
+    expect(response.headers).toHaveProperty('access-control-expose-headers');
+    expect(response.headers['content-range']).toEqual('0-1/1');
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining(topic),
+      ]),
+    );
+  });
+});
+

@@ -167,6 +167,30 @@ describe('getAll', () => {
   });
 });
 
+describe('getAllChapters', () => {
+  it('should return an array with chapters', async () => {
+    const spy = jest.spyOn(Chapter, 'findAndCountAll');
+    CoursesController.getAllChapters(10, 5);
+
+    expect(spy).toHaveBeenCalled();
+    expect(spy).toHaveBeenCalledWith(
+      expect.objectContaining({ limit: 10, offset: 5 }),
+    );
+  });
+});
+
+describe('getAllTopics', () => {
+  it('should return an array with topics', async () => {
+    const spy = jest.spyOn(Topic, 'findAndCountAll');
+    CoursesController.getAllTopics(10, 5);
+
+    expect(spy).toHaveBeenCalled();
+    expect(spy).toHaveBeenCalledWith(
+      expect.objectContaining({ limit: 10, offset: 5 }),
+    );
+  });
+});
+
 describe('createCourse', () => {
   it('should throw error when trying to create existing Course', async () => {
     const newObject = { name: 'mockedObj' };
