@@ -7,10 +7,8 @@ const adminChaptersRouter = require('./adminChaptersRouter');
 const adminAuthentication = require('../../middlewares/adminAuthentication');
 
 router.use('/users', adminUsersRouter);
-router.use('/courses', adminCoursesRouter);
+router.use('/courses', adminAuthentication, adminCoursesRouter);
 router.use('/topics', adminAuthentication, adminTopicsRouter);
 router.use('/chapters', adminAuthentication, adminChaptersRouter);
-//adminAuthentication
-//router.use('/courses', adminAuthentication, adminCoursesRouter);
 
 module.exports = router;
