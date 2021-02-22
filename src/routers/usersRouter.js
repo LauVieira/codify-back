@@ -43,7 +43,12 @@ router.post('/sign-in', async (req, res) => {
   };
   const token = jwt.sign(selectedUser, process.env.SECRET);
 
-  res.cookie('token', token, { secure: true, sameSite: 'none' });
+  const cookieOptions = {};
+  if (process.env.NODE_ENV === 'production') {
+      cookieOptions.secure = true;
+      cookieOptions.sameSite = 'none';
+  }
+  res.cookie('token', token, cookieOptions);
   res.status(200).send(selectedUser);
 });
 
