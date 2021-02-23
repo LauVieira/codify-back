@@ -150,3 +150,58 @@ describe('POST /users/sign-out', () => {
     expect(response.headers['set-cookie'][0]).toContain('Expires');
   });
 });
+
+describe('PUT /users/:id', () => {
+  let user, token;
+
+  beforeEach(async () => {
+    user = await Helpers.createUser();
+    token = await Helpers.createToken(user);
+  });
+
+  it('should return 401 when cookie is invalid', async () => {
+    const wrongToken = 'wrong_token';
+    const response = await agent.put('/users/0').set('Cookie', `token=${wrongToken}`);
+
+    expect(response.status).toBe(401);
+    expect(response.body.message).toEqual('Token inválido');
+  });
+
+  it('should return 401 when no cookie is sent', async () => {
+    const response = await agent.put('/users/0');
+
+    expect(response.status).toBe(401);
+    expect(response.body.message).toEqual('Token não encontrado');
+  });
+
+  it('should return 422 when called with invalid topic data', async () => {
+    const body = { data: 'invalid' };
+    const response = await agent.put('/users/0').send(body).set('Cookie', `token=${token}`);
+  
+    expect(response.status).toBe(422);
+    expect(response.body.message).toEqual('Não foi possível processar o formato dos dados');
+  });
+
+  it('should return 404 when user id is not found', async () => {
+    const body = { name: 'novo nome', email: 'novoemail@gmail.com' };
+    const response = await agent.put(`/users/0`).send(body).set('Cookie', `token=${token}`);
+
+    expect(response.status).toBe(404);
+    expect(response.body.message).toEqual('Usuário não encontrado');
+  });
+
+  it('should return the chapter updated with valid cookie', async () =>{
+    const body = { name: 'novo nome', email: 'novoemail@gmail.com' };
+
+    const response = await agent.put(`/users/${user.id}`).send(body).set('Cookie', `token=${token}`);
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual(expect.objectContaining({
+      id: user.id,
+      name: body.name,
+      email: body.email,
+      createdAt: user.createdAt,
+      updatedAt: expect.any(String),
+    }));
+  });
+});
