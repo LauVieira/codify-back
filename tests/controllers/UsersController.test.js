@@ -81,3 +81,44 @@ describe('checkExistingUser', () => {
     expect(error).rejects.toThrow(Err.ConflictError);
   });
 });
+
+describe('getUser', () => {
+  it('should return an user', async () => {
+    const id = 1;
+    const spy = jest.spyOn(User, 'findByPk');
+    spy.mockImplementationOnce(() => ({ id }));
+
+    const user = await UsersController.getUser(id);
+
+    expect(spy).toHaveBeenCalled();
+    expect(spy).toHaveBeenCalledWith(id);
+    expect(user).toEqual(expect.objectContaining({ id }));
+  });
+
+  it('should throw an NotFoundError in user', () => {
+    const id = 3;
+
+    User.findByPk.mockImplementationOnce(() => null);
+
+    const error = () => UsersController.getUser(id);
+
+    expect(error).rejects.toThrow(Err.NotFoundError);
+  });
+});
+
+describe('editUser', () => {
+  it('should return the object updated for user', async () => {
+    const save = jest.fn();
+    const oldObject = { obj: 'objUser Old', save };
+    const expectedObject = { obj: 'objUser New' };
+
+    jest.spyOn(UsersController, 'getUser').mockResolvedValueOnce(oldObject);
+
+    const request = await UsersController.editUser(2, expectedObject);
+    
+    expect(save).toHaveBeenCalled();
+    expect(request).toEqual(
+      expect.objectContaining(expectedObject)
+    );
+  });
+});
