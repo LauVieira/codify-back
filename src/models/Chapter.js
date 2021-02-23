@@ -15,7 +15,6 @@ Chapter.init({
   title: {
     type: Sequelize.STRING(150),
     allowNull: false,
-    unique: true
   },
   courseId: {
     type: Sequelize.INTEGER,

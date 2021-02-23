@@ -13,22 +13,22 @@ router.get('/:id', async (req, res) => {
   res.status(200).send({ course, program });
 });
 
-router.get('/topics/:id', async (req, res) => {
-  const obj = req.params;
+router.get('/chapters/:chapterId/topics/:topicId/activities', async (req, res) => {
+  const params = req.params;
 
-  const topic = await CoursesController.getTopic(obj.id);
-  const chapter = await CoursesController.getChapter(topic.chapterId);
-
+  const chapter = await CoursesController.getChapter(params.chapterId);
+  const topic = await CoursesController.getTopic(params.topicId, req.user.id);
+  
   res.status(200).send({ topic, chapter });
 });
 
 router.post('/activities/:id', async (req, res) => {
-  const obj = req.params;
+  const params = req.params;
 
-  const activity = await CoursesController.getActivity(obj.id);
-  await CoursesController.activityDone(activity.id, req.user.id);
+  const activity = await CoursesController.getActivity(params.id);
+  const activityDone = await CoursesController.activityDone(activity.id, req.user.id);
   
-  res.status(200).send({ message: 'Atividade feita' });
+  res.status(201).send(activityDone);
 });
 
 module.exports = router;

@@ -1,6 +1,5 @@
 /* global beforeEach, afterAll, it, describe, expect */
 /* eslint-disable quotes*/
-
 require('dotenv').config();
 const jwt = require('jsonwebtoken');
 
@@ -14,6 +13,8 @@ const db = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
 
+const Helpers = require('../Helpers');
+
 function getToken (user) {
   const { id, email, name } = user;
   const userToSign = { id, email, name };
@@ -22,8 +23,7 @@ function getToken (user) {
 }
 
 beforeEach(async () => {
-  await db.query('DELETE FROM users');
-  await db.query(`DELETE FROM courses WHERE title = 'Test title'`);
+  await Helpers.eraseDatabase();
 });
 
 afterAll(async () => {
@@ -138,3 +138,148 @@ describe('GET /courses/suggestions', () => {
 //     );
 //   });
 // });
+
+describe('GET /courses/chapters/:chapterId/topics/:id/activities', () => {
+  it('should return 401 when cookie is invalid', async () => {
+    const token = 'wrong_token';
+    const response = await agent.get('/courses/chapters/0/topics/0/activities').set('Cookie', `token=${token}`);
+
+    expect(response.status).toBe(401);
+    expect(response.body.message).toEqual('Token inválido');
+  });
+
+  it('should return 401 when no cookie is sent', async () => {
+    const response = await agent.get('/courses/chapters/0/topics/0/activities');
+
+    expect(response.status).toBe(401);
+    expect(response.body.message).toEqual('Token não encontrado');
+  });
+
+  it('should return 404 when chapter id is not found', async () => {
+    const user = await Helpers.createUser();
+    const token = await Helpers.createToken(user);
+
+    const response = await agent.get('/courses/chapters/0/topics/0/activities').set('Cookie', `token=${token}`);;
+
+    expect(response.status).toBe(404);
+    expect(response.body.message).toEqual('Capítulo não encontrado');
+  });
+
+  it('should return 404 when topic id is not found', async () => {
+    const user = await Helpers.createUser();
+    const token = await Helpers.createToken(user);
+    const course = await Helpers.createCourse();
+    const chapter = await Helpers.createChapter(course.id);
+
+    const response = await agent.get(`/courses/chapters/${chapter.id}/topics/0/activities`).set('Cookie', `token=${token}`);;
+
+    expect(response.status).toBe(404);
+    expect(response.body.message).toEqual('Tópico não encontrado');
+  });
+
+  it('should return 200 with the object expected', async () => {
+    const user = await Helpers.createUser();
+    const token = await Helpers.createToken(user);
+    const course = await Helpers.createCourse();
+    const chapter = await Helpers.createChapter(course.id);
+    const topic = await Helpers.createTopic(chapter.id);
+    const { activityTh, theory } = await Helpers.createActivityTheory(topic.id);
+    const { activityEx, exercise } = await Helpers.createActivityExercise(topic.id);
+    const activityUser = await Helpers.createActivityUsers(user.id, activityTh.id);
+    
+    const response = await agent.get(`/courses/chapters/${chapter.id}/topics/${topic.id}/activities`).set('Cookie', `token=${token}`);;
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual(expect.objectContaining({
+      topic: expect.objectContaining({
+        ...topic,
+        activities: expect.arrayContaining([
+          expect.objectContaining({
+            ...activityTh,
+            theory: expect.objectContaining({
+              ...theory
+            }),
+            exercise: null,
+            activityUsers: [expect.objectContaining({
+              ...activityUser
+            })]
+          }),
+          expect.objectContaining({
+            ...activityEx,
+            exercise: expect.objectContaining({
+              ...exercise
+            }),
+            theory: null,
+            activityUsers: []
+          }),
+        ])
+      }),
+      chapter: expect.objectContaining(chapter)
+    }));
+  });
+});
+
+describe('POST /courses/activities/:id', () => {
+  let token, activityTh, user, activityUser;
+
+  beforeEach(async () => {
+    user = await Helpers.createUser();
+    token = await Helpers.createToken(user);
+    const course = await Helpers.createCourse();
+    const chapter = await Helpers.createChapter(course.id);
+    const topic = await Helpers.createTopic(chapter.id);
+    activityTh = (await Helpers.createActivityTheory(topic.id)).activityTh;
+  });
+
+  it('should return 401 when cookie is invalid', async () => {
+    const token = 'wrong_token';
+    const response = await agent.post('/courses/activities/0').set('Cookie', `token=${token}`);
+
+    expect(response.status).toBe(401);
+    expect(response.body.message).toEqual('Token inválido');
+  });
+
+  it('should return 401 when no cookie is sent', async () => {
+    const response = await agent.post('/courses/activities/0');
+
+    expect(response.status).toBe(401);
+    expect(response.body.message).toEqual('Token não encontrado');
+  });
+
+  it('should return 404 when activity id is not found', async () => {
+    const response = await agent.post('/courses/activities/0').set('Cookie', `token=${token}`);
+
+    expect(response.status).toBe(404);
+    expect(response.body.message).toEqual('Atividade não encontrada');
+  });
+
+  it('should return the activity completed when dont exist in DB', async () => {
+    const response = await agent.post(`/courses/activities/${activityTh.id}`).set('Cookie', `token=${token}`);
+
+    expect(response.status).toBe(201);
+    expect(response.body).toEqual(expect.objectContaining({
+      id: expect.any(Number),
+      userId: user.id,
+      activityId: activityTh.id,
+      done: true,
+      createdAt: expect.any(String),
+      updatedAt: expect.any(String)
+    }));
+  });
+
+  it('should return the activity done equal to false', async () => {
+    activityUser = await Helpers.createActivityUsers(user.id, activityTh.id);
+
+    const response = await agent.post(`/courses/activities/${activityTh.id}`).set('Cookie', `token=${token}`);
+
+    delete activityUser.done;
+    delete activityUser.updatedAt;
+
+    expect(response.status).toBe(201);
+    expect(response.body).toEqual(expect.objectContaining({
+      ...activityUser,
+      done: false,
+      updatedAt: expect.any(String),
+    }));
+  });
+});

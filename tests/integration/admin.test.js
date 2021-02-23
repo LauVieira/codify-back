@@ -1,9 +1,7 @@
 /* global afterAll, jest, describe, it, expect  */
 /* eslint-disable quotes*/
-
-require('dotenv').config();
+require('dotenv-flow').config();
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
 
 const app = require('../../src/app');
 const supertest = require('supertest');
@@ -15,12 +13,10 @@ const db = new Pool({
     connectionString: process.env.DATABASE_URL
 });
 
-async function cleanDataBase () {
-  await db.query('DELETE FROM admins');
-}
+const { createAdmin, createAdminToken, eraseDatabase } = require('../Helpers');
 
 beforeEach(async () => {
-  await cleanDataBase();
+  await eraseDatabase();
 });
 
 afterAll(async () => {
@@ -31,22 +27,18 @@ afterAll(async () => {
 describe('POST /admin/users/login', () => {
   it('should return 200 when passed valid parameters', async () => {
     const body = { 
-      username: 'testeUsername',
-      password: 'testePassword' 
+      username: 'admin',
+      password: '123456' 
     };
-    const password = bcrypt.hashSync(body.password, 10);
     
-    await db.query('INSERT INTO admins (username, password) values ($1, $2)', [body.username, password]);
+    const admin = await createAdmin();
+    delete admin.password;
+    
     const response = await agent.post('/admin/users/login').send(body);
 
-    expect(response.headers).toHaveProperty('set-cookie');
     expect(response.status).toBe(200);
-    expect(response.body).toEqual(expect.objectContaining({
-      id: expect.any(Number),
-      username: body.username,
-      createdAt: expect.any(String),
-      updatedAt: expect.any(String)
-    }));
+    expect(response.headers['set-cookie'][0]).toContain('adminToken');
+    expect(response.body).toMatchObject(admin);
   });
 
   it('should return 422 when passed missing parameters', async () => {
@@ -69,19 +61,17 @@ describe('POST /admin/users/login', () => {
   });
 
   it('should return 401 when username is right, but password is not', async () => {
-      const body = {
-        username: 'testeUsername',
-        password: '1234567890',
-      };
+    const body = {
+      username: 'admin',
+      password: '1234567890',
+    };
 
-      const password = bcrypt.hashSync('123456', 10);
-      
-      await db.query('INSERT INTO admins (username, password) values ($1, $2)', [body.username, password]);
+    await createAdmin();
 
-      const response = await agent.post('/admin/users/login').send(body);
+    const response = await agent.post('/admin/users/login').send(body);
 
-      expect(response.status).toBe(401);
-      expect(response.body.message).toEqual('Username ou senha estão incorretos');
+    expect(response.status).toBe(401);
+    expect(response.body.message).toEqual('Username ou senha estão incorretos');
   });
 });
 
@@ -102,11 +92,11 @@ describe('POST /admin/users/logout', () => {
   });
 
   it('should return 200 -> valid cookie, and destroy session', async () => {
-    const admin = await db.query('INSERT INTO admins (username, password) values ($1, $2) RETURNING *', ['admin', '1Ju23123']);
-    const adminToken = jwt.sign(admin.rows[0], process.env.ADMIN_SECRET);
+    const admin = await createAdmin();
+    const adminToken = await createAdminToken(admin);
 
     const response = await agent.post('/admin/users/logout').set('Cookie', `adminToken=${adminToken}`);
-    
+
     expect(response.status).toBe(200);
     expect(response.body.message).toEqual('Logout efetuado com sucesso');
     expect(response.headers['set-cookie'][0]).toContain('Expires');

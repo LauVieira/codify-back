@@ -5,6 +5,8 @@ const Course = require('../models/Course');
 const Chapter = require('../models/Chapter');
 const Topic = require('../models/Topic');
 const Activity = require('../models/Activity');
+const ActivityUser = require('../models/ActivityUser');
+const User = require('../models/User');
 const Theory = require('../models/Theory');
 const Exercise = require('../models/Exercise');
 
@@ -19,16 +21,21 @@ class CoursesController {
     return course;
   }
 
-  async getTopic (id) {
+  async getTopic (id, userId) {
     const topic = await Topic.findByPk(id, { 
       include: { 
         model: Activity,
+        order: ['order', 'ASC'],
         include: [{
           model: Theory
         }, {
           model: Exercise
+        }, {
+          model: ActivityUser,
+          where: { userId },
+          required: false
         }]
-      } 
+      },
     });
 
     if (!topic) throw new NotFoundError('Tópico não encontrado');
@@ -43,12 +50,22 @@ class CoursesController {
 
   async getChapter (id) {
     const chapter = await Chapter.findByPk(id);
-    if (!chapter) throw new NotFoundError('Capitulo não encontrado');
+    if (!chapter) throw new NotFoundError('Capítulo não encontrado');
     return chapter;
   }
 
-  activityDone (activityId, userId) {
-    return Activity.create({ activityId, userId, done: true });
+  async activityDone (activityId, userId) {
+    let activityUser = await ActivityUser.findOne({ where: { activityId, userId } });
+
+    if (!activityUser) {
+      activityUser = await ActivityUser.create({ activityId, userId, done: true });
+      return activityUser;
+    }
+
+    activityUser.done = !activityUser.done;
+    await activityUser.save();
+
+    return activityUser;
   }
 
   getProgram (courseId){
