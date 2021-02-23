@@ -4,8 +4,8 @@ const jwt = require('jsonwebtoken');
 
 const { sanitiseObj } = require('../utils/generalFunctions');
 const UsersController = require('../controllers/UsersController');
-const { validateUser, userAuthentication } = require('../middlewares');
-const Schemas = require('../schemas');
+const { validateUser, userAuthentication, schemaMiddleware } = require('../middlewares');
+const usersSchema = require('../schemas/usersSchemas');
 const { InvalidDataError, UnauthorizedError } = require('../errors/');
 
 router.post('/sign-up', validateUser, async (req, res) => {
@@ -22,7 +22,7 @@ router.post('/sign-up', validateUser, async (req, res) => {
 });
 
 router.post('/sign-in', async (req, res) => {
-  const validation = Schemas.users.signIn.validate(req.body);
+  const validation = usersSchema.signIn.validate(req.body);
   if (validation.error) {
     throw new InvalidDataError();
   }
@@ -52,7 +52,6 @@ router.post('/sign-in', async (req, res) => {
   res.cookie('token', token, cookieOptions);
   res.status(200).send(selectedUser);
 });
-
 router.post('/sign-out', userAuthentication, (req, res) => {
   res.clearCookie('token');
   

@@ -1,5 +1,5 @@
 /* eslint-disable no-return-await */
-const { ConflictError, InvalidDataError } = require('../errors');
+const Err = require('../errors');
 const User = require('../models/User');
 const Schemas = require('../schemas');
 
@@ -19,14 +19,14 @@ class UsersControllers {
   validateUser (userData) {
     const validation = Schemas.users.signUp.validate(userData);
     if (validation.error) {
-      throw new InvalidDataError();
+      throw new Err.InvalidDataError();
     }
   }
 
   async checkExistingUser (email) {
     const existingUser = await this.findUserByEmail(email);
     if (existingUser) {
-      throw new ConflictError('Email selecionado já existe na plataforma');
+      throw new Err.ConflictError('Email selecionado já existe na plataforma');
     } 
   }
 }

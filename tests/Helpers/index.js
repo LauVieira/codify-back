@@ -14,7 +14,7 @@ function convertToJson (entity) {
 class Helpers {
   async createUser () {
     const hashedPassword = bcrypt.hashSync('123456', 10);
-    const values = ['teste', 'test@test.com', hashedPassword];
+    const values = ['teste sobrenome', 'test@test.com', hashedPassword];
   
     let user = await database.query(`
       INSERT INTO users (name, email, password) values ('${values[0]}', '${values[1]}', '${values[2]}') RETURNING *;

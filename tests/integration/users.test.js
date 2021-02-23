@@ -8,10 +8,10 @@ const agent = supertest(app);
 
 const sequelize = require('../../src/utils/database');
 
-const { eraseDatabase, createUser, createToken } = require('../Helpers');
+const Helpers = require('../Helpers');
 
 beforeEach(async () => {
-  await eraseDatabase();
+  await Helpers.eraseDatabase();
 });
 
 afterAll(async () => {
@@ -61,7 +61,7 @@ describe('POST /users/sign-up', () => {
       confirmPassword: '1Ju23123',
     };
 
-    await createUser();
+    await Helpers.createUser();
     const response = await agent.post('/users/sign-up').send(body);
 
     expect(response.status).toBe(409);
@@ -76,7 +76,7 @@ describe('POST /users/sign-in', () => {
       password: '123456',
     };
     
-    const user = await createUser();
+    const user = await Helpers.createUser();
     delete user.password;
     
     const response = await agent.post('/users/sign-in').send(body);
@@ -114,7 +114,7 @@ describe('POST /users/sign-in', () => {
       password: '1Ju23123xxx',
     };
 
-    await createUser();
+    await Helpers.createUser();
 
     const response = await agent.post('/users/sign-in').send(body);
 
@@ -140,8 +140,8 @@ describe('POST /users/sign-out', () => {
   });
 
   it('should return 200 -> valid cookie, and destroy session', async () => {
-    const user = await createUser();
-    const token = await createToken(user);
+    const user = await Helpers.createUser();
+    const token = await Helpers.createToken(user);
 
     const response = await agent.post('/users/sign-out').set('Cookie', `token=${token}`);
 
