@@ -19,9 +19,7 @@ class UsersControllers {
   validateUser (userData) {
     const validation = Schemas.users.signUp.validate(userData);
     if (validation.error) {
-      throw new InvalidDataError(
-        'Não foi possível processar o formato dos dados'
-      );
+      throw new InvalidDataError();
     }
   }
 

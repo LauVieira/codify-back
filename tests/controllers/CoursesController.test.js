@@ -1,5 +1,5 @@
 /* global jest, describe, it, expect  */
-require('dotenv-flow').config();
+require('dotenv-flow').config({ silent: true });
 
 const CoursesController = require('../../src/controllers/CoursesController');
 const Course = require('../../src/models/Course');
@@ -46,7 +46,7 @@ describe('getTopic', () => {
     expect(spy).toHaveBeenCalledWith(id, expect.any(Object));
   });
 
-  it('should throw an NotFoundError', async () => {
+  it('should throw an NotFoundError in topic', async () => {
     const id = 3;
 
     Topic.findByPk.mockImplementationOnce(() => null);
@@ -58,7 +58,7 @@ describe('getTopic', () => {
 });
 
 describe('getChapter', () => {
-  it('should return a topic', () => {
+  it('should return a chapter', () => {
     const id = 1;
     const spy = jest.spyOn(Chapter, 'findByPk');
     CoursesController.getChapter(id);
@@ -67,7 +67,7 @@ describe('getChapter', () => {
     expect(spy).toHaveBeenCalledWith(id);
   });
 
-  it('should throw an NotFoundError', async () => {
+  it('should throw an NotFoundError in chapter', async () => {
     const id = 3;
 
     Chapter.findByPk.mockImplementationOnce(() => null);
@@ -78,8 +78,29 @@ describe('getChapter', () => {
   });
 });
 
-describe('getActivity', () => {
+describe('getTopicById', () => {
   it('should return a topic', () => {
+    const id = 1;
+    const spy = jest.spyOn(Topic, 'findByPk');
+    CoursesController.getTopicById(id);
+
+    expect(spy).toHaveBeenCalled();
+    expect(spy).toHaveBeenCalledWith(id);
+  });
+
+  it('should throw an NotFoundError in topic', async () => {
+    const id = 3;
+
+    Topic.findByPk.mockImplementationOnce(() => null);
+
+    const error = () => CoursesController.getTopicById(id);
+
+    expect(error).rejects.toThrow(Err.NotFoundError);
+  });
+});
+
+describe('getActivity', () => {
+  it('should return a activity', () => {
     const id = 1;
     const spy = jest.spyOn(Activity, 'findByPk');
     CoursesController.getActivity(id);
@@ -88,7 +109,7 @@ describe('getActivity', () => {
     expect(spy).toHaveBeenCalledWith(id);
   });
 
-  it('should throw an NotFoundError', async () => {
+  it('should throw an NotFoundError in activity', async () => {
     const id = 3;
 
     Activity.findByPk.mockImplementationOnce(() => null);
@@ -132,12 +153,37 @@ describe('getProgram', () => {
 
     expect(spy).toHaveBeenCalled();
     expect(spy).toHaveBeenCalledWith(expect.objectContaining({ where: { courseId } }));
+  });
 });
 
 describe('getAll', () => {
   it('should return an array', async () => {
     const spy = jest.spyOn(Course, 'findAll');
     CoursesController.getAll(10, 5);
+
+    expect(spy).toHaveBeenCalled();
+    expect(spy).toHaveBeenCalledWith(
+      expect.objectContaining({ limit: 10, offset: 5 }),
+    );
+  });
+});
+
+describe('getAllChapters', () => {
+  it('should return an array with chapters', async () => {
+    const spy = jest.spyOn(Chapter, 'findAndCountAll');
+    CoursesController.getAllChapters(10, 5);
+
+    expect(spy).toHaveBeenCalled();
+    expect(spy).toHaveBeenCalledWith(
+      expect.objectContaining({ limit: 10, offset: 5 }),
+    );
+  });
+});
+
+describe('getAllTopics', () => {
+  it('should return an array with topics', async () => {
+    const spy = jest.spyOn(Topic, 'findAndCountAll');
+    CoursesController.getAllTopics(10, 5);
 
     expect(spy).toHaveBeenCalled();
     expect(spy).toHaveBeenCalledWith(
@@ -203,5 +249,77 @@ describe('editCourse', () => {
     expect(request).toEqual(
       expect.objectContaining(expectedObject)
     );
+  });
+});
+
+describe('editChapter', () => {
+  it('should return the object updated to chapter', async () => {
+    const save = jest.fn();
+    const oldObject = { title: 'mockedTitle Old', save };
+    const expectedObject = { title: 'mockedTitle New' };
+
+    jest.spyOn(CoursesController, 'getCourse').mockResolvedValueOnce({});
+    jest.spyOn(CoursesController, 'getChapter').mockResolvedValueOnce(oldObject);
+
+    const request = await CoursesController.editChapter(2, expectedObject);
+    
+    expect(save).toHaveBeenCalled();
+    expect(request).toEqual(
+      expect.objectContaining(expectedObject)
+    );
+  });
+});
+
+describe('editTopic', () => {
+  it('should return the object updated to topic', async () => {
+    const save = jest.fn();
+    const oldObject = { title: 'mockedTitle Old', save };
+    const expectedObject = { title: 'mockedTitle New' };
+
+    jest.spyOn(CoursesController, 'getChapter').mockResolvedValueOnce({});
+    jest.spyOn(CoursesController, 'getTopicById').mockResolvedValueOnce(oldObject);
+
+    const request = await CoursesController.editTopic(2, expectedObject);
+    
+    expect(save).toHaveBeenCalled();
+    expect(request).toEqual(
+      expect.objectContaining(expectedObject)
+    );
+  });
+});
+
+describe('createChapter', () => {
+  it('should create a chapter', async () => {
+    const newObject = { name: 'mockedObj' };
+    const expectedObject = { name: 'mockedObj', id: 1 };
+
+    jest.spyOn(CoursesController, 'getCourse').mockResolvedValueOnce({});
+    Chapter.create.mockResolvedValueOnce(expectedObject);
+  
+    const spy = jest.spyOn(Chapter, 'create');
+  
+    const request = await CoursesController.createChapter(newObject);
+    
+    expect(spy).toHaveBeenCalled();
+    expect(spy).toHaveBeenCalledWith(newObject);
+    expect(request).toEqual(expectedObject);
+  });
+});
+
+describe('createTopic', () => {
+  it('should create a topic', async () => {
+    const newObject = { name: 'mockedObj' };
+    const expectedObject = { name: 'mockedObj', id: 1 };
+
+    jest.spyOn(CoursesController, 'getChapter').mockResolvedValueOnce({});
+    Topic.create.mockResolvedValueOnce(expectedObject);
+  
+    const spy = jest.spyOn(Chapter, 'create');
+  
+    const request = await CoursesController.createTopic(newObject);
+    
+    expect(spy).toHaveBeenCalled();
+    expect(spy).toHaveBeenCalledWith(newObject);
+    expect(request).toEqual(expectedObject);
   });
 });

@@ -1,5 +1,5 @@
 require('express-async-errors');
-require('dotenv-flow').config();
+require('dotenv-flow').config({ silent: true });
 require('./utils/loadRelationships');
 
 const cookieParser = require('cookie-parser');

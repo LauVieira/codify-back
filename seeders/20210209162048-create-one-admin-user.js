@@ -1,5 +1,5 @@
 'use strict';
-require('dotenv-flow').config();
+require('dotenv-flow').config({ silent: true });
 const bcrypt = require('bcrypt');
 
 const username = process.env.ADMIN_USER;
