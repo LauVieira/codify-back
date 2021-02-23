@@ -29,6 +29,24 @@ class UsersControllers {
       throw new Err.ConflictError('Email selecionado já existe na plataforma');
     } 
   }
+
+  async getUser (id) {
+    const user = await User.findByPk(id);
+    console.log(user);
+    if (!user) {
+      throw new Err.NotFoundError('Usuário não encontrado');
+    }
+  
+    return user;
+  }
+  
+  async editUser (id, userData) {
+    const user = await this.getUser(id);
+  
+    Object.assign(user, userData);
+    await user.save();
+    return user;
+  }
 }
 
 module.exports = new UsersControllers();

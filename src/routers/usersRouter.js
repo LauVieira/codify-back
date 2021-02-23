@@ -52,6 +52,16 @@ router.post('/sign-in', async (req, res) => {
   res.cookie('token', token, cookieOptions);
   res.status(200).send(selectedUser);
 });
+
+router.put('/:id', userAuthentication, schemaMiddleware(usersSchema.putUser), async (req, res) => {
+  const { id } = req.params;
+  const sanitized = sanitiseObj(req.body);
+
+  const updatedUser = await UsersController.editUser(id, sanitized);
+
+  res.status(200).send(updatedUser);
+});
+
 router.post('/sign-out', userAuthentication, (req, res) => {
   res.clearCookie('token');
   
