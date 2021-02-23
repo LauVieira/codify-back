@@ -32,7 +32,7 @@ class UsersControllers {
 
   async getUser (id) {
     const user = await User.findByPk(id);
-    console.log(user);
+
     if (!user) {
       throw new Err.NotFoundError('Usuário não encontrado');
     }
