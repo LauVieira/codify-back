@@ -7,10 +7,6 @@ const app = require('../../src/app');
 const agent = supertest(app);
 
 const sequelize = require('../../src/utils/database');
-const redis = require('promise-redis')();
-const client = redis.createClient({
-  url: process.env.REDISCLOUD_URL
-});
 
 const Helpers = require('../Helpers');
 
@@ -34,6 +30,7 @@ describe('POST /users/sign-up', () => {
     const response = await agent.post('/users/sign-up').send(body);
 
     expect(response.status).toBe(201);
+    expect(response.body).not.toHaveProperty('password');
     expect(response.body).toEqual(expect.objectContaining({
       id: expect.any(Number),
       email: body.email,
@@ -88,6 +85,7 @@ describe('POST /users/sign-in', () => {
     expect(response.status).toBe(200);
     expect(response.headers['set-cookie'][0]).toContain('token');
     expect(response.body).toMatchObject(user);
+    expect(response.body).not.toHaveProperty('password');
   });
 
   it('should return 422 when passed missing parameters', async () => {

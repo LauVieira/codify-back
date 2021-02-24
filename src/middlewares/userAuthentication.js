@@ -10,7 +10,7 @@ async function userAuthentication (req, res, next) {
 
   const isValid = await sessionStore.getSession(token);
   if (!isValid) {
-    throw new UnauthorizedError('Token expirado');
+    throw new UnauthorizedError('Token inválido');
   }
 
   jwt.verify(token, process.env.SECRET, (err, decoded) => {

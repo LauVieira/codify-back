@@ -17,20 +17,20 @@ async function createInstance () {
 
 async function getInstance () {
   if (!client) {
-    client = createInstance();
+    client = await createInstance();
   }
 
   return client;
 }
 
 async function setSession (key, payload) {
-  const client = getInstance();
+  const client = await getInstance();
   
   await client.set(key, payload);
 }
 
 async function getSession (key) {
-  const client = getInstance();
+  const client = await getInstance();
 
   const result = await client.get(key);
 
@@ -38,7 +38,7 @@ async function getSession (key) {
 }
 
 async function deleteSession (key) {
-  const client = getInstance();
+  const client = await getInstance();
 
   await client.del(key);
 }

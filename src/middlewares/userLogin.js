@@ -1,12 +1,13 @@
-const UsersController = require('../controllers/AdminController');
+const bcrypt = require('bcrypt');
+const UsersController = require('../controllers/UsersController');
 const { sanitiseObj } = require('../utils/generalFunctions');
 const usersSchema = require('../schemas/usersSchemas');
-const Err = require('../errors/');
+const Err = require('../errors');
 
 async function userLogin (req, res, next) {
   const validation = usersSchema.signIn.validate(req.body);
   if (validation.error) {
-    throw new InvalidDataError();
+    throw new Err.InvalidDataError();
   }
 
   const userData = sanitiseObj(req.body);
@@ -20,7 +21,7 @@ async function userLogin (req, res, next) {
     throw new Err.UnauthorizedError('Email ou senha estão incorretos');
   }
 
-  req.user = selectedUser;
+  req.user = selectedUser.dataValues;
 
   next();
 }

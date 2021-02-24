@@ -6,8 +6,6 @@ const supertest = require('supertest');
 const agent = supertest(app);
 
 const sequelize = require('../../src/utils/database');
-const { getInstance } = require('../../src/utils/redis');
-const client = getInstance();
 
 const Helpers = require('../Helpers');
 

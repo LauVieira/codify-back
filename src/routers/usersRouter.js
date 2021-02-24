@@ -17,13 +17,13 @@ router.post('/sign-up', validateUser, async (req, res) => {
     hashedPassword,
   );
   
-  delete savedUser.password;
-  res.status(201).send(savedUser);
+  delete savedUser.dataValues.password;
+  res.status(201).send(savedUser.dataValues);
 });
 
 router.post('/sign-in', userLogin, async (req, res) => {
   delete req.user.password;
-  const token = jwt.sign(selectedUser, process.env.SECRET);
+  const token = jwt.sign(req.user, process.env.SECRET);
 
   await sessionStore.setSession(token, req.user.email);
 
@@ -35,7 +35,7 @@ router.post('/sign-in', userLogin, async (req, res) => {
   }
 
   res.cookie('token', token, cookieOptions);
-  res.status(200).send(selectedUser);
+  res.status(200).send(req.user);
 });
 
 router.put('/:id', userAuthentication, schemaMiddleware(usersSchema.putUser), async (req, res) => {
