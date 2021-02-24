@@ -7,6 +7,7 @@ const schemas = require('../../schemas/coursesSchemas');
 
 router.get('/', async (req, res) => {
   let limit, offset = null;
+  const filter = JSON.parse(req.query.filter) || {};
 
   if (req.query.range) {
     const range = JSON.parse(req.query.range);
@@ -14,7 +15,7 @@ router.get('/', async (req, res) => {
     offset = range[0];
   }
 
-  const { count: total, rows: topics } = await CoursesController.getAllTopics(limit, offset);
+  const { count: total, rows: topics } = await CoursesController.getAllTopics(limit, offset, filter);
   
   res.set({
     'Access-Control-Expose-Headers': 'Content-Range',
@@ -32,7 +33,8 @@ router.get('/:id', async (req, res) => {
 });
 
 router.post('/', schemaMiddleware(schemas.postTopic) , async (req, res) => {
-  const sanitized = sanitiseObj(req.body);
+  const { chapterId, title } = req.body;
+  const sanitized = sanitiseObj({ chapterId, title });
   const createdTopic = await CoursesController.createTopic(sanitized);
 
   res.status(201).send(createdTopic);

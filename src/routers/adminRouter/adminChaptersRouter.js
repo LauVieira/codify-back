@@ -7,6 +7,7 @@ const schemas = require('../../schemas/coursesSchemas');
 
 router.get('/', async (req, res) => {
   let limit, offset = null;
+  const filter = JSON.parse(req.query.filter) || {};
 
   if (req.query.range) {
     const range = JSON.parse(req.query.range);
@@ -14,7 +15,7 @@ router.get('/', async (req, res) => {
     offset = range[0];
   }
 
-  const { count: total, rows: chapters } = await CoursesController.getAllChapters(limit, offset);
+  const { count: total, rows: chapters } = await CoursesController.getAllChapters(limit, offset, filter);
   
   res.set({
     'Access-Control-Expose-Headers': 'Content-Range',

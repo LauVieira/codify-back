@@ -1,5 +1,6 @@
 const { NotFoundError } = require('../errors');
 const Err = require('../errors');
+const sequelize = require('../utils/database');
 
 const Course = require('../models/Course');
 const CourseUser = require('../models/CourseUser');
@@ -83,8 +84,16 @@ class CoursesController {
     await course.destroy();
   }
 
-  getAllTopics (limit = null, offset = null) {
-    return Topic.findAndCountAll({ limit, offset });
+  getAllTopics (limit = null, offset = null, filter = {}) {
+    return Topic.findAndCountAll({ 
+      where: filter, 
+      limit, 
+      offset,
+      include: {
+        model: Chapter,
+      },
+      attributes: ['id', 'title', 'chapterId', [sequelize.col('chapter."courseId"'), 'courseId']],
+    });
   }
 
   async getTopicById (id) {
@@ -119,8 +128,8 @@ class CoursesController {
     return chapter;
   }
 
-  getAllChapters (limit = null, offset = null) {
-    return Chapter.findAndCountAll({ limit, offset });
+  getAllChapters (limit = null, offset = null, filter = {}) {
+    return Chapter.findAndCountAll({ where: filter, limit, offset });
   }
 
   async createChapter (chapterData) {
@@ -160,6 +169,24 @@ class CoursesController {
     await activityUser.save();
 
     return activityUser;
+  }
+
+  getAllTheories (limit = null, offset = null, filter = {}) {
+    return Theory.findAndCountAll({ 
+      where: filter, 
+      limit, 
+      offset,
+      include: {
+        model: Activity,
+        include: {
+          model: Topic,
+          include: {
+            model: Chapter
+          }
+        }
+      },
+      attributes: ['id', 'title', 'chapterId', [sequelize.col('chapter."courseId"'), 'courseId']],
+    });
   }
 }
 
