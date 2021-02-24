@@ -7,6 +7,10 @@ const app = require('../../src/app');
 const agent = supertest(app);
 
 const sequelize = require('../../src/utils/database');
+const redis = require('promise-redis')();
+const client = redis.createClient({
+  url: process.env.REDISCLOUD_URL
+});
 
 const Helpers = require('../Helpers');
 
@@ -196,6 +200,7 @@ describe('PUT /users/:id', () => {
     const response = await agent.put(`/users/${user.id}`).send(body).set('Cookie', `token=${token}`);
 
     expect(response.status).toBe(200);
+    expect(response.body).not.toHaveProperty('password');
     expect(response.body).toEqual(expect.objectContaining({
       id: user.id,
       name: body.name,
