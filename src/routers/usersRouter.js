@@ -52,7 +52,7 @@ router.post('/sign-out', userAuthentication, async (req, res) => {
   await sessionStore.deleteSession(req.token);
   res.clearCookie('token');
   
-  res.status(200).send({ message: 'Sign-out efetuado com sucesso' });
+  res.sendStatus(200);
 });
 
 module.exports = router;

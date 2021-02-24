@@ -8,20 +8,20 @@ async function adminAuthentication (req, res, next) {
     throw new UnauthorizedError('Token não encontrado');
   }
 
-  const isValid = await sessionStore.getSession(adminToken);
-  if (!isValid) {
-    throw new UnauthorizedError('Token inválido');
-  }
-
-  jwt.verify(adminToken, process.env.ADMIN_SECRET, (err, decoded) => {
-    if (err) {
+  try {
+    const admin = jwt.verify(adminToken, process.env.ADMIN_SECRET);
+    const session = await sessionStore.getSession(adminToken);
+    if (!session || session !== admin.username) {
       throw new UnauthorizedError('Token inválido');
     }
 
-    req.admin = decoded;
+    req.admin = admin;
     req.adminToken = adminToken;
+    
     next();
-  });
+  } catch (err) {
+    throw new UnauthorizedError('Token inválido');
+  }
 }
 
 module.exports = adminAuthentication;

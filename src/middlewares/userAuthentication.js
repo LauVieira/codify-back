@@ -8,21 +8,20 @@ async function userAuthentication (req, res, next) {
     throw new UnauthorizedError('Token não encontrado');
   }
 
-  const isValid = await sessionStore.getSession(token);
-  if (!isValid) {
-    throw new UnauthorizedError('Token inválido');
-  }
-
-  jwt.verify(token, process.env.SECRET, (err, decoded) => {
-    if (err) {
+  try {
+    const user = jwt.verify(token, process.env.SECRET);
+    const session = await sessionStore.getSession(token);
+    if (!session || session !== user.email) {
       throw new UnauthorizedError('Token inválido');
     }
-
-    req.user = decoded;
+    req.user = user;
     req.token = token;
     
     next();
-  });
+  } catch (err) {
+    console.error(err);
+    throw new UnauthorizedError('Token inválido');
+  }
 }
 
 module.exports = userAuthentication;

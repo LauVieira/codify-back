@@ -25,7 +25,7 @@ router.post('/logout', adminAuthentication, async (req, res) => {
     await sessionStore.deleteSession(req.adminToken);
     res.clearCookie('adminToken');
 
-    res.status(200).send({ message: 'Logout efetuado com sucesso' });
+    res.sendStatus(200);
 });
 
 module.exports = router;

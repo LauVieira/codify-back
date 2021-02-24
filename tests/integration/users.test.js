@@ -10,6 +10,8 @@ const sequelize = require('../../src/utils/database');
 
 const Helpers = require('../Helpers');
 
+const { getSession } = require('../../src/utils/redis');
+
 beforeEach(async () => {
   await Helpers.eraseDatabase();
 });
@@ -147,9 +149,11 @@ describe('POST /users/sign-out', () => {
 
     const response = await agent.post('/users/sign-out').set('Cookie', `token=${token}`);
 
+    const session = await getSession(token);
+
     expect(response.status).toBe(200);
-    expect(response.body.message).toEqual('Sign-out efetuado com sucesso');
     expect(response.headers['set-cookie'][0]).toContain('Expires');
+    expect(session).toBeFalsy();
   });
 });
 

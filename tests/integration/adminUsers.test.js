@@ -7,10 +7,12 @@ const agent = supertest(app);
 
 const sequelize = require('../../src/utils/database');
 
-const { createAdmin, createAdminToken, eraseDatabase } = require('../Helpers');
+const Helpers = require('../Helpers');
+
+const { getSession } = require('../../src/utils/redis');
 
 beforeEach(async () => {
-  await eraseDatabase();
+  await Helpers.eraseDatabase();
 });
 
 afterAll(async () => {
@@ -24,7 +26,7 @@ describe('POST /admin/users/login', () => {
       password: '123456' 
     };
     
-    const admin = await createAdmin();
+    const admin = await Helpers.createAdmin();
     delete admin.password;
     
     const response = await agent.post('/admin/users/login').send(body);
@@ -59,7 +61,7 @@ describe('POST /admin/users/login', () => {
       password: '1234567890',
     };
 
-    await createAdmin();
+    await Helpers.createAdmin();
 
     const response = await agent.post('/admin/users/login').send(body);
 
@@ -85,13 +87,16 @@ describe('POST /admin/users/logout', () => {
   });
 
   it('should return 200 -> valid cookie, and destroy session', async () => {
-    const admin = await createAdmin();
-    const adminToken = await createAdminToken(admin);
+    const admin = await Helpers.createAdmin();
+    const adminToken = await Helpers.createAdminToken(admin);
 
+    const sessionBefore = await getSession(adminToken);
     const response = await agent.post('/admin/users/logout').set('Cookie', `adminToken=${adminToken}`);
 
+    const session = await getSession(adminToken);
+
     expect(response.status).toBe(200);
-    expect(response.body.message).toEqual('Logout efetuado com sucesso');
     expect(response.headers['set-cookie'][0]).toContain('Expires');
+    expect(session).toBeFalsy();
   });
 });
