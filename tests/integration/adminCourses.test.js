@@ -13,7 +13,7 @@ const db = new Pool({
     connectionString: process.env.DATABASE_URL
 });
 
-const { setSession, endConnection } = require('../../src/utils/redis');
+const redis = require('../../src/utils/redis');
 
 const Helpers = require('../Helpers');
 
@@ -24,7 +24,7 @@ beforeEach(async () => {
 afterAll(async () => {
   await sequelize.close();
   await db.end();
-  await endConnection();
+  await redis.endConnection();
 });
 
 describe('GET /admin/courses/', () => {
@@ -51,7 +51,7 @@ describe('GET /admin/courses/', () => {
     courses[0].updatedAt = courses[0].updatedAt.toJSON();
 
     adminToken = jwt.sign(admin.rows[0], process.env.ADMIN_SECRET);
-    await setSession(adminToken, admin.rows[0].username);
+    await redis.setSession(adminToken, admin.rows[0].username);
   });
 
   afterEach(async () => {
@@ -97,7 +97,7 @@ describe('POST /admin/courses/', () => {
     );
 
     adminToken = jwt.sign(admin.rows[0], process.env.ADMIN_SECRET);
-    await setSession(adminToken, admin.rows[0].username);
+    await redis.setSession(adminToken, admin.rows[0].username);
   });
 
   afterEach(async () => {
@@ -160,7 +160,7 @@ describe('PUT /admin/courses/:id', () => {
 
     courseId = dbCourse.rows[0].id;
     adminToken = jwt.sign(admin.rows[0], process.env.ADMIN_SECRET);
-    await setSession(adminToken, admin.rows[0].username);
+    await redis.setSession(adminToken, admin.rows[0].username);
   });
 
   afterEach(async () => {

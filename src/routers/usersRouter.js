@@ -57,9 +57,15 @@ router.post('/sign-out', userAuthentication, async (req, res) => {
 });
 
 router.post('/forgot-password', schemaMiddleware(usersSchema.forgot), async (req, res) => {
-  const user = UsersController.findUserByEmail(req.body.email);
+  const user = await UsersController.findUserByEmail(req.body.email);
+  if (!user) {
+    return res.sendStatus(202);
+  }
 
   const token = await redis.setItem(user.id);
+
+  await UsersController.sendEmail(user.email, token);
+  res.sendStatus(202);
 });
 
 router.post('/redefine-password', schemaMiddleware(usersSchema.redefine), async (req, res) => {

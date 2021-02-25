@@ -8,7 +8,7 @@ const agent = supertest(app);
 const sequelize = require('../../src/utils/database');
 
 const Helpers = require('../Helpers');
-const { endConnection } = require('../../src/utils/redis');
+const redis = require('../../src/utils/redis');
 
 beforeEach(async () => {
   await Helpers.eraseDatabase();
@@ -16,7 +16,7 @@ beforeEach(async () => {
 
 afterAll(async () => {
   await sequelize.close();
-  await endConnection();
+  await redis.endConnection();
 });
 
 describe('GET /admin/topics/:id', () => {

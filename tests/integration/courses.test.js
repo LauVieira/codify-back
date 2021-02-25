@@ -8,7 +8,7 @@ const sequelize = require('../../src/utils/database');
 
 const agent = supertest(app);
 
-const { endConnection } = require('../../src/utils/redis');
+const redis = require('../../src/utils/redis');
 const Helpers = require('../Helpers');
 
 beforeEach(async () => {
@@ -17,7 +17,7 @@ beforeEach(async () => {
 
 afterAll(async () => {
   await sequelize.close();
-  await endConnection();
+  await redis.endConnection();
 });
 
 describe('GET /courses/suggestions', () => {

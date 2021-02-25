@@ -2,12 +2,14 @@
 const UsersController = require('../../src/controllers/UsersController');
 const User = require('../../src/models/User');
 const Err = require('../../src/errors');
+const axios = require('axios');
 
 jest.mock('bcrypt', () => ({
   hashSync: (password) => password,
 }));
 jest.mock('../../src/models/User');
 jest.mock('sequelize');
+jest.mock('axios');
 
 describe('saveUser', () => {
   it('should return a user with id', async () => {
@@ -136,5 +138,18 @@ describe('editUser', () => {
     expect(request).toEqual(
       expect.objectContaining({ password: expectedObject.password })
     );
+  });
+});
+
+describe('sendEmail', () => {
+  it('should send an email with the right inputs', async () => {
+    const url = 'https://api.sendgrid.com/v3/mail/send';
+    const email = 'test@test.com';
+    const token = 'token';
+
+    await UsersController.sendEmail(email, token);
+
+    expect(axios.post).toHaveBeenCalled();
+    expect(axios.post).toHaveBeenCalledWith(url, expect.any(Object), expect.any(Object));
   });
 });

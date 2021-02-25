@@ -3,6 +3,7 @@ const Err = require('../errors');
 const User = require('../models/User');
 const Schemas = require('../schemas');
 const bcrypt = require('bcrypt');
+const axios = require('axios');
 
 class UsersControllers {
   saveUser (name, email, password) {
@@ -52,6 +53,36 @@ class UsersControllers {
     Object.assign(user, userData);
     await user.save();
     return user;
+  }
+
+  async sendEmail (email, token) {
+    const url = 'https://api.sendgrid.com/v3/mail/send';
+    const headers = { 
+      headers: { 
+        Authorization: 'Bearer ' + process.env.SENDGRID_API_KEY,
+      }
+    };
+
+    const data = {
+      personalizations: [{
+        to: [{
+          email
+        }]
+      }],
+      from: {
+        email: 'gabriell.mil@gmail.com'
+      },
+      subject: 'Redefinição de senha CODIFY',
+      content: [{
+        type: 'text/plain',
+        value: `
+          Para redefinir sua senha clique nesse link:\n
+          ${process.env.FRONT_URL || 'http://localhost:9000'}/redefinir-senha/${token}
+        `
+      }]
+    };
+
+    await axios.post(url, data, headers);
   }
 }
 

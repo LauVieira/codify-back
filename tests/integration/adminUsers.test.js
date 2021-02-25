@@ -9,7 +9,7 @@ const sequelize = require('../../src/utils/database');
 
 const Helpers = require('../Helpers');
 
-const { getSession, endConnection } = require('../../src/utils/redis');
+const redis = require('../../src/utils/redis');
 
 beforeEach(async () => {
   await Helpers.eraseDatabase();
@@ -17,7 +17,7 @@ beforeEach(async () => {
 
 afterAll(async () => {
   await sequelize.close();
-  await endConnection();
+  await redis.endConnection();
 });
 
 describe('POST /admin/users/login', () => {
@@ -91,10 +91,10 @@ describe('POST /admin/users/logout', () => {
     const admin = await Helpers.createAdmin();
     const adminToken = await Helpers.createAdminToken(admin);
 
-    const sessionBefore = await getSession(adminToken);
+    const sessionBefore = await redis.getSession(adminToken);
     const response = await agent.post('/admin/users/logout').set('Cookie', `adminToken=${adminToken}`);
 
-    const session = await getSession(adminToken);
+    const session = await redis.getSession(adminToken);
 
     expect(response.status).toBe(200);
     expect(response.headers['set-cookie'][0]).toContain('Expires');

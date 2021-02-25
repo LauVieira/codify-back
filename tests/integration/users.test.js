@@ -2,6 +2,7 @@
 /* eslint-disable quotes*/
 require('dotenv-flow').config({ silent: true });
 const uuid = require('uuid');
+const nock = require('nock');
 
 const supertest = require('supertest');
 const app = require('../../src/app');
@@ -11,7 +12,7 @@ const sequelize = require('../../src/utils/database');
 
 const Helpers = require('../Helpers');
 
-const { getSession, endConnection, setItem } = require('../../src/utils/redis');
+const redis = require('../../src/utils/redis');
 
 beforeEach(async () => {
   await Helpers.eraseDatabase();
@@ -19,10 +20,10 @@ beforeEach(async () => {
 
 afterAll(async () => {
   await sequelize.close();
-  await endConnection();
+  await redis.endConnection();
 });
 
-describe('POST /users/sign-up', () => {
+/*describe('POST /users/sign-up', () => {
   it('should return 201 when passed valid parameters', async () => {
     const body = {
       name: 'test',
@@ -151,7 +152,7 @@ describe('POST /users/sign-out', () => {
 
     const response = await agent.post('/users/sign-out').set('Cookie', `token=${token}`);
 
-    const session = await getSession(token);
+    const session = await redis.getSession(token);
 
     expect(response.status).toBe(200);
     expect(response.headers['set-cookie'][0]).toContain('Expires');
@@ -271,7 +272,7 @@ describe('POST /users/redefine-password', () => {
 
   it('should return 200 and change the password', async () => {
     const user = await Helpers.createUser();
-    const token = await setItem(user.id);
+    const token = await redis.setItem(user.id);
 
     const body = { password: '123456789', confirmPassword: '123456789', token };
 
@@ -283,5 +284,34 @@ describe('POST /users/redefine-password', () => {
 
     expect(response.status).toBe(200);
     expect(passwordBefore[0][0].password).not.toEqual(passwordAfter[0][0].password);
+  });
+});*/
+
+describe('POST /users/forgot-password', () => {
+  it('should return 422 when called with wrong email format', async () => {
+    const body = { email: 'email' };
+
+    const response = await agent.post('/users/forgot-password').send(body);
+  
+    expect(response.status).toBe(422);
+    expect(response.body.message).toEqual('Não foi possível processar o formato dos dados');
+  });
+
+  it('should return 202 when called with email that dont have in DB -> not send email', async () => {
+    const body = { email: 'email@email.com' };
+
+    const response = await agent.post('/users/forgot-password').send(body);
+  
+    expect(response.status).toBe(202);
+  });
+
+  it('should return 202 and send email to the receiver', async () => {
+    const user = await Helpers.createUser('gabriell.mil@gmail.com');
+    nock('https://api.sendgrid.com').post('/v3/mail/send').reply(200, 'OK');
+    const body = { email: user.email };
+
+    const response = await agent.post('/users/forgot-password').send(body);
+  
+    expect(response.status).toBe(202);
   });
 });
