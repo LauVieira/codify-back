@@ -196,19 +196,54 @@ describe('PUT /users/:id', () => {
     expect(response.body.message).toEqual('Usuário não encontrado');
   });
 
-  it('should return the chapter updated with valid cookie', async () =>{
+  it('should return the user updated with valid cookie', async () =>{
     const body = { name: 'novo nome', email: 'novoemail@gmail.com' };
+
+    const passwordBefore = await sequelize.query(`SELECT password FROM users WHERE id=${user.id}`);
 
     const response = await agent.put(`/users/${user.id}`).send(body).set('Cookie', `token=${token}`);
 
+    const passwordAfter = await sequelize.query(`SELECT password FROM users WHERE id=${user.id}`);
+
     expect(response.status).toBe(200);
     expect(response.body).not.toHaveProperty('password');
-    expect(response.body).toEqual(expect.objectContaining({
-      id: user.id,
-      name: body.name,
-      email: body.email,
-      createdAt: user.createdAt,
-      updatedAt: expect.any(String),
-    }));
+    expect(passwordBefore[0][0].password).toEqual(passwordAfter[0][0].password);
+    expect(response.body).toEqual(
+      expect.objectContaining({
+        id: user.id,
+        name: body.name,
+        email: body.email,
+        createdAt: user.createdAt,
+        updatedAt: expect.any(String),
+      })
+    );
+  });
+
+  it('should return the user updated with valid cookie and change the password', async () =>{
+    const body = { 
+      name: 'novo nome', 
+      email: 'novoemail@gmail.com',
+      password: 'novasenha123',
+      confirmPassword: 'novasenha123',
+    };
+
+    const passwordBefore = await sequelize.query(`SELECT password FROM users WHERE id=${user.id}`);
+
+    const response = await agent.put(`/users/${user.id}`).send(body).set('Cookie', `token=${token}`);
+
+    const passwordAfter = await sequelize.query(`SELECT password FROM users WHERE id=${user.id}`);
+
+    expect(response.status).toBe(200);
+    expect(response.body).not.toHaveProperty('password');
+    expect(passwordBefore[0][0].password).not.toEqual(passwordAfter[0][0].password);
+    expect(response.body).toEqual(
+      expect.objectContaining({
+        id: user.id,
+        name: body.name,
+        email: body.email,
+        createdAt: user.createdAt,
+        updatedAt: expect.any(String),
+      })
+    );
   });
 });

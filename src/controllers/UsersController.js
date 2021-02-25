@@ -2,6 +2,7 @@
 const Err = require('../errors');
 const User = require('../models/User');
 const Schemas = require('../schemas');
+const bcrypt = require('bcrypt');
 
 class UsersControllers {
   saveUser (name, email, password) {
@@ -42,7 +43,12 @@ class UsersControllers {
   
   async editUser (id, userData) {
     const user = await this.getUser(id);
-  
+
+    if ('password' in userData) {
+      delete userData.confirmPassword;
+      userData.password = bcrypt.hashSync(userData.password, 10);
+    }
+    
     Object.assign(user, userData);
     await user.save();
     return user;

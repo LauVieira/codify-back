@@ -15,6 +15,8 @@ const signIn = joi.object({
 const putUser = joi.object({
   name: joi.string().pattern(/^[A-z\u00C0-\u00ff ]+$/),
   email: joi.string().email(),
+  password: joi.string().pattern(/^\S{6,}$/),
+  confirmPassword: joi.ref('password'),
 });
 
 module.exports = {
