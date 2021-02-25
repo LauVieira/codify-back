@@ -1,6 +1,6 @@
 const router = require('express').Router();
 
-const CoursesController = require('../../controllers/CoursesController');
+const ActivitiesController = require('../../controllers/ActivitiesController');
 const TheoriesController = require('../../controllers/TheoriesController');
 const { schemaMiddleware } = require('../../middlewares');
 const { sanitiseObj } = require('../../utils/generalFunctions');
@@ -23,6 +23,23 @@ router.get('/', async (req, res) => {
     'Content-Range': `${offset || 0}-${theories.length}/${total}`
   });
   res.send(theories);
+});
+
+router.get('/:id', async (req, res) => {
+  const { id } = req.params;
+
+  const theory = await TheoriesController.getByPk(id);
+  
+  res.status(200).send(theory);
+});
+
+router.delete('/:id', async (req, res) => {
+  const { id } = req.params;
+
+  const activityIdToDelete = await TheoriesController.deleteByPk(id);
+  await ActivitiesController.deleteByPk(activityIdToDelete);
+  
+  res.status(200);
 });
 
 module.exports = router;

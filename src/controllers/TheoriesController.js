@@ -30,6 +30,19 @@ class TheoriesController {
       ],
     });
   }
+
+  async getByPk (id) {
+    const theory = await Theory.findByPk(id);
+    if (!theory) throw new Err.NotFoundError('Teoria não encontrada');
+    return theory;
+  }
+
+  async deleteByPk (id) {
+    const theory = await this.getByPk(id);
+    const { activityId } = theory;
+    await theory.destroy();
+    return activityId;
+  }
 }
 
 module.exports = new TheoriesController();

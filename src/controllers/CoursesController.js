@@ -1,4 +1,3 @@
-const { NotFoundError } = require('../errors');
 const Err = require('../errors');
 const sequelize = require('../utils/database');
 
@@ -18,7 +17,7 @@ class CoursesController {
 
   async getCourse (id) {
     const course = await Course.findByPk(id);
-    if (!course) throw new NotFoundError('Curso não encontrado');
+    if (!course) throw new Err.NotFoundError('Curso não encontrado');
     return course;
   }
 
@@ -73,15 +72,6 @@ class CoursesController {
     Object.assign(course, courseData);
     await course.save();
     return course;
-  }
-
-  async deleteCourse (id) {
-    const course = await Course.findByPk(id);
-    if (course === null) throw new Err.NotFoundError('Curso não encontrado');
-    
-    CourseUser.destroy({ where: { courseId: id } });
-
-    await course.destroy();
   }
 
   getAllTopics (limit = null, offset = null, filter = {}) {
