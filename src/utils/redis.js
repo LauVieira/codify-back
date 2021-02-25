@@ -43,4 +43,14 @@ async function deleteSession (key) {
   await client.del(key);
 }
 
-module.exports = { getSession, setSession, deleteSession };
+function endConnection () {
+  client.quit();
+}
+
+module.exports = { 
+  getSession, 
+  setSession, 
+  deleteSession, 
+  endConnection,
+  getInstance
+};

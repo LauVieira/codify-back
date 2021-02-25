@@ -9,7 +9,7 @@ const sequelize = require('../../src/utils/database');
 
 const Helpers = require('../Helpers');
 
-const { getSession } = require('../../src/utils/redis');
+const { getSession, endConnection } = require('../../src/utils/redis');
 
 beforeEach(async () => {
   await Helpers.eraseDatabase();
@@ -17,6 +17,7 @@ beforeEach(async () => {
 
 afterAll(async () => {
   await sequelize.close();
+  await endConnection();
 });
 
 describe('POST /admin/users/login', () => {

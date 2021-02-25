@@ -13,7 +13,7 @@ const db = new Pool({
     connectionString: process.env.DATABASE_URL
 });
 
-const { setSession } = require('../../src/utils/redis');
+const { setSession, endConnection } = require('../../src/utils/redis');
 
 const Helpers = require('../Helpers');
 
@@ -24,6 +24,7 @@ beforeEach(async () => {
 afterAll(async () => {
   await sequelize.close();
   await db.end();
+  await endConnection();
 });
 
 describe('GET /admin/courses/', () => {
