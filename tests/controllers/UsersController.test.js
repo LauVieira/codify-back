@@ -121,4 +121,20 @@ describe('editUser', () => {
       expect.objectContaining(expectedObject)
     );
   });
+
+  it('should updated the password', async () => {
+    const save = jest.fn();
+    const oldObject = { password: 'old password', save };
+    const expectedObject = { password: 'new password', confirmPassword: 'new password' };
+
+    jest.spyOn(UsersController, 'getUser').mockResolvedValueOnce(oldObject);
+
+    const request = await UsersController.editUser(2, expectedObject);
+    
+    expect(save).toHaveBeenCalled();
+    expect(request).not.toHaveProperty('confirmPassword');
+    expect(request).toEqual(
+      expect.objectContaining({ password: expectedObject.password })
+    );
+  });
 });

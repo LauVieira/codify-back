@@ -280,8 +280,7 @@ describe('POST /users/redefine-password', () => {
     const response = await agent.post('/users/redefine-password').send(body);
 
     const passwordAfter = await sequelize.query(`SELECT password FROM users WHERE id=${user.id}`);
-    console.log(passwordBefore[0][0]);
-    console.log(passwordAfter[0][0]);
+
     expect(response.status).toBe(200);
     expect(passwordBefore[0][0].password).not.toEqual(passwordAfter[0][0].password);
   });
