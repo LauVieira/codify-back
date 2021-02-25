@@ -1,6 +1,7 @@
 /* global afterAll, jest, describe, it, expect  */
 /* eslint-disable quotes*/
 require('dotenv-flow').config({ silent: true });
+const uuid = require('uuid');
 
 const supertest = require('supertest');
 const app = require('../../src/app');
@@ -10,7 +11,7 @@ const sequelize = require('../../src/utils/database');
 
 const Helpers = require('../Helpers');
 
-const { getSession, endConnection } = require('../../src/utils/redis');
+const { getSession, endConnection, setItem } = require('../../src/utils/redis');
 
 beforeEach(async () => {
   await Helpers.eraseDatabase();
@@ -246,5 +247,42 @@ describe('PUT /users/:id', () => {
         updatedAt: expect.any(String),
       })
     );
+  });
+});
+
+describe('POST /users/redefine-password', () => {
+  it('should return 422 when called with wrong body uuid', async () => {
+    const body = { password: '123456789', confirmPassword: '123456789', token: 'aa' };
+
+    const response = await agent.post('/users/redefine-password').send(body);
+  
+    expect(response.status).toBe(422);
+    expect(response.body.message).toEqual('Não foi possível processar o formato dos dados');
+  });
+
+  it('should return 403 when called with token expire or invalid', async () => {
+    const body = { password: '123456789', confirmPassword: '123456789', token: uuid.v4() };
+
+    const response = await agent.post('/users/redefine-password').send(body);
+  
+    expect(response.status).toBe(403);
+    expect(response.body.message).toEqual('Token inválido ou expirado');
+  });
+
+  it('should return 200 and change the password', async () => {
+    const user = await Helpers.createUser();
+    const token = await setItem(user.id);
+
+    const body = { password: '123456789', confirmPassword: '123456789', token };
+
+    const passwordBefore = await sequelize.query(`SELECT password FROM users WHERE id=${user.id}`);
+
+    const response = await agent.post('/users/redefine-password').send(body);
+
+    const passwordAfter = await sequelize.query(`SELECT password FROM users WHERE id=${user.id}`);
+    console.log(passwordBefore[0][0]);
+    console.log(passwordAfter[0][0]);
+    expect(response.status).toBe(200);
+    expect(passwordBefore[0][0].password).not.toEqual(passwordAfter[0][0].password);
   });
 });

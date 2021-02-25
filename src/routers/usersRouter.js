@@ -67,7 +67,7 @@ router.post('/redefine-password', schemaMiddleware(usersSchema.redefine), async 
   const { password } = sanitiseObj(req.body);
 
   if (!userId) {
-    throw new Err.ForbiddenError('Token já foi expirado');
+    throw new Err.ForbiddenError('Token inválido ou expirado');
   }
 
   await UsersController.editUser(userId, { password });
