@@ -29,6 +29,24 @@ async function setSession (key, payload) {
   await client.set(key, payload);
 }
 
+async function setItem (payload) {
+  const key = uuid.v4();
+  const client = await getInstance();
+
+  await client.set(key, JSON.stringify(payload));
+  await client.expire(key, 600);
+
+  return key;
+}
+
+async function getItem (key) {
+  const client = await getInstance();
+
+  const result = await client.get(key);
+
+  return result ? JSON.parse(result) : false;
+}
+
 async function getSession (key) {
   const client = await getInstance();
 
@@ -52,5 +70,7 @@ module.exports = {
   setSession, 
   deleteSession, 
   endConnection,
-  getInstance
+  getInstance,
+  setItem,
+  getItem
 };

@@ -19,8 +19,20 @@ const putUser = joi.object({
   confirmPassword: joi.ref('password'),
 });
 
+const forgot = joi.object({
+  email: joi.string().email()
+});
+
+const redefine = joi.object({
+  password: joi.string().pattern(/^\S{6,}$/).required(),
+  confirmPassword: joi.ref('password'),
+  token: joi.string().guid({ version: 'uuidv4' }).required()
+});
+
 module.exports = {
   signUp,
   signIn,
-  putUser
+  putUser,
+  forgot,
+  redefine
 };

@@ -6,7 +6,8 @@ const { sanitiseObj } = require('../utils/generalFunctions');
 const UsersController = require('../controllers/UsersController');
 const { validateUser, userAuthentication, schemaMiddleware, userLogin } = require('../middlewares');
 const usersSchema = require('../schemas/usersSchemas');
-const sessionStore = require('../utils/redis');
+const Err = require('../errors');
+const redis = require('../utils/redis');
 
 router.post('/sign-up', validateUser, async (req, res) => {
   const { name, email, password } = req.userData;
@@ -25,7 +26,7 @@ router.post('/sign-in', userLogin, async (req, res) => {
   delete req.user.password;
   const token = jwt.sign(req.user, process.env.SECRET);
 
-  await sessionStore.setSession(token, req.user.email);
+  await redis.setSession(token, req.user.email);
 
   const cookieOptions = {};
 
@@ -49,9 +50,27 @@ router.put('/:id', userAuthentication, schemaMiddleware(usersSchema.putUser), as
 });
 
 router.post('/sign-out', userAuthentication, async (req, res) => {
-  await sessionStore.deleteSession(req.token);
+  await redis.deleteSession(req.token);
   res.clearCookie('token');
   
+  res.sendStatus(200);
+});
+
+router.post('/forgot-password', schemaMiddleware(usersSchema.forgot), async (req, res) => {
+  const user = UsersController.findUserByEmail(req.body.email);
+
+  const token = await redis.setItem(user.id);
+});
+
+router.post('/redefine-password', schemaMiddleware(usersSchema.redefine), async (req, res) => {
+  const userId = await redis.getItem(req.body.token);
+  const { password } = sanitiseObj(req.body);
+
+  if (!userId) {
+    throw new Err.ForbiddenError('Token já foi expirado');
+  }
+
+  await UsersController.editUser(userId, { password });
   res.sendStatus(200);
 });
 
