@@ -23,7 +23,7 @@ afterAll(async () => {
   await redis.endConnection();
 });
 
-/*describe('POST /users/sign-up', () => {
+describe('POST /users/sign-up', () => {
   it('should return 201 when passed valid parameters', async () => {
     const body = {
       name: 'test',
@@ -285,7 +285,7 @@ describe('POST /users/redefine-password', () => {
     expect(response.status).toBe(200);
     expect(passwordBefore[0][0].password).not.toEqual(passwordAfter[0][0].password);
   });
-});*/
+});
 
 describe('POST /users/forgot-password', () => {
   it('should return 422 when called with wrong email format', async () => {

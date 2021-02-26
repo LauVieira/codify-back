@@ -34,7 +34,7 @@ async function setItem (payload) {
   const client = await getInstance();
 
   await client.set(key, JSON.stringify(payload));
-  await client.expire(key, 600);
+  await client.expire(key, 900);
 
   return key;
 }

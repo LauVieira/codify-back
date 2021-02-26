@@ -20,7 +20,7 @@ const putUser = joi.object({
 });
 
 const forgot = joi.object({
-  email: joi.string().email()
+  email: joi.string().email().required()
 });
 
 const redefine = joi.object({
