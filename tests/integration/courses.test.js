@@ -16,6 +16,7 @@ beforeEach(async () => {
 });
 
 afterAll(async () => {
+  await Helpers.eraseDatabase();
   await sequelize.close();
   await redis.endConnection();
 });
@@ -251,5 +252,63 @@ describe('POST /courses/activities/:id', () => {
       done: false,
       updatedAt: expect.any(String),
     }));
+  });
+});
+
+describe('POST /courses/:id', () => {
+  let token, user;
+
+  beforeEach(async () => {
+    user = await Helpers.createUser();
+    token = await Helpers.createToken(user);
+  });
+
+  it('should return 401 when cookie is invalid', async () => {
+    const wrongToken = 'wrong_token';
+    const response = await agent.post('/courses/0').set('Cookie', `token=${wrongToken}`);
+  
+    expect(response.status).toBe(401);
+    expect(response.body.message).toEqual('Token inválido');
+  });
+  
+  it('should return 401 when no cookie is sent', async () => {
+    const response = await agent.post('/courses/0');
+  
+    expect(response.status).toBe(401);
+    expect(response.body.message).toEqual('Token não encontrado');
+  });
+
+  it('should return 404 when course id is not found', async () => {
+    const response = await agent.post(`/courses/0`).set('Cookie', `token=${token}`);
+
+    expect(response.status).toBe(404);
+    expect(response.body.message).toEqual('Curso não encontrado');
+  });
+
+  it('should return 200 with the courses expected and a valid cookie', async () => {
+    const course = await Helpers.createCourse();
+
+    const response = await agent.post(`/courses/${course.id}`).set('Cookie', `token=${token}`);
+    
+    expect(response.status).toBe(201);
+    expect(response.body).toEqual(
+      expect.objectContaining({
+        courseUser: expect.objectContaining({
+          id: expect.any(Number),
+          courseId: course.id,
+          userId: user.id,
+          updatedAt: expect.any(String),
+          createdAt: expect.any(String)
+        }),
+        user: expect.objectContaining({
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          lastCourse: course.id,
+          updatedAt: expect.any(String),
+          createdAt: user.createdAt
+        })
+      })
+    );
   });
 });

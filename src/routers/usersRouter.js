@@ -40,7 +40,7 @@ router.post('/sign-in', userLogin, async (req, res) => {
 });
 
 router.put('/:id', userAuthentication, schemaMiddleware(usersSchema.putUser), async (req, res) => {
-  const { id } = req.params;
+  const id = Number(req.params.id);
   const sanitized = sanitiseObj(req.body);
 
   const updatedUser = await UsersController.editUser(id, sanitized);

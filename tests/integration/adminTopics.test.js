@@ -15,6 +15,7 @@ beforeEach(async () => {
 });
 
 afterAll(async () => {
+  await Helpers.eraseDatabase();
   await sequelize.close();
   await redis.endConnection();
 });
