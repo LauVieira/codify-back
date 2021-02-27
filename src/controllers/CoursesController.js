@@ -17,6 +17,7 @@ class CoursesController {
 
   async getCourse (id) {
     const course = await Course.findByPk(id);
+
     if (!course) throw new NotFoundError('Curso não encontrado');
     return course;
   }
@@ -54,6 +55,13 @@ class CoursesController {
 
   getAll (limit = null, offset = null) {
     return Course.findAll({ limit, offset });
+  }
+
+  async initializeCourse (courseId, userId) {
+    await this.getCourse(courseId);
+
+    const courseUser = await CourseUser.create({ courseId, userId });
+    return courseUser;
   }
 
   async createCourse (courseData) {

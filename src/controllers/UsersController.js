@@ -55,6 +55,15 @@ class UsersControllers {
     return user;
   }
 
+  async changeLastCourse (lastCourse, userId) {
+    const user = await this.getUser(userId);
+
+    user.lastCourse = lastCourse;
+    await user.save();
+
+    return user;
+  }
+
   async sendEmail (email, token) {
     const url = 'https://api.sendgrid.com/v3/mail/send';
     const headers = { 

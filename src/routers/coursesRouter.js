@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const CoursesController = require('../controllers/CoursesController');
+const UsersController = require('../controllers/UsersController');
 
 router.get('/suggestions', async (req, res) => {
   const suggestions = await CoursesController.getSuggestions();
@@ -18,8 +19,8 @@ router.post('/:id', async (req, res) => {
 
   const courseUser = await CoursesController.initializeCourse(params.id, req.user.id);
 
-  await CoursesController.changeLastCourse(params.id);
-  res.status(201).send(courseUser);
+  const user = await UsersController.changeLastCourse(params.id, req.user.id);
+  res.status(201).send({ courseUser, user });
 });
 
 router.get('/chapters/:chapterId/topics/:topicId/activities', async (req, res) => {
