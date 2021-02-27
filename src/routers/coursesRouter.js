@@ -13,6 +13,15 @@ router.get('/:id', async (req, res) => {
   res.status(200).send({ course, program });
 });
 
+router.post('/:id', async (req, res) => {
+  const params = req.params;
+
+  const courseUser = await CoursesController.initializeCourse(params.id, req.user.id);
+
+  await CoursesController.changeLastCourse(params.id);
+  res.status(201).send(courseUser);
+});
+
 router.get('/chapters/:chapterId/topics/:topicId/activities', async (req, res) => {
   const params = req.params;
 
