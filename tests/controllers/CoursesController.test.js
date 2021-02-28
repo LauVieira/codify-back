@@ -8,6 +8,7 @@ const Chapter = require('../../src/models/Chapter');
 const Activity = require('../../src/models/Activity');
 const ActivityUser = require('../../src/models/ActivityUser');
 const Err = require('../../src/errors');
+const CourseUser = require('../../src/models/CourseUser');
 
 jest.mock('../../src/models/ActivityUser');
 jest.mock('sequelize');
@@ -335,6 +336,36 @@ describe('createTopic', () => {
     
     expect(spy).toHaveBeenCalled();
     expect(spy).toHaveBeenCalledWith(newObject);
+    expect(request).toEqual(expectedObject);
+  });
+});
+
+describe('initializeCourse', () => {
+  it('should throw error when trying to create existing CourseUser', async () => {
+    const courseId = 1;
+    const userId = 1;
+
+    jest.spyOn(CoursesController, 'getCourse').mockResolvedValueOnce({});
+    CourseUser.findOne.mockResolvedValueOnce({});
+
+    const error = () => CoursesController.initializeCourse(courseId, userId);
+    
+    expect(error).rejects.toThrow(Err.ConflictError);
+  });
+
+  it('should create CourseUser if it does not exist yet', async () => {
+    const courseId = 1;
+    const userId = 1;
+    const expectedObject = { name: 'mockedObj', id: 1 };
+
+    jest.spyOn(CoursesController, 'getCourse').mockResolvedValueOnce({});
+
+    CourseUser.findOne.mockResolvedValueOnce(null);
+    CourseUser.create.mockResolvedValueOnce(expectedObject);
+
+    const request = await CoursesController.initializeCourse(courseId, userId);
+    
+    expect(CourseUser.create).toHaveBeenCalledWith({ courseId, userId });
     expect(request).toEqual(expectedObject);
   });
 });
