@@ -1,5 +1,6 @@
 const { NotFoundError } = require('../errors');
 const Err = require('../errors');
+const { Op } = require('sequelize');
 
 const Course = require('../models/Course');
 const CourseUser = require('../models/CourseUser');
@@ -11,8 +12,29 @@ const Theory = require('../models/Theory');
 const Exercise = require('../models/Exercise');
 
 class CoursesController {
-  getSuggestions (limit = null) {
-    return Course.findAll({ limit });
+  async getSuggestions (userId, limit=null) {
+    let initialized = await CourseUser.findAll({ where: { userId } });
+    initialized = initialized.map(item => item.courseId);
+
+    const courses = await Course.findAll({ 
+      where: { 
+        id: { 
+          [Op.notIn]: initialized 
+        } 
+      }, 
+      limit 
+    });
+
+    return courses;
+  }
+
+  async getInitializedCourses (userId, limit=null) {
+    let initialized = await CourseUser.findAll({ where: { userId } });
+    initialized = initialized.map(item => item.courseId);
+
+    const courses = await Course.findAll({ where: { id: initialized }, limit });
+    
+    return courses;
   }
 
   async getCourse (id) {
@@ -61,7 +83,7 @@ class CoursesController {
     await this.getCourse(courseId);
 
     const isValid = await CourseUser.findOne({ where: { courseId, userId } });
-    
+
     if (isValid) { 
       throw new Err.ConflictError('Curso já foi inicializado');
     }

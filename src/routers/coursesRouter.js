@@ -3,8 +3,15 @@ const CoursesController = require('../controllers/CoursesController');
 const UsersController = require('../controllers/UsersController');
 
 router.get('/suggestions', async (req, res) => {
-  const suggestions = await CoursesController.getSuggestions();
+  const suggestions = await CoursesController.getSuggestions(req.user.id);
+
   res.status(200).send(suggestions);
+});
+
+router.get('/initialized', async (req, res) => {
+  const initialized = await CoursesController.getInitializedCourses(req.user.id);
+  
+  res.status(200).send(initialized);
 });
 
 router.get('/:id', async (req, res) => {
