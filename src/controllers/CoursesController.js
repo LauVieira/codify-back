@@ -13,7 +13,7 @@ const Exercise = require('../models/Exercise');
 
 class CoursesController {
   async getSuggestions (userId, limit=null) {
-    let initialized = await CourseUser.findAll({ where: { userId } });
+    let initialized = await CourseUser.findAll({ where: { userId }, required: false });
     initialized = initialized.map(item => item.courseId);
 
     const courses = await Course.findAll({ 
@@ -29,7 +29,7 @@ class CoursesController {
   }
 
   async getInitializedCourses (userId, limit=null) {
-    let initialized = await CourseUser.findAll({ where: { userId } });
+    let initialized = await CourseUser.findAll({ where: { userId }, required: false });
     initialized = initialized.map(item => item.courseId);
 
     const courses = await Course.findAll({ where: { id: initialized }, limit });
