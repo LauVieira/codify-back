@@ -61,7 +61,7 @@ class CoursesController {
     await this.getCourse(courseId);
 
     const isValid = await CourseUser.findOne({ where: { courseId, userId } });
-    console.log(isValid);
+    
     if (isValid) { 
       throw new Err.ConflictError('Curso já foi inicializado');
     }

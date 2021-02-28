@@ -285,11 +285,21 @@ describe('POST /courses/:id', () => {
     expect(response.body.message).toEqual('Curso não encontrado');
   });
 
+  it('should return 409 when CourseUser is already created', async () => {
+    const course = await Helpers.createCourse();
+    await Helpers.createCourseUsers(user.id, course.id);
+
+    const response = await agent.post(`/courses/${course.id}`).set('Cookie', `token=${token}`);
+
+    expect(response.status).toBe(409);
+    expect(response.body.message).toEqual('Curso já foi inicializado');
+  });
+
   it('should return 200 with the courses expected and a valid cookie', async () => {
     const course = await Helpers.createCourse();
 
     const response = await agent.post(`/courses/${course.id}`).set('Cookie', `token=${token}`);
-    
+
     expect(response.status).toBe(201);
     expect(response.body).toEqual(
       expect.objectContaining({
