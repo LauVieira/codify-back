@@ -1,16 +1,12 @@
 /* global beforeEach, afterAll, it, describe, expect */
 /* eslint-disable quotes*/
-require('dotenv').config();
+require('dotenv-flow').config({ silent: true });
 
-const { Pool } = require('pg');
 const supertest = require('supertest');
 const app = require('../../src/app');
 const sequelize = require('../../src/utils/database');
 
 const agent = supertest(app);
-const db = new Pool({
-  connectionString: process.env.DATABASE_URL,
-});
 
 const Helpers = require('../Helpers');
 
@@ -20,7 +16,6 @@ beforeEach(async () => {
 
 afterAll(async () => {
   await sequelize.close();
-  await db.end();
 });
 
 describe('GET /courses/suggestions', () => {
