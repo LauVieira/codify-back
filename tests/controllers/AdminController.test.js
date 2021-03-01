@@ -35,10 +35,12 @@ describe('function validateUserAndPassword', () => {
         const expected = { id: 1, username: 'teste' };
 
         Admin.findOne.mockResolvedValueOnce({ 
-            ...expected,
-            password: 'senha-teste',
-            createdAt: '09/02/2021',
-            updatedAt: '09/02/2021'
+            dataValues: { 
+                ...expected,
+                password: 'senha-teste',
+                createdAt: '09/02/2021',
+                updatedAt: '09/02/2021'
+            } 
         });
 
         bcrypt.compareSync.mockImplementationOnce(() => true);

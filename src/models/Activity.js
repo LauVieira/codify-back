@@ -16,6 +16,7 @@ Activity.init({
     type: Sequelize.ENUM('exercise', 'theory'),
     allowNull: false
   },
+  order: Sequelize.INTEGER,
   topicId: {
     type: Sequelize.INTEGER,
     allowNull: false

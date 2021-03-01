@@ -1,9 +1,7 @@
 /* global afterAll, jest, describe, it, expect  */
 /* eslint-disable quotes*/
-
-require('dotenv').config();
+require('dotenv-flow').config({ silent: true });
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
 
 const app = require('../../src/app');
 const supertest = require('supertest');
@@ -15,102 +13,15 @@ const db = new Pool({
     connectionString: process.env.DATABASE_URL
 });
 
-async function cleanDataBase () {
-  await db.query('DELETE FROM admins');
-}
+const Helpers = require('../Helpers');
 
 beforeEach(async () => {
-  await cleanDataBase();
+  await Helpers.eraseDatabase();
 });
 
 afterAll(async () => {
   await sequelize.close();
   await db.end();
-});
-
-describe('POST /admin/users/login', () => {
-  it('should return 200 when passed valid parameters', async () => {
-    const body = { 
-      username: 'testeUsername',
-      password: 'testePassword' 
-    };
-    const password = bcrypt.hashSync(body.password, 10);
-    
-    await db.query('INSERT INTO admins (username, password) values ($1, $2)', [body.username, password]);
-    const response = await agent.post('/admin/users/login').send(body);
-
-    expect(response.headers).toHaveProperty('set-cookie');
-    expect(response.status).toBe(200);
-    expect(response.body).toEqual(expect.objectContaining({
-      id: expect.any(Number),
-      username: body.username,
-      createdAt: expect.any(String),
-      updatedAt: expect.any(String)
-    }));
-  });
-
-  it('should return 422 when passed missing parameters', async () => {
-    const body = { username: 'teste' };
-    const response = await agent.post('/admin/users/login').send(body);
-
-    expect(response.status).toBe(422);
-    expect(response.body.message).toEqual('Não foi possível processar os dados enviados');
-  });
-
-  it('should return 401 when username does not match in DB', async () => {
-    const body = {
-      username: 'unexistingUsername',
-      password: '123456'
-    };
-    const response = await agent.post('/admin/users/login').send(body);
-
-    expect(response.status).toBe(401);
-    expect(response.body.message).toEqual('Username ou senha estão incorretos');
-  });
-
-  it('should return 401 when username is right, but password is not', async () => {
-      const body = {
-        username: 'testeUsername',
-        password: '1234567890',
-      };
-
-      const password = bcrypt.hashSync('123456', 10);
-      
-      await db.query('INSERT INTO admins (username, password) values ($1, $2)', [body.username, password]);
-
-      const response = await agent.post('/admin/users/login').send(body);
-
-      expect(response.status).toBe(401);
-      expect(response.body.message).toEqual('Username ou senha estão incorretos');
-  });
-});
-
-describe('POST /admin/users/logout', () => {
-  it('should return 401 when cookie is invalid', async () => {
-    const adminToken = 'wrong_token';
-    const response = await agent.post('/admin/users/logout').set('Cookie', `adminToken=${adminToken}`);
-
-    expect(response.status).toBe(401);
-    expect(response.body.message).toEqual('Token inválido');
-  });
-
-  it('should return 401 when no cookie is sent', async () => {
-    const response = await agent.post('/admin/users/logout');
-
-    expect(response.status).toBe(401);
-    expect(response.body.message).toEqual('Token não encontrado');
-  });
-
-  it('should return 200 -> valid cookie, and destroy session', async () => {
-    const admin = await db.query('INSERT INTO admins (username, password) values ($1, $2) RETURNING *', ['admin', '1Ju23123']);
-    const adminToken = jwt.sign(admin.rows[0], process.env.ADMIN_SECRET);
-
-    const response = await agent.post('/admin/users/logout').set('Cookie', `adminToken=${adminToken}`);
-    
-    expect(response.status).toBe(200);
-    expect(response.body.message).toEqual('Logout efetuado com sucesso');
-    expect(response.headers['set-cookie'][0]).toContain('Expires');
-  });
 });
 
 describe('GET /admin/courses/', () => {
@@ -132,6 +43,10 @@ describe('GET /admin/courses/', () => {
     );
 
     courses = dbCourse.rows;
+
+    courses[0].createdAt = courses[0].createdAt.toJSON();
+    courses[0].updatedAt = courses[0].updatedAt.toJSON();
+
     adminToken = jwt.sign(admin.rows[0], process.env.ADMIN_SECRET);
   });
 
@@ -235,6 +150,9 @@ describe('PUT /admin/courses/:id', () => {
     );
 
     courses = dbCourse.rows;
+    courses[0].createdAt = courses[0].createdAt.toJSON();
+    courses[0].updatedAt = courses[0].updatedAt.toJSON();
+
     courseId = dbCourse.rows[0].id;
     adminToken = jwt.sign(admin.rows[0], process.env.ADMIN_SECRET);
   });

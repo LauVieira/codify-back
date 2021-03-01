@@ -8,7 +8,7 @@ class AdminController {
         const validation = Schemas.admin.login.validate(userData);
 
         if (validation.error) {
-            throw new Err.InvalidDataError('Não foi possível processar os dados enviados');
+            throw new Err.InvalidDataError();
         }
     }
 

@@ -1,5 +1,5 @@
 'use strict';
-require('dotenv').config();
+require('dotenv-flow').config({ silent: true });
 const bcrypt = require('bcrypt');
 
 const username = process.env.ADMIN_USER;
@@ -10,12 +10,10 @@ module.exports = {
     await queryInterface.bulkInsert('admins', [{
       username,
       password: bcrypt.hashSync(password, 10),
-      createdAt: new Date(Date.now()).toUTCString(),
-      updatedAt: new Date(Date.now()).toUTCString(),
     }]);
   },
 
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.bulkDelete('admins', { username }, {});
+    await queryInterface.bulkDelete('admins', { username });
   }
 };
