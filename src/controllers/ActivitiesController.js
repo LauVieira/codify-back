@@ -12,7 +12,7 @@ class ActivitiesController {
 
   async deleteByPk (id) {
     const activity = await this.getByPk(id);
-    activity.destroy();
+    await activity.destroy();
   }
 
   async createActivity (activityData) {
