@@ -4,7 +4,7 @@ const ActivitiesController = require('../../controllers/ActivitiesController');
 const TheoriesController = require('../../controllers/TheoriesController');
 const { schemaMiddleware } = require('../../middlewares');
 const { sanitiseObj } = require('../../utils/generalFunctions');
-const schemas = require('../../schemas/coursesSchemas');
+const theoriesSchemas = require('../../schemas/theoriesSchemas');
 
 router.get('/', async (req, res) => {
   let limit, offset = null;
@@ -31,6 +31,28 @@ router.get('/:id', async (req, res) => {
   const theory = await TheoriesController.getByPk(id);
   
   res.status(200).send(theory);
+});
+
+router.post('/', schemaMiddleware(theoriesSchemas.postPut), async (req, res) => {
+  const sanitized = sanitiseObj(req.body);
+  const order = sanitized.order || 1;
+
+  const activityBody = { type: 'theory', order, topicId: sanitized.topicId };
+  const createdActivity = await ActivitiesController.createActivity(activityBody);
+
+  const theoryBody = { youtubeLink: sanitized.youtubeLink, activityId: createdActivity.id };
+  const createdTheory = await TheoriesController.createTheory(theoryBody);
+
+  res.status(201).send(createdTheory);
+});
+
+router.put('/', schemaMiddleware(theoriesSchemas.postPut), async (req, res) => {
+  const sanitized = sanitiseObj(req.body);
+
+  const { youtubeLink } = sanitized;
+  const updatedTheory = await TheoriesController.updateTheory(youtubeLink, sanitized.id);
+
+  res.status(200).send(updatedTheory);
 });
 
 router.delete('/:id', async (req, res) => {

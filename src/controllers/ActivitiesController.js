@@ -1,6 +1,7 @@
 const Err = require('../errors');
 
 const Activity = require('../models/Activity');
+const CoursesController = require('./CoursesController');
 
 class ActivitiesController {
   async getByPk (id) {
@@ -12,6 +13,14 @@ class ActivitiesController {
   async deleteByPk (id) {
     const activity = await this.getByPk(id);
     activity.destroy();
+  }
+
+  async createActivity (activityData) {
+    await CoursesController.getTopicById(activityData.topicId);
+
+    const createdActivity = await Activity.create(activityData);
+    
+    return createdActivity;
   }
 }
 

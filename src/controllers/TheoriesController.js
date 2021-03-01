@@ -43,6 +43,18 @@ class TheoriesController {
     await theory.destroy();
     return activityId;
   }
+
+  createTheory (theoryData) {
+    const createdTheory = Theory.create(theoryData);
+    return createdTheory;
+  }
+
+  async updateTheory (youtubeLink, id) {
+    const theory = await this.getByPk(id);
+    theory.youtubeLink = youtubeLink;
+    await theory.save();
+    return theory;
+  }
 }
 
 module.exports = new TheoriesController();
