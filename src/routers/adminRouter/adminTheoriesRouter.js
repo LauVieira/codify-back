@@ -46,7 +46,10 @@ router.post('/', schemaMiddleware(theoriesSchemas.postPut), async (req, res) => 
   res.status(201).send(createdTheory);
 });
 
-router.put('/', schemaMiddleware(theoriesSchemas.postPut), async (req, res) => {
+router.put('/:id', async (req, res) => {
+  const validation = schemaMiddleware(theoriesSchemas.postPut);
+  if (validation.error) return res.sendStatus(422);
+  
   const sanitized = sanitiseObj(req.body);
 
   const { youtubeLink } = sanitized;
