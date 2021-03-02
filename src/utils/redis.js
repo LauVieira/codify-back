@@ -26,15 +26,15 @@ async function getInstance () {
 async function setSession (key, payload) {
   const client = await getInstance();
   
-  await client.set(key, payload);
+  await client.set(`session:${key}`, payload);
 }
 
 async function setItem (payload) {
   const key = uuid.v4();
   const client = await getInstance();
 
-  await client.set(key, JSON.stringify(payload));
-  await client.expire(key, 900);
+  await client.set(`item:${key}`, JSON.stringify(payload));
+  await client.expire(`item:${key}`, 900);
 
   return key;
 }
@@ -42,7 +42,7 @@ async function setItem (payload) {
 async function getItem (key) {
   const client = await getInstance();
 
-  const result = await client.get(key);
+  const result = await client.get(`item:${key}`);
 
   return result ? JSON.parse(result) : false;
 }
@@ -50,7 +50,7 @@ async function getItem (key) {
 async function getSession (key) {
   const client = await getInstance();
 
-  const result = await client.get(key);
+  const result = await client.get(`session:${key}`);
 
   return result ? result: false;
 }
@@ -58,7 +58,7 @@ async function getSession (key) {
 async function deleteSession (key) {
   const client = await getInstance();
 
-  await client.del(key);
+  await client.del(`session:${key}`);
 }
 
 function endConnection () {

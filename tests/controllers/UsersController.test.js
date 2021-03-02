@@ -156,7 +156,7 @@ describe('sendEmail', () => {
 
 describe('changeLastCourse', () => {
   it('should return the user with another last course', async () => {
-    const lastCourse = '4';
+    const lastCourse = 4;
     const userId = 1;
     const save = jest.fn();
     const expectedObject = { lastCourse: 4 };

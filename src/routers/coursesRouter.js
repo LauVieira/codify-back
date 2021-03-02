@@ -15,7 +15,7 @@ router.get('/initialized', async (req, res) => {
 });
 
 router.get('/:id', async (req, res) => {
-  const id = +req.params.id;
+  const id = Number(req.params.id);
 
   const course = await CoursesController.getCourse(id);
   const program = await CoursesController.getProgram(course.id);
