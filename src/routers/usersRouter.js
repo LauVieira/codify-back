@@ -78,13 +78,13 @@ router.post('/profile', (req, res) => {
     }
   }).single('avatar');
   
-  upload(req, res, (err) => {
+  upload(req, res, async (err) => {
     if (err) {
       res.status(500).send(err);
     } else {
       if (req.file === undefined) res.status(400).send(err);
       else {
-        UploadController.uploadFile(req.file);
+        await UploadController.uploadFile(req.file);
         res.sendStatus(200);
       }
     }

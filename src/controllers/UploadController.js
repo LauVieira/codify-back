@@ -11,14 +11,14 @@ class UploadController {
           Bucket: process.env.BUCKET
         };
       }
-      async uploadFile (fileStream, name, extension = 'zip') {
+      async uploadFile (file) {
         try {
           const data = await this.s3
             .upload({
               ...this.defaultParams,
-              Key: `${name}.${extension}`,
-              Body: fileStream,
-              ContentType: 'application/json'
+              Key: `${file.filename}`,
+              Body: fileStream, //modificar para pegar de onde tem os dados do arquivo
+              ContentType: file.mimetype
             })
             .promise();
           return Promise.resolve(data.Location);
@@ -29,7 +29,3 @@ class UploadController {
 }
 
 module.exports = new UploadController();
-
-const file = fs.createReadStream('./pic.json');
-
-new S3FileUploader().uploadFile(file, 'pic', 'json');
