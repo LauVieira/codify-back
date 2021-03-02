@@ -5,7 +5,7 @@ let client;
 
 async function createInstance () {
   const client = redis.createClient({
-    url: process.env.REDISCLOUD_URL
+    url: process.env.REDIS_URL
   });
 
   client.on('error', (error) => {

@@ -66,7 +66,7 @@ class UsersControllers {
     return user;
   }
 
-  async sendEmail (email, token) {
+  async sendEmail (email, token, name) {
     const url = 'https://api.sendgrid.com/v3/mail/send';
     const headers = { 
       headers: { 
@@ -81,13 +81,14 @@ class UsersControllers {
         }]
       }],
       from: {
-        email: 'gabriell.mil@gmail.com'
+        email: process.env.EMAIL
       },
       subject: 'Redefinição de senha CODIFY',
       content: [{
         type: 'text/plain',
         value: `
-          Para redefinir sua senha clique nesse link:\n
+          Olá, ${name}!\n
+          Para redefinir sua senha, clique no seguinte link:\n
           ${process.env.FRONT_URL || 'http://localhost:9000'}/redefinir-senha/${token}
         `
       }]

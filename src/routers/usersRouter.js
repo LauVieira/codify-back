@@ -64,7 +64,7 @@ router.post('/forgot-password', schemaMiddleware(usersSchema.forgot), async (req
 
   const token = await redis.setItem(user.id);
 
-  await UsersController.sendEmail(user.email, token);
+  await UsersController.sendEmail(user.email, token, user.name);
   res.sendStatus(202);
 });
 
