@@ -368,22 +368,12 @@ describe('POST /courses/:id', () => {
     expect(response.status).toBe(201);
     expect(response.body).toEqual(
       expect.objectContaining({
-        courseUser: expect.objectContaining({
-          id: expect.any(Number),
-          courseId: course.id,
-          userId: user.id,
-          updatedAt: expect.any(String),
-          createdAt: expect.any(String)
-        }),
-        user: expect.objectContaining({
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          lastCourse: course.id,
-          updatedAt: expect.any(String),
-          createdAt: user.createdAt
-        })
-      })
+        id: expect.any(Number),
+        courseId: course.id,
+        userId: user.id,
+        updatedAt: expect.any(String),
+        createdAt: expect.any(String)
+      }),
     );
   });
 });

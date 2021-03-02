@@ -27,8 +27,7 @@ router.post('/:id', async (req, res) => {
 
   const courseUser = await CoursesController.initializeCourse(id, req.user.id);
 
-  const user = await UsersController.changeLastCourse(id, req.user.id);
-  res.status(201).send({ courseUser, user });
+  res.status(201).send(courseUser);
 });
 
 router.get('/chapters/:chapterId/topics/:topicId/activities', async (req, res) => {

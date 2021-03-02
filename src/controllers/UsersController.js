@@ -58,7 +58,7 @@ class UsersControllers {
   async changeLastCourse (lastCourse, userId) {
     const user = await this.getUser(userId);
     
-    user.lastCourse = Number(lastCourse);
+    user.lastCourse = lastCourse;
     await user.save();
 
     delete user.dataValues.password;
