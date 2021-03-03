@@ -106,6 +106,8 @@ class UsersControllers {
 
     user.avatarUrl = avatarUrl;
     await user.save();
+
+    delete user.dataValues.password;
     
     return user;
   }

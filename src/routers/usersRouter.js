@@ -10,6 +10,8 @@ const redis = require('../utils/redis');
 const CoursesController = require('../controllers/CoursesController');
 const UsersController = require('../controllers/UsersController');
 
+const upload = require('../utils/multer');
+
 router.post('/sign-up', Middle.validateUser, async (req, res) => {
   const { name, email, password } = req.userData;
   const hashedPassword = bcrypt.hashSync(password, 10);
@@ -50,7 +52,7 @@ router.put('/:id', Middle.userAuthentication, Middle.schemaMiddleware(usersSchem
   res.status(200).send(updatedUser.dataValues);
 });
 
-router.post('/sign-out', userAuthentication, async (req, res) => {
+router.post('/sign-out', Middle.userAuthentication, async (req, res) => {
   await redis.deleteSession(req.token);
   res.clearCookie('token');
   
@@ -89,10 +91,14 @@ router.post('/last-course/:id', Middle.userAuthentication, async (req, res) => {
   res.status(200).send(user);
 });
 
-router.post('/avatar', Middle.userAuthentication, Middle.multerMiddleware, async (req, res) => {
-  const user = await UsersController.changeAvatar(req.file, req.user.id);
+router.post('/avatar', Middle.userAuthentication, upload.single('avatar'), async (req, res) => {
+  if (req.file === undefined) {
+    res.sendStatus(400);
+  } else {
+    const user = await UsersController.changeAvatar(req.user.id, req.file);
 
-  res.status(200).send(user);
+    res.status(200).send(user);
+  }
 });
 
 module.exports = router;

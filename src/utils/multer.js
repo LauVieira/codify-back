@@ -21,14 +21,4 @@ function checkFileType (file, cb){
   }
 }
 
-function multerMiddleware (req, res, next) {
-  upload.single('avatar');
-
-  if (req.file === undefined) {
-    res.sendStatus(400);
-  }
-  
-  next();
-}
-
-module.exports = multerMiddleware;
+module.exports = upload;
