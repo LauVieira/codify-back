@@ -21,6 +21,7 @@ Exercise.init({
   example: Sequelize.STRING,
   sampleCode: Sequelize.STRING,
   solution: Sequelize.STRING,
+  testCode:Sequelize.TEXT,
 }, {
   sequelize,
   modelName: 'exercise',
