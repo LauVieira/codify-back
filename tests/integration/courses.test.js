@@ -289,34 +289,26 @@ describe('POST /courses/activities/:id', () => {
     expect(response.body.message).toEqual('Atividade não encontrada');
   });
 
-  it('should return the activity completed when dont exist in DB', async () => {
+  it('should return the activity concluded when dont exist in DB', async () => {
     const response = await agent.post(`/courses/activities/${activityTh.id}`).set('Cookie', `token=${token}`);
 
+    const activityUserDB = await sequelize.query(`SELECT FROM "activityUsers" WHERE "activityId"=${activityTh.id}`);
+
     expect(response.status).toBe(201);
-    expect(response.body).toEqual(expect.objectContaining({
-      id: expect.any(Number),
-      userId: user.id,
-      activityId: activityTh.id,
-      done: true,
-      createdAt: expect.any(String),
-      updatedAt: expect.any(String)
-    }));
+    expect(response.body).toEqual({ done: true });
+    expect(activityUserDB[0][0]).toBeTruthy();
   });
 
-  it('should return the activity done equal to false', async () => {
+  it('should return the activity not done', async () => {
     activityUser = await Helpers.createActivityUsers(user.id, activityTh.id);
 
     const response = await agent.post(`/courses/activities/${activityTh.id}`).set('Cookie', `token=${token}`);
 
-    delete activityUser.done;
-    delete activityUser.updatedAt;
+    const activityUserDB = await sequelize.query(`SELECT FROM "activityUsers" WHERE id=${activityUser.id}`);
 
     expect(response.status).toBe(201);
-    expect(response.body).toEqual(expect.objectContaining({
-      ...activityUser,
-      done: false,
-      updatedAt: expect.any(String),
-    }));
+    expect(response.body).toEqual({ done: false });
+    expect(activityUserDB[0][0]).toBeFalsy();
   });
 });
 

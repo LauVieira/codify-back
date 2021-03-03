@@ -198,12 +198,12 @@ class CoursesController {
 
     if (!activityUser) {
       activityUser = await ActivityUser.create({ activityId, userId });
-      return activityUser;
+      return { done: true };
     }
 
     await activityUser.destroy();
 
-    return activityUser;
+    return { done: false };
   }
 }
 
