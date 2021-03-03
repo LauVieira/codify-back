@@ -4,6 +4,7 @@ const User = require('../models/User');
 const Schemas = require('../schemas');
 const bcrypt = require('bcrypt');
 const axios = require('axios');
+const Aws = require('../utils/Aws');
 
 class UsersControllers {
   saveUser (name, email, password) {
@@ -95,6 +96,18 @@ class UsersControllers {
     };
 
     await axios.post(url, data, headers);
+  }
+
+  async changeAvatar (id, file) {
+    const user = await this.getUser(id);
+    
+    await Aws.uploadFile(file);
+    const avatarUrl = await Aws.getFile(file);
+
+    user.avatarUrl = avatarUrl;
+    await user.save();
+    
+    return user;
   }
 }
 

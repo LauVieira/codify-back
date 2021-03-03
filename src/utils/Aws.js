@@ -1,6 +1,6 @@
 const AWS = require('aws-sdk');
 
-class UploadController {
+class Aws {
   constructor () {
     this.s3 = new AWS.S3({
       accessKeyId: process.env.KEY_ID,
@@ -50,4 +50,4 @@ class UploadController {
   }
 }
 
-module.exports = new UploadController();
+module.exports = new Aws();
