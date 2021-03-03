@@ -45,6 +45,7 @@ router.post('/activities/:id', async (req, res) => {
   const activity = await CoursesController.getActivity(id);
   const activityDone = await CoursesController.activityDone(activity.id, req.user.id);
   
+  console.log(activityDone);
   res.status(201).send(activityDone);
 });
 

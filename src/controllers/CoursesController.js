@@ -197,12 +197,11 @@ class CoursesController {
     let activityUser = await ActivityUser.findOne({ where: { activityId, userId } });
 
     if (!activityUser) {
-      activityUser = await ActivityUser.create({ activityId, userId, done: true });
+      activityUser = await ActivityUser.create({ activityId, userId });
       return activityUser;
     }
 
-    activityUser.done = !activityUser.done;
-    await activityUser.save();
+    await activityUser.destroy();
 
     return activityUser;
   }
