@@ -89,7 +89,10 @@ class CoursesController {
 
   async getTopicById (id) {
     const topic = await Topic.findByPk(id);
-    if (!topic) throw new Err.NotFoundError('Tópico não encontrado');
+
+    if (!topic) {
+      throw new Err.NotFoundError('Tópico não encontrado');
+    }
 
     return topic;
   }
@@ -115,7 +118,10 @@ class CoursesController {
   async getChapter (id) {
     const chapter = await Chapter.findByPk(id);
 
-    if (!chapter) throw new NotFoundError('Capítulo não encontrado');
+    if (!chapter) { 
+      throw new NotFoundError('Capítulo não encontrado');
+    }
+
     return chapter;
   }
 
@@ -144,7 +150,10 @@ class CoursesController {
   async getActivity (id) {
     const activity = await Activity.findByPk(id);
 
-    if (!activity) throw new NotFoundError('Atividade não encontrada');
+    if (!activity) {
+      throw new NotFoundError('Atividade não encontrada');
+    }
+    
     return activity;
   }
 

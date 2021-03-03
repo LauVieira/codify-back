@@ -7,6 +7,7 @@ const agent = supertest(app);
 
 const sequelize = require('../../src/utils/database');
 
+const redis = require('../../src/utils/redis');
 const Helpers = require('../Helpers');
 
 beforeEach(async () => {
@@ -15,6 +16,7 @@ beforeEach(async () => {
 
 afterAll(async () => {
   await sequelize.close();
+  await redis.endConnection();
 });
 
 describe('GET /admin/chapters/:id', () => {

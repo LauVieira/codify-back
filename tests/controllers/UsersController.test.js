@@ -2,12 +2,14 @@
 const UsersController = require('../../src/controllers/UsersController');
 const User = require('../../src/models/User');
 const Err = require('../../src/errors');
+const axios = require('axios');
 
 jest.mock('bcrypt', () => ({
   hashSync: (password) => password,
 }));
 jest.mock('../../src/models/User');
 jest.mock('sequelize');
+jest.mock('axios');
 
 describe('saveUser', () => {
   it('should return a user with id', async () => {
@@ -79,5 +81,75 @@ describe('checkExistingUser', () => {
 
     const error = () => UsersController.checkExistingUser(email);
     expect(error).rejects.toThrow(Err.ConflictError);
+  });
+});
+
+describe('getUser', () => {
+  it('should return an user', async () => {
+    const id = 1;
+    const spy = jest.spyOn(User, 'findByPk');
+    spy.mockImplementationOnce(() => ({ id }));
+
+    const user = await UsersController.getUser(id);
+
+    expect(spy).toHaveBeenCalled();
+    expect(spy).toHaveBeenCalledWith(id);
+    expect(user).toEqual(expect.objectContaining({ id }));
+  });
+
+  it('should throw an NotFoundError in user', () => {
+    const id = 3;
+
+    User.findByPk.mockImplementationOnce(() => null);
+
+    const error = () => UsersController.getUser(id);
+
+    expect(error).rejects.toThrow(Err.NotFoundError);
+  });
+});
+
+describe('editUser', () => {
+  it('should return the object updated for user', async () => {
+    const save = jest.fn();
+    const oldObject = { obj: 'objUser Old', save };
+    const expectedObject = { obj: 'objUser New' };
+
+    jest.spyOn(UsersController, 'getUser').mockResolvedValueOnce(oldObject);
+
+    const request = await UsersController.editUser(2, expectedObject);
+    
+    expect(save).toHaveBeenCalled();
+    expect(request).toEqual(
+      expect.objectContaining(expectedObject)
+    );
+  });
+
+  it('should updated the password', async () => {
+    const save = jest.fn();
+    const oldObject = { password: 'old password', save };
+    const expectedObject = { password: 'new password', confirmPassword: 'new password' };
+
+    jest.spyOn(UsersController, 'getUser').mockResolvedValueOnce(oldObject);
+
+    const request = await UsersController.editUser(2, expectedObject);
+    
+    expect(save).toHaveBeenCalled();
+    expect(request).not.toHaveProperty('confirmPassword');
+    expect(request).toEqual(
+      expect.objectContaining({ password: expectedObject.password })
+    );
+  });
+});
+
+describe('sendEmail', () => {
+  it('should send an email with the right inputs', async () => {
+    const url = 'https://api.sendgrid.com/v3/mail/send';
+    const email = 'test@test.com';
+    const token = 'token';
+
+    await UsersController.sendEmail(email, token);
+
+    expect(axios.post).toHaveBeenCalled();
+    expect(axios.post).toHaveBeenCalledWith(url, expect.any(Object), expect.any(Object));
   });
 });
