@@ -97,6 +97,7 @@ router.post('/avatar', Middle.userAuthentication, upload.single('avatar'), async
   } else {
     const user = await UsersController.changeAvatar(req.user.id, req.file);
 
+    console.log(user.dataValues);
     res.status(200).send(user);
   }
 });
