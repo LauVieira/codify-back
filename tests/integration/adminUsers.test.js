@@ -16,6 +16,7 @@ beforeEach(async () => {
 });
 
 afterAll(async () => {
+  await Helpers.eraseDatabase();
   await sequelize.close();
   await redis.endConnection();
 });
@@ -91,7 +92,6 @@ describe('POST /admin/users/logout', () => {
     const admin = await Helpers.createAdmin();
     const adminToken = await Helpers.createAdminToken(admin);
 
-    const sessionBefore = await redis.getSession(adminToken);
     const response = await agent.post('/admin/users/logout').set('Cookie', `adminToken=${adminToken}`);
 
     const session = await redis.getSession(adminToken);

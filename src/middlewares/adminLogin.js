@@ -2,8 +2,8 @@ const AdminController = require('../controllers/AdminController');
 const { sanitiseObj } = require('../utils/generalFunctions');
 
 async function adminLogin (req, res, next) {
+    AdminController.validateEntriesData(req.body);
     const userData = sanitiseObj(req.body);
-    AdminController.validateEntriesData(userData);
 
     const userAdmin = await AdminController.validateUserAndPassword(userData);
 

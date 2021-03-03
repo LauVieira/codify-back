@@ -153,3 +153,21 @@ describe('sendEmail', () => {
     expect(axios.post).toHaveBeenCalledWith(url, expect.any(Object), expect.any(Object));
   });
 });
+
+describe('changeLastCourse', () => {
+  it('should return the user with another last course', async () => {
+    const lastCourse = 4;
+    const userId = 1;
+    const save = jest.fn();
+    const expectedObject = { lastCourse: 4 };
+
+    jest.spyOn(UsersController, 'getUser').mockResolvedValueOnce({ lastCourse: 0, dataValues: { password: '123456' } , save });
+
+    const request = await UsersController.changeLastCourse(lastCourse, userId);
+    
+    expect(save).toHaveBeenCalled();
+    expect(request).toEqual(
+      expect.objectContaining(expectedObject)
+    );
+  });
+});

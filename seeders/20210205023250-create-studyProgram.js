@@ -3,7 +3,7 @@
 module.exports = {
   up: async (queryInterface) => {
     const courses = await queryInterface.sequelize.query(
-      'SELECT id from COURSES;'
+      'SELECT id FROM courses;'
     );
 
     const courseId = courses[0][0].id;
@@ -64,7 +64,7 @@ module.exports = {
 
   down: async (queryInterface) => {
     const courses = await queryInterface.sequelize.query(
-      'SELECT id from COURSES;'
+      'SELECT id FROM courses;'
     );
 
     const chapters = await queryInterface.sequelize.query(

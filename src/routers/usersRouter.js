@@ -8,6 +8,7 @@ const { validateUser, userAuthentication, schemaMiddleware, userLogin } = requir
 const usersSchema = require('../schemas/usersSchemas');
 const Err = require('../errors');
 const redis = require('../utils/redis');
+const CoursesController = require('../controllers/CoursesController');
 
 router.post('/sign-up', validateUser, async (req, res) => {
   const { name, email, password } = req.userData;
@@ -40,7 +41,7 @@ router.post('/sign-in', userLogin, async (req, res) => {
 });
 
 router.put('/:id', userAuthentication, schemaMiddleware(usersSchema.putUser), async (req, res) => {
-  const { id } = req.params;
+  const id = Number(req.params.id);
   const sanitized = sanitiseObj(req.body);
 
   const updatedUser = await UsersController.editUser(id, sanitized);
@@ -64,7 +65,7 @@ router.post('/forgot-password', schemaMiddleware(usersSchema.forgot), async (req
 
   const token = await redis.setItem(user.id);
 
-  await UsersController.sendEmail(user.email, token);
+  await UsersController.sendEmail(user.email, token, user.name);
   res.sendStatus(202);
 });
 
@@ -78,6 +79,14 @@ router.post('/redefine-password', schemaMiddleware(usersSchema.redefine), async 
 
   await UsersController.editUser(userId, { password });
   res.sendStatus(200);
+});
+
+router.post('/last-course/:id', userAuthentication, async (req, res) => {
+  const id = +req.params.id;
+  await CoursesController.getCourse(id);
+
+  const user = await UsersController.changeLastCourse(id, req.user.id);
+  res.status(200).send(user);
 });
 
 module.exports = router;

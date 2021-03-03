@@ -22,6 +22,7 @@ beforeEach(async () => {
 });
 
 afterAll(async () => {
+  await Helpers.eraseDatabase();
   await sequelize.close();
   await db.end();
   await redis.endConnection();
