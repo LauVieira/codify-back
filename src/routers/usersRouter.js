@@ -88,14 +88,13 @@ router.post('/initialize-course/:id', Middle.userAuthentication, async (req, res
   await CoursesController.initializeCourse(id, req.user.id);
 
   const user = await UsersController.changeLastCourse(id, req.user.id);
-  res.status(200).send(user);
+  res.status(201).send(user);
 });
 
-router.post('/return-course/:id', Middle.userAuthentication, async (req, res) => {
+router.get('/return-course/:id', Middle.userAuthentication, async (req, res) => {
   const id = +req.params.id;
   const idsObject = await CoursesController.getLastActivity(req.user.id, id);
 
-  console.log(idsObject);
   res.status(200).send(idsObject);
 });
 

@@ -354,7 +354,7 @@ describe('POST /users/initialize-course/:id', () => {
 
     const courseUser = await sequelize.query(`SELECT * FROM "courseUsers" WHERE "courseId"=${course.id} AND "userId"=${user.id}`);
 
-    expect(response.status).toBe(200);
+    expect(response.status).toBe(201);
     expect(courseUser[0][0]).toBeTruthy();
     expect(response.body).toEqual(
       expect.objectContaining({
@@ -369,8 +369,8 @@ describe('POST /users/initialize-course/:id', () => {
   });
 });
 
-describe('POST /users/return-course/:id', () => {
-  let token, activityTh, user, topic, chapter, course;
+describe('GET /users/return-course/:id', () => {
+  let token, activityTh, activityEx ,user, topic, chapter, course;
 
   beforeEach(async () => {
     user = await Helpers.createUser();
@@ -378,27 +378,27 @@ describe('POST /users/return-course/:id', () => {
     course = await Helpers.createCourse();
     chapter = await Helpers.createChapter(course.id);
     topic = await Helpers.createTopic(chapter.id);
-    activityTh = (await Helpers.createActivityTheory(topic.id)).activityTh;
-    activityEx = (await Helpers.createActivityExercise(topic.id)).activityEx;
+    activityTh = (await Helpers.createActivityTheory(topic.id, course.id)).activityTh;
+    activityEx = (await Helpers.createActivityExercise(topic.id, course.id)).activityEx;
   });
 
   it('should return 401 when cookie is invalid', async () => {
     const wrongToken = 'wrong_token';
-    const response = await agent.post('/users/return-course/0').set('Cookie', `token=${wrongToken}`);
+    const response = await agent.get('/users/return-course/0').set('Cookie', `token=${wrongToken}`);
 
     expect(response.status).toBe(401);
     expect(response.body.message).toEqual('Token inválido');
   });
 
   it('should return 401 when no cookie is sent', async () => {
-    const response = await agent.post('/users/return-course/0');
+    const response = await agent.get('/users/return-course/0');
 
     expect(response.status).toBe(401);
     expect(response.body.message).toEqual('Token não encontrado');
   });
 
   it('should return 404 when course id is not found', async () => {
-    const response = await agent.post(`/users/return-course/0`).set('Cookie', `token=${token}`);
+    const response = await agent.get(`/users/return-course/0`).set('Cookie', `token=${token}`);
 
     expect(response.status).toBe(404);
     expect(response.body.message).toEqual('Curso não encontrado');
@@ -408,7 +408,7 @@ describe('POST /users/return-course/:id', () => {
     await Helpers.createActivityUsers(user.id, activityTh.id, course.id);
     await Helpers.createActivityUsers(user.id, activityEx.id, course.id);
 
-    const response = await agent.post(`/users/return-course/${course.id}`).set('Cookie', `token=${token}`);
+    const response = await agent.get(`/users/return-course/${course.id}`).set('Cookie', `token=${token}`);
 
     expect(response.status).toBe(200);
     expect(response.body).toMatchObject(
@@ -421,7 +421,7 @@ describe('POST /users/return-course/:id', () => {
   });
 
   it('should return that is not done any activity', async () => {
-    const response = await agent.post(`/users/return-course/${course.id}`).set('Cookie', `token=${token}`);
+    const response = await agent.get(`/users/return-course/${course.id}`).set('Cookie', `token=${token}`);
 
     expect(response.status).toBe(200);
     expect(response.body).toMatchObject({ firstActivity: true });

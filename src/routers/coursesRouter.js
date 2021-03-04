@@ -16,12 +16,15 @@ router.get('/initialized', async (req, res) => {
 router.get('/:id', async (req, res) => {
   const id = Number(req.params.id);
 
-  const course = await CoursesController.getCourse(id);
-  const program = await CoursesController.getProgram(course.id);
+  let course = await CoursesController.getCourse(id);
+  const program = await CoursesController.getProgram(id);
+  const progress = await CoursesController.getProgress(req.user.id, id);
+
+  course.dataValues = { ...course.dataValues, progress };
   res.status(200).send({ course, program });
 });
 
-router.post('/:id/is-initialized', async (req, res) => {
+router.get('/:id/is-initialized', async (req, res) => {
   const id = +req.params.id;
 
   const isInitialized = await CoursesController.isInitialized(id, req.user.id);

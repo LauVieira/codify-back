@@ -71,27 +71,27 @@ class Helpers {
     return topic;
   }
 
-  async createActivityExercise (topicId) {
-    let values = ['exercise', topicId, 2];
+  async createActivityExercise (topicId, courseId) {
+    let values = ['exercise', topicId, 2, courseId];
     let activityEx = await database.query(`
-      INSERT INTO activities (type, "topicId", "order") VALUES ('${values[0]}', '${values[1]}', '${values[2]}') RETURNING *;
+      INSERT INTO activities (type, "topicId", "order", "courseId") VALUES ('${values[0]}', '${values[1]}', '${values[2]}', '${values[3]}') RETURNING *;
     `);
 
     activityEx = convertToJson(activityEx);
-    values = ['Title exercise', activityEx.id];
+    values = ['Title exercise', activityEx.id, 'statement exercise', 'example exercise'];
 
     let exercise = await database.query(`
-      INSERT INTO exercises ("title", "activityId") VALUES ('${values[0]}', '${values[1]}') RETURNING *;
+      INSERT INTO exercises ("title", "activityId", "statement", "example") VALUES ('${values[0]}', '${values[1]}', '${values[2]}', '${values[3]}') RETURNING *;
     `);
     exercise = convertToJson(exercise);
 
     return { activityEx, exercise };
   }
 
-  async createActivityTheory (topicId) {
-    let values = ['theory', topicId, 1];
+  async createActivityTheory (topicId, courseId) {
+    let values = ['theory', topicId, 1, courseId];
     let activityTh = await database.query(`
-      INSERT INTO activities (type, "topicId", "order") VALUES ('${values[0]}', '${values[1]}', '${values[2]}') RETURNING *;`
+      INSERT INTO activities (type, "topicId", "order", "courseId") VALUES ('${values[0]}', '${values[1]}', '${values[2]}', '${values[3]}') RETURNING *;`
     );
 
     activityTh = convertToJson(activityTh);

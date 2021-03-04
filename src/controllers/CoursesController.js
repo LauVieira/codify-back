@@ -75,6 +75,13 @@ class CoursesController {
     });
   }
 
+  async getProgress (userId, courseId) {
+    const { count: totalActivities } = await Activity.findAndCountAll({ where: { courseId } });
+    const { count: doneActivities } = await ActivityUser.findAndCountAll({ where: { userId, courseId } });
+
+    return Math.floor(100 * doneActivities / totalActivities);
+  }
+
   getAll (limit = null, offset = null) {
     return Course.findAll({ limit, offset });
   }
