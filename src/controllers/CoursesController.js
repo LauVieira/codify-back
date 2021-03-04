@@ -206,10 +206,13 @@ class CoursesController {
     return { done: false };
   }
 
-  async getLastActivity (userId) {
+  async getLastActivity (userId, courseId) {
+    await this.getCourse(courseId);
+    
     const activityUser = await ActivityUser.findAll({ 
-      where: { userId }, 
-      order: [['createdAt', 'DESC']] 
+      where: { userId, courseId }, 
+      order: [['createdAt', 'DESC']],
+      required: true
     });
 
     const activity = await this.getActivity(activityUser[0].activityId);
@@ -222,7 +225,6 @@ class CoursesController {
       activityId: activity.id, 
       topicId: topic.id, 
       chapterId: chapter.id,
-      courseId: chapter.courseId 
     };
   }
 }

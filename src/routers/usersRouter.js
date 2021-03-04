@@ -91,8 +91,9 @@ router.post('/last-course/:id', Middle.userAuthentication, async (req, res) => {
   res.status(200).send(user);
 });
 
-router.post('/return-course', Middle.userAuthentication, async (req, res) => {
-  const idsObject = await CoursesController.getLastActivity(req.user.id);
+router.post('/return-course/:id', Middle.userAuthentication, async (req, res) => {
+  const id = +req.params.id;
+  const idsObject = await CoursesController.getLastActivity(req.user.id, id);
 
   res.status(200).send(idsObject);
 });

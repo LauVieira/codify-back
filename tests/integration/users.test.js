@@ -366,8 +366,8 @@ describe('POST users/last-course/:id', () => {
   });
 });
 
-describe('POST /users/return-course', () => {
-  let token, activityTh, user, activityUser, topic, chapter, course;
+describe('POST /users/return-course/:id', () => {
+  let token, activityTh, user, topic, chapter, course;
 
   beforeEach(async () => {
     user = await Helpers.createUser();
@@ -381,24 +381,31 @@ describe('POST /users/return-course', () => {
 
   it('should return 401 when cookie is invalid', async () => {
     const wrongToken = 'wrong_token';
-    const response = await agent.post('/users/return-course').set('Cookie', `token=${wrongToken}`);
+    const response = await agent.post('/users/return-course/0').set('Cookie', `token=${wrongToken}`);
 
     expect(response.status).toBe(401);
     expect(response.body.message).toEqual('Token inválido');
   });
 
   it('should return 401 when no cookie is sent', async () => {
-    const response = await agent.post('/users/return-course');
+    const response = await agent.post('/users/return-course/0');
 
     expect(response.status).toBe(401);
     expect(response.body.message).toEqual('Token não encontrado');
   });
 
-  it('should return the path ids to return', async () => {
-    activityUser = await Helpers.createActivityUsers(user.id, activityTh.id);
-    activityUser_2 = await Helpers.createActivityUsers(user.id, activityEx.id);
+  it('should return 404 when course id is not found', async () => {
+    const response = await agent.post(`/users/return-course/0`).set('Cookie', `token=${token}`);
 
-    const response = await agent.post(`/users/return-course`).set('Cookie', `token=${token}`);
+    expect(response.status).toBe(404);
+    expect(response.body.message).toEqual('Curso não encontrado');
+  });
+
+  it('should return the path ids to return', async () => {
+    await Helpers.createActivityUsers(user.id, activityTh.id, course.id);
+    await Helpers.createActivityUsers(user.id, activityEx.id, course.id);
+
+    const response = await agent.post(`/users/return-course/${course.id}`).set('Cookie', `token=${token}`);
 
     expect(response.status).toBe(200);
     expect(response.body).toMatchObject(
@@ -406,7 +413,6 @@ describe('POST /users/return-course', () => {
         activityId: activityEx.id, 
         topicId: topic.id, 
         chapterId: chapter.id,
-        courseId: course.id
       }
     );
   });
