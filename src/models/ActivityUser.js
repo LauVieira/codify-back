@@ -19,6 +19,7 @@ ActivityUser.init(
       type: Sequelize.INTEGER,
       allowNull: false,
     },
+    courseId: Sequelize.INTEGER,
   },
   {
     sequelize,
