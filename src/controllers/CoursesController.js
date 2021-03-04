@@ -205,6 +205,19 @@ class CoursesController {
 
     return { done: false };
   }
+
+  async getLastActivity (courseId, userId) {
+    const activityUser = await ActivityUser.findAll({ 
+      where: { userId }, 
+      order: [['createdAt', 'DESC']] 
+    });
+
+    const activity = await this.getActivity(activityUser[0].id);
+
+    const topic = await this.getTopic(activity.id);
+
+    return { activityId: activity.id, topicId: topic.id, chapterId: topic.chapterId };
+  }
 }
 
 module.exports = new CoursesController();

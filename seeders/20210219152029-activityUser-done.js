@@ -15,27 +15,21 @@ module.exports = {
 
     await queryInterface.bulkInsert('activityUsers', [
       {
-        done: true,
         userId,
         activityId: activities[0][0].id
       },{
-        done: true,
         userId,
         activityId: activities[0][1].id
       },{
-        done: true,
         userId,
         activityId: activities[0][2].id
       },{
-        done: true,
         userId,
         activityId: activities[0][3].id
       },{
-        done: true,
         userId,
         activityId: activities[0][4].id
       }, {
-        done: true,
         userId,
         activityId: activities[0][5].id
       }

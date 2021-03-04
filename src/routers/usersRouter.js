@@ -91,6 +91,12 @@ router.post('/last-course/:id', Middle.userAuthentication, async (req, res) => {
   res.status(200).send(user);
 });
 
+router.post('/return-course', Middle.userAuthentication, async (req, res) => {
+  const idsObject = await CoursesController.getLastActivity(req.user.id);
+
+  res.status(200).send(idsObject);
+});
+
 router.post('/avatar', Middle.userAuthentication, upload.single('avatar'), async (req, res) => {
   if (req.file === undefined) {
     res.sendStatus(400);
