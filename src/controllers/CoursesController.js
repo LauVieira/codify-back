@@ -79,14 +79,20 @@ class CoursesController {
     return Course.findAll({ limit, offset });
   }
 
+  async isInitialized (courseId, userId) {
+    await this.getCourse(courseId);
+    
+    const courseUser = await CourseUser.findOne({ where: { courseId, userId } });
+    
+    return courseUser ? true : false;
+  }
+
   async initializeCourse (courseId, userId) {
     await this.getCourse(courseId);
 
-    const isValid = await CourseUser.findOne({ where: { courseId, userId } });
+    const alreadyInitialized = await this.isInitialized(courseId, userId);
 
-    if (isValid) { 
-      throw new Err.ConflictError('Curso já foi inicializado');
-    }
+    if (alreadyInitialized) return;
 
     const courseUser = await CourseUser.create({ courseId, userId });
     return courseUser;
@@ -193,11 +199,11 @@ class CoursesController {
     return activity;
   }
 
-  async activityDone (activityId, userId) {
+  async activityDone (activityId, userId, courseId) {
     let activityUser = await ActivityUser.findOne({ where: { activityId, userId } });
 
     if (!activityUser) {
-      activityUser = await ActivityUser.create({ activityId, userId });
+      activityUser = await ActivityUser.create({ activityId, userId, courseId });
       return { done: true };
     }
 
@@ -208,7 +214,7 @@ class CoursesController {
 
   async getLastActivity (userId, courseId) {
     await this.getCourse(courseId);
-    
+
     const activityUser = await ActivityUser.findAll({ 
       where: { userId, courseId }, 
       order: [['createdAt', 'DESC']],

@@ -83,9 +83,9 @@ router.post('/redefine-password', Middle.schemaMiddleware(usersSchema.redefine),
   res.sendStatus(200);
 });
 
-router.post('/last-course/:id', Middle.userAuthentication, async (req, res) => {
+router.post('/initialize-course/:id', Middle.userAuthentication, async (req, res) => {
   const id = +req.params.id;
-  await CoursesController.getCourse(id);
+  await CoursesController.initializeCourse(id, req.user.id);
 
   const user = await UsersController.changeLastCourse(id, req.user.id);
   res.status(200).send(user);
