@@ -14,6 +14,7 @@ const post = Joi.object({
 const postTopic = Joi.object({
   title: Joi.string().required(),
   chapterId: Joi.number().integer().required(),
+  courseId: Joi.number().integer(),
 });
 
 const putTopic = Joi.object({
