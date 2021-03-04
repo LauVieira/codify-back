@@ -20,6 +20,7 @@ router.get('/:id', async (req, res) => {
   const program = await CoursesController.getProgram(req.user.id, id);
   const progress = await CoursesController.getProgress(req.user.id, id);
 
+  console.log(progress, 'progress');
   course.dataValues = { ...course.dataValues, progress };
 
   res.status(200).send({ course, program });

@@ -7,51 +7,68 @@ module.exports = {
       'SELECT id FROM topics;'
     );
 
+    const courses = await queryInterface.sequelize.query(
+      `SELECT id FROM courses;`
+    );
+    
+    const courseId = courses[0][0].id;
+
     await queryInterface.bulkInsert('activities', [
       {
         type: 'theory',
         topicId: topics[0][0].id,
-        order: 1
+        order: 1,
+        courseId
       },{
         type: 'exercise',
         topicId: topics[0][0].id,
-        order: 2
+        order: 2,
+        courseId
       },{
         type: 'exercise',
         topicId: topics[0][0].id,
-        order: 3
+        order: 3,
+        courseId
       },{
         type: 'theory',
         topicId: topics[0][1].id,
-        order: 1
+        order: 1,
+        courseId
       },{
         type: 'exercise',
         topicId: topics[0][1].id,
-        order: 2
+        order: 2,
+        courseId
       }, {
         type: 'exercise',
         topicId: topics[0][1].id,
-        order: 3
+        order: 3,
+        courseId
       },{
         type: 'theory',
         topicId: topics[0][2].id,
-        order: 1
+        order: 1,
+        courseId
       },{
         type: 'exercise',
         topicId: topics[0][2].id,
-        order: 2
+        order: 2,
+        courseId
       },{
         type: 'exercise',
         topicId: topics[0][2].id,
-        order: 3
+        order: 3,
+        courseId
       }, {
         type: 'theory',
         topicId: topics[0][3].id,
-        order: 1
+        order: 1,
+        courseId
       }, {
         type: 'theory',
         topicId: topics[0][4].id,
-        order: 1
+        order: 1,
+        courseId
       },
     ]);
 
