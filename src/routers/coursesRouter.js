@@ -17,7 +17,7 @@ router.get('/:id', async (req, res) => {
   const id = Number(req.params.id);
 
   let course = await CoursesController.getCourse(id);
-  const program = await CoursesController.getProgram(id);
+  const program = await CoursesController.getProgram(req.user.id, id);
   const progress = await CoursesController.getProgress(req.user.id, id);
 
   course.dataValues = { ...course.dataValues, progress };

@@ -65,14 +65,29 @@ class CoursesController {
     return topic;
   }
 
-  getProgram (courseId){
-    return Chapter.findAll({ where: { courseId }, 
+  async isTopicDone (topicId, userId) {
+    const { count: totalActivities, rows: activities } = await Activity.findAndCountAll({ where: { topicId } });
+    const activitiesId = activities.map(activity => activity.id);
+    const { count: doneActivities } = await ActivityUser.findAndCountAll({ where: { userId, activitiesId } });
+
+    return (doneActivities / totalActivities) === 1 ? true: false;
+  }
+
+  async getProgram (userId, courseId){
+    const program = await Chapter.findAll({ where: { courseId }, 
       include: { model: Topic, 
         include: { 
           model: Activity
         }
       } 
     });
+
+    await Promise.all(program.map(chapter => {
+      return Promise.all(chapter.topics.map(async topic => {
+        const done = await this.isTopicDone(topic.id, userId);
+        topic.done = done; 
+      }));
+    }));
   }
 
   async getProgress (userId, courseId) {

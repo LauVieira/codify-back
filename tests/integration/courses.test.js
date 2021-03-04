@@ -152,7 +152,7 @@ describe('GET /courses/:id', () => {
     expect(response.body.message).toEqual('Curso não encontrado');
   });
 
-  it('should return 200 with the courses expected and a valid cookie', async () => {
+  it('should return 200 with the courses, program and progress', async () => {
     const course = await Helpers.createCourse();
     const chapter = await Helpers.createChapter(course.id);
     const topic = await Helpers.createTopic(chapter.id);
@@ -161,7 +161,7 @@ describe('GET /courses/:id', () => {
     await Helpers.createActivityUsers(user.id, activityTh.id, course.id);
 
     const response = await agent.get(`/courses/${course.id}`).set('Cookie', `token=${token}`);
-    
+
     expect(response.status).toBe(200);
     expect(response.body).toEqual(expect.objectContaining({
       course: expect.objectContaining({
@@ -172,6 +172,38 @@ describe('GET /courses/:id', () => {
         ...chapter,
         topics: expect.arrayContaining([expect.objectContaining({
           ...topic,
+          done: false,
+          activities: expect.arrayContaining([
+            expect.objectContaining(activityTh),
+            expect.objectContaining(activityEx)
+          ])
+        })])
+      })])
+    }));
+  });
+
+  it('should return 200 with the courses, program and progress and topic done', async () => {
+    const course = await Helpers.createCourse();
+    const chapter = await Helpers.createChapter(course.id);
+    const topic = await Helpers.createTopic(chapter.id);
+    const { activityTh } = await Helpers.createActivityTheory(topic.id, course.id);
+    const { activityEx } = await Helpers.createActivityExercise(topic.id, course.id);
+    await Helpers.createActivityUsers(user.id, activityTh.id, course.id);
+    await Helpers.createActivityUsers(user.id, activityEx.id, course.id);
+
+    const response = await agent.get(`/courses/${course.id}`).set('Cookie', `token=${token}`);
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual(expect.objectContaining({
+      course: expect.objectContaining({
+        ...course,
+        progress: 100
+      }),
+      program: expect.arrayContaining([expect.objectContaining({
+        ...chapter,
+        topics: expect.arrayContaining([expect.objectContaining({
+          ...topic,
+          done: true,
           activities: expect.arrayContaining([
             expect.objectContaining(activityTh),
             expect.objectContaining(activityEx)
