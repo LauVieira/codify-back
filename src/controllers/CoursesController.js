@@ -221,6 +221,10 @@ class CoursesController {
       required: true
     });
 
+    if (activityUser.length === 0) {
+      return { firstActivity: true };
+    }
+
     const activity = await this.getActivity(activityUser[0].activityId);
 
     const topic = await this.getTopicById(activity.topicId);

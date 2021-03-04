@@ -419,4 +419,11 @@ describe('POST /users/return-course/:id', () => {
       }
     );
   });
+
+  it('should return that is not done any activity', async () => {
+    const response = await agent.post(`/users/return-course/${course.id}`).set('Cookie', `token=${token}`);
+
+    expect(response.status).toBe(200);
+    expect(response.body).toMatchObject({ firstActivity: true });
+  });
 });

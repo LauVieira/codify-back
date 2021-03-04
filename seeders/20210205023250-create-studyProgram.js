@@ -1,9 +1,10 @@
+/* eslint-disable quotes*/
 'use strict';
 
 module.exports = {
   up: async (queryInterface) => {
     const courses = await queryInterface.sequelize.query(
-      'SELECT id FROM courses;'
+      `SELECT id FROM courses;`
     );
 
     const courseId = courses[0][0].id;
@@ -64,7 +65,7 @@ module.exports = {
 
   down: async (queryInterface) => {
     const courses = await queryInterface.sequelize.query(
-      'SELECT id FROM courses;'
+      `SELECT id FROM courses;`
     );
 
     const chapters = await queryInterface.sequelize.query(

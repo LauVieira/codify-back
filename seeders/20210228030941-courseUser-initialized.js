@@ -14,7 +14,7 @@ module.exports = {
     const userId = user[0][0].id;
 
     await queryInterface.sequelize.query(
-      `UPDATE users SET "lastCourse"=${courses[0][0].id} WHERE id=${userId};`
+      `UPDATE users SET "lastCourse"=${courses[0][1].id} WHERE id=${userId};`
     );
 
     await queryInterface.bulkInsert('courseUsers', [

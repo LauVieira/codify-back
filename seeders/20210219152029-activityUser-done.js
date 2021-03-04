@@ -9,6 +9,12 @@ module.exports = {
 
     const userId = user[0][0].id;
 
+    const courses = await queryInterface.sequelize.query(
+      `SELECT id FROM courses;`
+    );
+    
+    const courseId = courses[0][0].id;
+
     const activities = await queryInterface.sequelize.query(
       `SELECT id FROM activities;`
     );
@@ -16,22 +22,28 @@ module.exports = {
     await queryInterface.bulkInsert('activityUsers', [
       {
         userId,
-        activityId: activities[0][0].id
+        activityId: activities[0][0].id,
+        courseId
       },{
         userId,
-        activityId: activities[0][1].id
+        activityId: activities[0][1].id,
+        courseId
       },{
         userId,
-        activityId: activities[0][2].id
+        activityId: activities[0][2].id,
+        courseId
       },{
         userId,
-        activityId: activities[0][3].id
+        activityId: activities[0][3].id,
+        courseId
       },{
         userId,
-        activityId: activities[0][4].id
+        activityId: activities[0][4].id,
+        courseId
       }, {
         userId,
-        activityId: activities[0][5].id
+        activityId: activities[0][5].id,
+        courseId
       }
     ]);
   },
