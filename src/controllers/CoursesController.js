@@ -68,8 +68,7 @@ class CoursesController {
   async isTopicDone (topicId, userId) {
     const { count: totalActivities, rows: activities } = await Activity.findAndCountAll({ where: { topicId } });
     const activitiesId = activities.map(activity => activity.id);
-    const { count: doneActivities } = await ActivityUser.findAndCountAll({ where: { userId, activitiesId } });
-
+    const { count: doneActivities } = await ActivityUser.findAndCountAll({ where: { userId, activityId: activitiesId } });
     return (doneActivities / totalActivities) === 1 ? true: false;
   }
 
@@ -82,12 +81,16 @@ class CoursesController {
       } 
     });
 
+
+
     await Promise.all(program.map(chapter => {
       return Promise.all(chapter.topics.map(async topic => {
         const done = await this.isTopicDone(topic.id, userId);
-        topic.done = done; 
+        topic.dataValues.done = done; 
       }));
     }));
+
+    return program;
   }
 
   async getProgress (userId, courseId) {
