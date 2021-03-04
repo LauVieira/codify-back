@@ -206,17 +206,24 @@ class CoursesController {
     return { done: false };
   }
 
-  async getLastActivity (courseId, userId) {
+  async getLastActivity (userId) {
     const activityUser = await ActivityUser.findAll({ 
       where: { userId }, 
       order: [['createdAt', 'DESC']] 
     });
 
-    const activity = await this.getActivity(activityUser[0].id);
+    const activity = await this.getActivity(activityUser[0].activityId);
 
-    const topic = await this.getTopic(activity.id);
+    const topic = await this.getTopicById(activity.topicId);
 
-    return { activityId: activity.id, topicId: topic.id, chapterId: topic.chapterId };
+    const chapter = await this.getChapter(topic.chapterId);
+
+    return { 
+      activityId: activity.id, 
+      topicId: topic.id, 
+      chapterId: chapter.id,
+      courseId: chapter.courseId 
+    };
   }
 }
 

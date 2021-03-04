@@ -365,3 +365,49 @@ describe('POST users/last-course/:id', () => {
     );
   });
 });
+
+describe('POST /users/return-course', () => {
+  let token, activityTh, user, activityUser, topic, chapter, course;
+
+  beforeEach(async () => {
+    user = await Helpers.createUser();
+    token = await Helpers.createToken(user);
+    course = await Helpers.createCourse();
+    chapter = await Helpers.createChapter(course.id);
+    topic = await Helpers.createTopic(chapter.id);
+    activityTh = (await Helpers.createActivityTheory(topic.id)).activityTh;
+    activityEx = (await Helpers.createActivityExercise(topic.id)).activityEx;
+  });
+
+  it('should return 401 when cookie is invalid', async () => {
+    const wrongToken = 'wrong_token';
+    const response = await agent.post('/users/return-course').set('Cookie', `token=${wrongToken}`);
+
+    expect(response.status).toBe(401);
+    expect(response.body.message).toEqual('Token inválido');
+  });
+
+  it('should return 401 when no cookie is sent', async () => {
+    const response = await agent.post('/users/return-course');
+
+    expect(response.status).toBe(401);
+    expect(response.body.message).toEqual('Token não encontrado');
+  });
+
+  it('should return the path ids to return', async () => {
+    activityUser = await Helpers.createActivityUsers(user.id, activityTh.id);
+    activityUser_2 = await Helpers.createActivityUsers(user.id, activityEx.id);
+
+    const response = await agent.post(`/users/return-course`).set('Cookie', `token=${token}`);
+
+    expect(response.status).toBe(200);
+    expect(response.body).toMatchObject(
+      { 
+        activityId: activityEx.id, 
+        topicId: topic.id, 
+        chapterId: chapter.id,
+        courseId: course.id
+      }
+    );
+  });
+});
