@@ -25,7 +25,7 @@ router.get('/', async (req, res) => {
 });
 
 router.get('/:id', async (req, res) => {
-  const { id } = req.params;
+  const id = +req.params.id;
 
   const topic = await CoursesController.getTopicById(id);
   
@@ -42,7 +42,7 @@ router.post('/', schemaMiddleware(schemas.postTopic) , async (req, res) => {
 
 router.put('/:id', schemaMiddleware(schemas.putTopic), async (req, res) => {
   const sanitized = sanitiseObj(req.body);
-  const { id } = req.params;
+  const id = +req.params.id;
 
   const updatedTopic = await CoursesController.editTopic(id, sanitized);
   res.status(200).send(updatedTopic);

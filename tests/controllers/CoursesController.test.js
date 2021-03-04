@@ -8,42 +8,78 @@ const Chapter = require('../../src/models/Chapter');
 const Activity = require('../../src/models/Activity');
 const ActivityUser = require('../../src/models/ActivityUser');
 const Err = require('../../src/errors');
+const CourseUser = require('../../src/models/CourseUser');
 
 jest.mock('../../src/models/ActivityUser');
 jest.mock('sequelize');
 jest.mock('../../src/models/Course');
+jest.mock('../../src/models/CourseUser');
+jest.mock('../../src/models/Topic');
+jest.mock('../../src/models/Chapter');
+jest.mock('../../src/models/Activity');
 
-describe('getSuggestions', () => {
+/*describe('getSuggestions', () => {
   it('should return an array', () => {
-    const spy = jest.spyOn(Course, 'findAll');
-    CoursesController.getSuggestions(10);
+    const userId = 1;
+    const limit = 10;
+    const spy_2 = jest.spyOn(CourseUser, 'findAll');
+    
+    spy_2.mockResolvedValueOnce([]);
+    CoursesController.getSuggestions(userId, limit);
 
-    expect(spy).toHaveBeenCalled();
-    expect(spy).toHaveBeenCalledWith(
+    expect(spy_2).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { userId }}),
+    );
+    expect(Course.findAll).toHaveBeenCalledWith(
       expect.objectContaining({ limit: 10 }),
     );
   });
 });
 
+describe('getInitializedCourse', () => {
+  it('should return an array', () => {
+    const userId = 1;
+    const limit = 10;
+    const spy = jest.spyOn(Course, 'findAll');
+    const spy_2 = jest.spyOn(CourseUser, 'findAll');
+
+    spy_2.mockResolvedValueOnce([]);
+    CoursesController.getInitializedCourses(userId, limit);
+
+    expect(spy_2).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { userId } }),
+    );
+    expect(spy).toHaveBeenCalledWith(
+      expect.objectContaining({ limit: 10 }),
+    );
+  });
+});*/
+
 describe('getCourse', () => {
-  it('should return a course', () => {
+  it('should return a course', async () => {
     const id = 1;
     const spy = jest.spyOn(Course, 'findByPk');
-    CoursesController.getCourse(id);
+    spy.mockImplementationOnce(() => ({ id }));
+
+    const course = await CoursesController.getCourse(id);
 
     expect(spy).toHaveBeenCalled();
     expect(spy).toHaveBeenCalledWith(id);
+    expect(course).toEqual(expect.objectContaining({ id }));
   });
 });
 
 describe('getTopic', () => {
-  it('should return a topic', () => {
+  it('should return a topic', async () => {
     const id = 1;
     const spy = jest.spyOn(Topic, 'findByPk');
-    CoursesController.getTopic(id);
+    spy.mockImplementationOnce(() => ({ id }));
+
+    const topic = await CoursesController.getTopic(id);
 
     expect(spy).toHaveBeenCalled();
     expect(spy).toHaveBeenCalledWith(id, expect.any(Object));
+    expect(topic).toEqual(expect.objectContaining({ id }));
   });
 
   it('should throw an NotFoundError in topic', async () => {
@@ -58,13 +94,16 @@ describe('getTopic', () => {
 });
 
 describe('getChapter', () => {
-  it('should return a chapter', () => {
+  it('should return a chapter', async () => {
     const id = 1;
     const spy = jest.spyOn(Chapter, 'findByPk');
-    CoursesController.getChapter(id);
+    spy.mockImplementationOnce(() => ({ id }));
+
+    const chapter = await CoursesController.getChapter(id);
 
     expect(spy).toHaveBeenCalled();
     expect(spy).toHaveBeenCalledWith(id);
+    expect(chapter).toEqual(expect.objectContaining({ id }));
   });
 
   it('should throw an NotFoundError in chapter', async () => {
@@ -79,13 +118,16 @@ describe('getChapter', () => {
 });
 
 describe('getTopicById', () => {
-  it('should return a topic', () => {
+  it('should return a topic', async () => {
     const id = 1;
     const spy = jest.spyOn(Topic, 'findByPk');
-    CoursesController.getTopicById(id);
+    spy.mockImplementationOnce(() => ({ id }));
+
+    const topic = await CoursesController.getTopicById(id);
 
     expect(spy).toHaveBeenCalled();
     expect(spy).toHaveBeenCalledWith(id);
+    expect(topic).toEqual(expect.objectContaining({ id }));
   });
 
   it('should throw an NotFoundError in topic', async () => {
@@ -100,13 +142,16 @@ describe('getTopicById', () => {
 });
 
 describe('getActivity', () => {
-  it('should return a activity', () => {
+  it('should return a activity', async () => {
     const id = 1;
     const spy = jest.spyOn(Activity, 'findByPk');
-    CoursesController.getActivity(id);
+    spy.mockImplementationOnce(() => ({ id }));
+
+    const activity = await CoursesController.getActivity(id);
 
     expect(spy).toHaveBeenCalled();
     expect(spy).toHaveBeenCalledWith(id);
+    expect(activity).toEqual(expect.objectContaining({ id }));
   });
 
   it('should throw an NotFoundError in activity', async () => {
@@ -314,12 +359,42 @@ describe('createTopic', () => {
     jest.spyOn(CoursesController, 'getChapter').mockResolvedValueOnce({});
     Topic.create.mockResolvedValueOnce(expectedObject);
   
-    const spy = jest.spyOn(Chapter, 'create');
+    const spy = jest.spyOn(Topic, 'create');
   
     const request = await CoursesController.createTopic(newObject);
     
     expect(spy).toHaveBeenCalled();
     expect(spy).toHaveBeenCalledWith(newObject);
+    expect(request).toEqual(expectedObject);
+  });
+});
+
+describe('initializeCourse', () => {
+  it('should throw error when trying to create existing CourseUser', async () => {
+    const courseId = 1;
+    const userId = 1;
+
+    jest.spyOn(CoursesController, 'getCourse').mockResolvedValueOnce({});
+    CourseUser.findOne.mockResolvedValueOnce({});
+
+    const error = () => CoursesController.initializeCourse(courseId, userId);
+    
+    expect(error).rejects.toThrow(Err.ConflictError);
+  });
+
+  it('should create CourseUser if it does not exist yet', async () => {
+    const courseId = 1;
+    const userId = 1;
+    const expectedObject = { name: 'mockedObj', id: 1 };
+
+    jest.spyOn(CoursesController, 'getCourse').mockResolvedValueOnce({});
+
+    CourseUser.findOne.mockResolvedValueOnce(null);
+    CourseUser.create.mockResolvedValueOnce(expectedObject);
+
+    const request = await CoursesController.initializeCourse(courseId, userId);
+    
+    expect(CourseUser.create).toHaveBeenCalledWith({ courseId, userId });
     expect(request).toEqual(expectedObject);
   });
 });

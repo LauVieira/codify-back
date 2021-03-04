@@ -8,6 +8,7 @@ const sequelize = require('../../src/utils/database');
 
 const agent = supertest(app);
 
+const redis = require('../../src/utils/redis');
 const Helpers = require('../Helpers');
 
 beforeEach(async () => {
@@ -15,7 +16,9 @@ beforeEach(async () => {
 });
 
 afterAll(async () => {
+  await Helpers.eraseDatabase();
   await sequelize.close();
+  await redis.endConnection();
 });
 
 describe('GET /courses/suggestions', () => {
@@ -41,15 +44,80 @@ describe('GET /courses/suggestions', () => {
     expect(response.body.message).toEqual('Token não encontrado');
   });
 
-  it('should return the array expected with valid cookie', async () => {
+  it('should return the array expected with valid cookie, not initialized courses', async () => {
     const course = await Helpers.createCourse();
     const response = await agent.get('/courses/suggestions').set('Cookie', `token=${token}`);
 
     expect(response.status).toBe(200);
+    expect(response.body.length).toEqual(1);
     expect(response.body).toEqual(
       expect.arrayContaining([
         expect.objectContaining(course),
       ]),
+    );
+  });
+
+  it('should return the array expected with valid cookie, initialized courses', async () => {
+    const course = await Helpers.createCourse();
+    await Helpers.createCourseUsers(user.id, course.id);
+
+    const response = await agent.get('/courses/suggestions').set('Cookie', `token=${token}`);
+
+    expect(response.status).toBe(200);
+    expect(response.body.length).toEqual(0);
+    expect(response.body).toEqual(
+      expect.arrayContaining([]),
+    );
+  });
+});
+
+describe('GET /courses/initialized', () => {
+  let user, token;
+
+  beforeEach(async () => {
+    user = await Helpers.createUser();
+    token = await Helpers.createToken(user);
+  });
+
+  it('should return 401 when cookie is invalid', async () => {
+    const token = 'wrong_token';
+    const response = await agent.get('/courses/initialized').set('Cookie', `token=${token}`);
+
+    expect(response.status).toBe(401);
+    expect(response.body.message).toEqual('Token inválido');
+  });
+
+  it('should return 401 when no cookie is sent', async () => {
+    const response = await agent.get('/courses/initialized');
+
+    expect(response.status).toBe(401);
+    expect(response.body.message).toEqual('Token não encontrado');
+  });
+
+  it('should return the array expected with valid cookie, -> INITIALIZED COURSE', async () => {
+    const course = await Helpers.createCourse();
+    await Helpers.createCourseUsers(user.id, course.id);
+    
+    const response = await agent.get('/courses/initialized').set('Cookie', `token=${token}`);
+
+    expect(response.status).toBe(200);
+    expect(response.body.length).toEqual(1);
+    expect(response.body).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining(course),
+      ]),
+    );
+  });
+
+  it('should return the array expected with valid cookie, -> NOT INITIALIZED COURSE', async () => {
+    await Helpers.createCourse();
+    
+    const response = await agent.get('/courses/initialized').set('Cookie', `token=${token}`);
+
+    expect(response.status).toBe(200);
+    expect(response.body.length).toEqual(0);
+    expect(response.body).toEqual(
+      expect.arrayContaining([]),
     );
   });
 });
@@ -249,5 +317,63 @@ describe('POST /courses/activities/:id', () => {
       done: false,
       updatedAt: expect.any(String),
     }));
+  });
+});
+
+describe('POST /courses/:id', () => {
+  let token, user;
+
+  beforeEach(async () => {
+    user = await Helpers.createUser();
+    token = await Helpers.createToken(user);
+  });
+
+  it('should return 401 when cookie is invalid', async () => {
+    const wrongToken = 'wrong_token';
+    const response = await agent.post('/courses/0').set('Cookie', `token=${wrongToken}`);
+  
+    expect(response.status).toBe(401);
+    expect(response.body.message).toEqual('Token inválido');
+  });
+  
+  it('should return 401 when no cookie is sent', async () => {
+    const response = await agent.post('/courses/0');
+  
+    expect(response.status).toBe(401);
+    expect(response.body.message).toEqual('Token não encontrado');
+  });
+
+  it('should return 404 when course id is not found', async () => {
+    const response = await agent.post(`/courses/0`).set('Cookie', `token=${token}`);
+
+    expect(response.status).toBe(404);
+    expect(response.body.message).toEqual('Curso não encontrado');
+  });
+
+  it('should return 409 when CourseUser is already created', async () => {
+    const course = await Helpers.createCourse();
+    await Helpers.createCourseUsers(user.id, course.id);
+
+    const response = await agent.post(`/courses/${course.id}`).set('Cookie', `token=${token}`);
+
+    expect(response.status).toBe(409);
+    expect(response.body.message).toEqual('Curso já foi inicializado');
+  });
+
+  it('should return 200 with the courses expected and a valid cookie', async () => {
+    const course = await Helpers.createCourse();
+
+    const response = await agent.post(`/courses/${course.id}`).set('Cookie', `token=${token}`);
+
+    expect(response.status).toBe(201);
+    expect(response.body).toEqual(
+      expect.objectContaining({
+        id: expect.any(Number),
+        courseId: course.id,
+        userId: user.id,
+        updatedAt: expect.any(String),
+        createdAt: expect.any(String)
+      }),
+    );
   });
 });

@@ -25,7 +25,7 @@ router.get('/', async (req, res) => {
 });
 
 router.get('/:id', async (req, res) => {
-  const { id } = req.params;
+  const id = +req.params.id;
 
   const courses = await CoursesController.getCourse(id);
   
@@ -46,7 +46,7 @@ router.put('/:id', async (req, res) => {
   const { error } = schemas.courses.post.validate(req.body);
   if (error) throw new InvalidDataError();
 
-  const { id } = req.params;
+  const id = +req.params.id;
   const sanitisedCourse = sanitiseObj(req.body);
   const updatedCourse = await CoursesController.editCourse(id, sanitisedCourse);
   res.status(200).send(updatedCourse);

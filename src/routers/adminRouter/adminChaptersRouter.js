@@ -25,7 +25,7 @@ router.get('/', async (req, res) => {
 });
 
 router.get('/:id', async (req, res) => {
-  const { id } = req.params;
+  const id = +req.params.id;
 
   const chapter = await CoursesController.getChapter(id);
   
@@ -41,7 +41,7 @@ router.post('/', schemaMiddleware(schemas.postChapter), async (req, res) => {
 
 router.put('/:id', schemaMiddleware(schemas.putChapter), async (req, res) => {
   const sanitized = sanitiseObj(req.body);
-  const { id } = req.params;
+  const id = +req.params.id;
 
   const updatedChapter = await CoursesController.editChapter(id, sanitized);
   res.status(200).send(updatedChapter);

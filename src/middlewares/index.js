@@ -4,6 +4,7 @@ const adminLogin = require('./adminLogin');
 const errorHandlerMiddleware = require('./errorHandlerMiddleware');
 const adminAuthentication = require('./adminAuthentication');
 const schemaMiddleware = require('./schemaMiddleware');
+const userLogin = require('./userLogin');
 
 module.exports = {
   userAuthentication,
@@ -11,5 +12,6 @@ module.exports = {
   adminLogin,
   errorHandlerMiddleware,
   adminAuthentication,
-  schemaMiddleware
+  schemaMiddleware,
+  userLogin
 };

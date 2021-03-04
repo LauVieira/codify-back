@@ -1,6 +1,7 @@
 require('dotenv-flow').config({ silent: true });
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
+const { setSession } = require('../../src/utils/redis');
 
 const database = require('../../src/utils/database');
 
@@ -12,9 +13,9 @@ function convertToJson (entity) {
 }
 
 class Helpers {
-  async createUser () {
+  async createUser (email='test@test.com') {
     const hashedPassword = bcrypt.hashSync('123456', 10);
-    const values = ['teste', 'test@test.com', hashedPassword];
+    const values = ['teste sobrenome', email, hashedPassword];
   
     let user = await database.query(`
       INSERT INTO users (name, email, password) values ('${values[0]}', '${values[1]}', '${values[2]}') RETURNING *;
@@ -124,23 +125,25 @@ class Helpers {
     return activityUser;
   }
   
-  createAdminToken (admin) {
+  async createAdminToken (admin) {
     delete admin.password;
     const adminToken = jwt.sign(
       admin,
       process.env.ADMIN_SECRET
     );
-
+    
+    await setSession(adminToken, admin.username);
     return adminToken;
   }
 
-  createToken (user) {
+  async createToken (user) {
     delete user.password;
     const token = jwt.sign(
       user,
       process.env.SECRET
     );
-
+    
+    await setSession(token, user.email);
     return token;
   }
 
