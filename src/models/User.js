@@ -25,6 +25,10 @@ User.init({
     type: Sequelize.STRING(150),
     allowNull: false,
   },
+  lastCourse: {
+    type: Sequelize.INTEGER,
+    defaultValue: 0
+  }
 }, {
   sequelize,
   modelName: 'user',

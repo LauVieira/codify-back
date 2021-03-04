@@ -4,9 +4,11 @@ const jwt = require('jsonwebtoken');
 
 const { sanitiseObj } = require('../utils/generalFunctions');
 const UsersController = require('../controllers/UsersController');
-const { validateUser, userAuthentication } = require('../middlewares');
-const Schemas = require('../schemas');
-const { InvalidDataError, UnauthorizedError } = require('../errors/');
+const { validateUser, userAuthentication, schemaMiddleware, userLogin } = require('../middlewares');
+const usersSchema = require('../schemas/usersSchemas');
+const Err = require('../errors');
+const redis = require('../utils/redis');
+const CoursesController = require('../controllers/CoursesController');
 
 router.post('/sign-up', validateUser, async (req, res) => {
   const { name, email, password } = req.userData;
@@ -17,46 +19,74 @@ router.post('/sign-up', validateUser, async (req, res) => {
     hashedPassword,
   );
   
-  delete savedUser.password;
-  res.status(201).send(savedUser);
+  delete savedUser.dataValues.password;
+  res.status(201).send(savedUser.dataValues);
 });
 
-router.post('/sign-in', async (req, res) => {
-  const validation = Schemas.users.signIn.validate(req.body);
-  if (validation.error) {
-    throw new InvalidDataError();
-  }
+router.post('/sign-in', userLogin, async (req, res) => {
+  delete req.user.password;
+  const token = jwt.sign(req.user, process.env.SECRET);
 
-  const userData = sanitiseObj(req.body);
-  let selectedUser = await UsersController.findUserByEmail(userData.email);
-  if (!selectedUser) {
-    throw new UnauthorizedError('Email ou senha estão incorretos');
-  }
-
-  const valid = bcrypt.compareSync(userData.password, selectedUser.password);
-  if (!valid) {
-    throw new UnauthorizedError('Email ou senha estão incorretos');
-  }
-
-  selectedUser = selectedUser.dataValues;
-  delete selectedUser.password;
-  const token = jwt.sign(selectedUser, process.env.SECRET);
+  await redis.setSession(token, req.user.email);
 
   const cookieOptions = {};
 
   if (process.env.NODE_ENV === 'production') {
-      cookieOptions.secure = true;
-      cookieOptions.sameSite = 'none';
+    cookieOptions.secure = true;
+    cookieOptions.sameSite = 'none';
   }
 
   res.cookie('token', token, cookieOptions);
-  res.status(200).send(selectedUser);
+  res.status(200).send(req.user);
 });
 
-router.post('/sign-out', userAuthentication, (req, res) => {
+router.put('/:id', userAuthentication, schemaMiddleware(usersSchema.putUser), async (req, res) => {
+  const id = Number(req.params.id);
+  const sanitized = sanitiseObj(req.body);
+
+  const updatedUser = await UsersController.editUser(id, sanitized);
+
+  delete updatedUser.dataValues.password;
+  res.status(200).send(updatedUser.dataValues);
+});
+
+router.post('/sign-out', userAuthentication, async (req, res) => {
+  await redis.deleteSession(req.token);
   res.clearCookie('token');
   
-  res.status(200).send({ message: 'Sign-out efetuado com sucesso' });
+  res.sendStatus(200);
+});
+
+router.post('/forgot-password', schemaMiddleware(usersSchema.forgot), async (req, res) => {
+  const user = await UsersController.findUserByEmail(req.body.email);
+  if (!user) {
+    return res.sendStatus(202);
+  }
+
+  const token = await redis.setItem(user.id);
+
+  await UsersController.sendEmail(user.email, token, user.name);
+  res.sendStatus(202);
+});
+
+router.post('/redefine-password', schemaMiddleware(usersSchema.redefine), async (req, res) => {
+  const userId = await redis.getItem(req.body.token);
+  const { password } = sanitiseObj(req.body);
+
+  if (!userId) {
+    throw new Err.ForbiddenError('Token inválido ou expirado');
+  }
+
+  await UsersController.editUser(userId, { password });
+  res.sendStatus(200);
+});
+
+router.post('/last-course/:id', userAuthentication, async (req, res) => {
+  const id = +req.params.id;
+  await CoursesController.getCourse(id);
+
+  const user = await UsersController.changeLastCourse(id, req.user.id);
+  res.status(200).send(user);
 });
 
 module.exports = router;

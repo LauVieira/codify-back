@@ -1,6 +1,6 @@
 /* global afterAll, jest, describe, it, expect  */
 /* eslint-disable quotes*/
-require('dotenv-flow').config();
+require('dotenv-flow').config({ silent: true });
 const jwt = require('jsonwebtoken');
 
 const app = require('../../src/app');
@@ -13,6 +13,8 @@ const db = new Pool({
     connectionString: process.env.DATABASE_URL
 });
 
+const redis = require('../../src/utils/redis');
+
 const Helpers = require('../Helpers');
 
 beforeEach(async () => {
@@ -20,8 +22,10 @@ beforeEach(async () => {
 });
 
 afterAll(async () => {
+  await Helpers.eraseDatabase();
   await sequelize.close();
   await db.end();
+  await redis.endConnection();
 });
 
 describe('GET /admin/courses/', () => {
@@ -43,7 +47,12 @@ describe('GET /admin/courses/', () => {
     );
 
     courses = dbCourse.rows;
+
+    courses[0].createdAt = courses[0].createdAt.toJSON();
+    courses[0].updatedAt = courses[0].updatedAt.toJSON();
+
     adminToken = jwt.sign(admin.rows[0], process.env.ADMIN_SECRET);
+    await redis.setSession(adminToken, admin.rows[0].username);
   });
 
   afterEach(async () => {
@@ -89,6 +98,7 @@ describe('POST /admin/courses/', () => {
     );
 
     adminToken = jwt.sign(admin.rows[0], process.env.ADMIN_SECRET);
+    await redis.setSession(adminToken, admin.rows[0].username);
   });
 
   afterEach(async () => {
@@ -146,8 +156,12 @@ describe('PUT /admin/courses/:id', () => {
     );
 
     courses = dbCourse.rows;
+    courses[0].createdAt = courses[0].createdAt.toJSON();
+    courses[0].updatedAt = courses[0].updatedAt.toJSON();
+
     courseId = dbCourse.rows[0].id;
     adminToken = jwt.sign(admin.rows[0], process.env.ADMIN_SECRET);
+    await redis.setSession(adminToken, admin.rows[0].username);
   });
 
   afterEach(async () => {

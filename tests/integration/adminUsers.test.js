@@ -1,5 +1,5 @@
 /* global afterAll, jest, describe, it, expect  */
-require('dotenv-flow').config();
+require('dotenv-flow').config({ silent: true });
 
 const app = require('../../src/app');
 const supertest = require('supertest');
@@ -7,14 +7,18 @@ const agent = supertest(app);
 
 const sequelize = require('../../src/utils/database');
 
-const { createAdmin, createAdminToken, eraseDatabase } = require('../Helpers');
+const Helpers = require('../Helpers');
+
+const redis = require('../../src/utils/redis');
 
 beforeEach(async () => {
-  await eraseDatabase();
+  await Helpers.eraseDatabase();
 });
 
 afterAll(async () => {
+  await Helpers.eraseDatabase();
   await sequelize.close();
+  await redis.endConnection();
 });
 
 describe('POST /admin/users/login', () => {
@@ -24,7 +28,7 @@ describe('POST /admin/users/login', () => {
       password: '123456' 
     };
     
-    const admin = await createAdmin();
+    const admin = await Helpers.createAdmin();
     delete admin.password;
     
     const response = await agent.post('/admin/users/login').send(body);
@@ -39,7 +43,7 @@ describe('POST /admin/users/login', () => {
     const response = await agent.post('/admin/users/login').send(body);
 
     expect(response.status).toBe(422);
-    expect(response.body.message).toEqual('Não foi possível processar os dados enviados');
+    expect(response.body.message).toEqual('Não foi possível processar o formato dos dados');
   });
 
   it('should return 401 when username does not match in DB', async () => {
@@ -59,7 +63,7 @@ describe('POST /admin/users/login', () => {
       password: '1234567890',
     };
 
-    await createAdmin();
+    await Helpers.createAdmin();
 
     const response = await agent.post('/admin/users/login').send(body);
 
@@ -85,13 +89,15 @@ describe('POST /admin/users/logout', () => {
   });
 
   it('should return 200 -> valid cookie, and destroy session', async () => {
-    const admin = await createAdmin();
-    const adminToken = await createAdminToken(admin);
+    const admin = await Helpers.createAdmin();
+    const adminToken = await Helpers.createAdminToken(admin);
 
     const response = await agent.post('/admin/users/logout').set('Cookie', `adminToken=${adminToken}`);
 
+    const session = await redis.getSession(adminToken);
+
     expect(response.status).toBe(200);
-    expect(response.body.message).toEqual('Logout efetuado com sucesso');
     expect(response.headers['set-cookie'][0]).toContain('Expires');
+    expect(session).toBeFalsy();
   });
 });

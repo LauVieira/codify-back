@@ -2,6 +2,7 @@ const router = require('express').Router();
 
 const CoursesController = require('../../controllers/CoursesController');
 const { schemaMiddleware } = require('../../middlewares');
+const { sanitiseObj } = require('../../utils/generalFunctions');
 const schemas = require('../../schemas/coursesSchemas');
 
 router.get('/', async (req, res) => {
@@ -23,7 +24,7 @@ router.get('/', async (req, res) => {
 });
 
 router.get('/:id', async (req, res) => {
-  const { id } = req.params;
+  const id = +req.params.id;
 
   const topic = await CoursesController.getTopicById(id);
   
@@ -31,15 +32,17 @@ router.get('/:id', async (req, res) => {
 });
 
 router.post('/', schemaMiddleware(schemas.postTopic) , async (req, res) => {
-  const createdTopic = await CoursesController.createTopic(req.body);
+  const sanitized = sanitiseObj(req.body);
+  const createdTopic = await CoursesController.createTopic(sanitized);
 
   res.status(201).send(createdTopic);
 });
 
 router.put('/:id', schemaMiddleware(schemas.putTopic), async (req, res) => {
-  const { id } = req.params;
+  const sanitized = sanitiseObj(req.body);
+  const id = +req.params.id;
 
-  const updatedTopic = await CoursesController.editTopic(id, req.body);
+  const updatedTopic = await CoursesController.editTopic(id, sanitized);
   res.status(200).send(updatedTopic);
 });
 

@@ -1,5 +1,5 @@
 /* global afterAll, jest, describe, it, expect  */
-require('dotenv-flow').config();
+require('dotenv-flow').config({ silent: true });
 
 const app = require('../../src/app');
 const supertest = require('supertest');
@@ -8,13 +8,16 @@ const agent = supertest(app);
 const sequelize = require('../../src/utils/database');
 
 const Helpers = require('../Helpers');
+const redis = require('../../src/utils/redis');
 
 beforeEach(async () => {
   await Helpers.eraseDatabase();
 });
 
 afterAll(async () => {
+  await Helpers.eraseDatabase();
   await sequelize.close();
+  await redis.endConnection();
 });
 
 describe('GET /admin/topics/:id', () => {

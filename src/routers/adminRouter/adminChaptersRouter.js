@@ -2,6 +2,7 @@ const router = require('express').Router();
 
 const CoursesController = require('../../controllers/CoursesController');
 const { schemaMiddleware } = require('../../middlewares');
+const { sanitiseObj } = require('../../utils/generalFunctions');
 const schemas = require('../../schemas/coursesSchemas');
 
 router.get('/', async (req, res) => {
@@ -23,7 +24,7 @@ router.get('/', async (req, res) => {
 });
 
 router.get('/:id', async (req, res) => {
-  const { id } = req.params;
+  const id = +req.params.id;
 
   const chapter = await CoursesController.getChapter(id);
   
@@ -31,15 +32,17 @@ router.get('/:id', async (req, res) => {
 });
 
 router.post('/', schemaMiddleware(schemas.postChapter), async (req, res) => {
-    const createdChapter = await CoursesController.createChapter(req.body);
+  const sanitized = sanitiseObj(req.body);
+  const createdChapter = await CoursesController.createChapter(sanitized);
 
-    res.status(201).send(createdChapter);
+  res.status(201).send(createdChapter);
 });
 
 router.put('/:id', schemaMiddleware(schemas.putChapter), async (req, res) => {
-  const { id } = req.params;
+  const sanitized = sanitiseObj(req.body);
+  const id = +req.params.id;
 
-  const updatedChapter = await CoursesController.editChapter(id, req.body);
+  const updatedChapter = await CoursesController.editChapter(id, sanitized);
   res.status(200).send(updatedChapter);
 });
 
