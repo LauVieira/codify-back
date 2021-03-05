@@ -28,7 +28,8 @@ User.init({
   lastCourse: {
     type: Sequelize.INTEGER,
     defaultValue: 0
-  }
+  },
+  avatarUrl: Sequelize.STRING
 }, {
   sequelize,
   modelName: 'user',

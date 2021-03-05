@@ -13,5 +13,5 @@ module.exports = {
   errorHandlerMiddleware,
   adminAuthentication,
   schemaMiddleware,
-  userLogin
+  userLogin,
 };

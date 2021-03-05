@@ -19,10 +19,7 @@ ActivityUser.init(
       type: Sequelize.INTEGER,
       allowNull: false,
     },
-    done: {
-      type: Sequelize.BOOLEAN,
-      defaultValue: false
-    }
+    courseId: Sequelize.INTEGER,
   },
   {
     sequelize,

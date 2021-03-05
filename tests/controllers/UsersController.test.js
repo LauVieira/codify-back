@@ -3,6 +3,7 @@ const UsersController = require('../../src/controllers/UsersController');
 const User = require('../../src/models/User');
 const Err = require('../../src/errors');
 const axios = require('axios');
+const Aws = require('../../src/utils/Aws');
 
 jest.mock('bcrypt', () => ({
   hashSync: (password) => password,
@@ -10,6 +11,7 @@ jest.mock('bcrypt', () => ({
 jest.mock('../../src/models/User');
 jest.mock('sequelize');
 jest.mock('axios');
+jest.mock('../../src/utils/Aws');
 
 describe('saveUser', () => {
   it('should return a user with id', async () => {
@@ -164,6 +166,25 @@ describe('changeLastCourse', () => {
     jest.spyOn(UsersController, 'getUser').mockResolvedValueOnce({ lastCourse: 0, dataValues: { password: '123456' } , save });
 
     const request = await UsersController.changeLastCourse(lastCourse, userId);
+    
+    expect(save).toHaveBeenCalled();
+    expect(request).toEqual(
+      expect.objectContaining(expectedObject)
+    );
+  });
+});
+
+describe('changeAvatar', () => {
+  it('should return the user with another avatarUrl', async () => {
+    const file = 'string';
+    const userId = 1;
+    const save = jest.fn();
+    const expectedObject = { avatarUrl: 'https://algumlink.com' };
+
+    jest.spyOn(UsersController, 'getUser').mockResolvedValueOnce({ avatarUrl: null, dataValues: { password: '123456' } , save });
+    Aws.getFile.mockResolvedValueOnce('https://algumlink.com');
+    
+    const request = await UsersController.changeAvatar(userId, file);
     
     expect(save).toHaveBeenCalled();
     expect(request).toEqual(

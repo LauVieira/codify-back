@@ -1,4 +1,3 @@
-const { NotFoundError } = require('../errors');
 const Err = require('../errors');
 const { Op } = require('sequelize');
 
@@ -65,28 +64,59 @@ class CoursesController {
     return topic;
   }
 
-  getProgram (courseId){
-    return Chapter.findAll({ where: { courseId }, 
+  async isTopicDone (topicId, userId) {
+    const { count: totalActivities, rows: activities } = await Activity.findAndCountAll({ where: { topicId } });
+    const activitiesId = activities.map(activity => activity.id);
+    const { count: doneActivities } = await ActivityUser.findAndCountAll({ where: { userId, activityId: activitiesId } });
+    return (doneActivities / totalActivities) === 1 ? true: false;
+  }
+
+  async getProgram (userId, courseId){
+    const program = await Chapter.findAll({ where: { courseId }, 
       include: { model: Topic, 
         include: { 
           model: Activity
         }
       } 
     });
+
+
+
+    await Promise.all(program.map(chapter => {
+      return Promise.all(chapter.topics.map(async topic => {
+        const done = await this.isTopicDone(topic.id, userId);
+        topic.dataValues.done = done; 
+      }));
+    }));
+
+    return program;
+  }
+
+  async getProgress (userId, courseId) {
+    const { count: totalActivities } = await Activity.findAndCountAll({ where: { courseId } });
+    const { count: doneActivities } = await ActivityUser.findAndCountAll({ where: { userId, courseId } });
+
+    return Math.floor(100 * doneActivities / totalActivities);
   }
 
   getAll (limit = null, offset = null) {
     return Course.findAll({ limit, offset });
   }
 
+  async isInitialized (courseId, userId) {
+    await this.getCourse(courseId);
+    
+    const courseUser = await CourseUser.findOne({ where: { courseId, userId } });
+    
+    return courseUser ? true : false;
+  }
+
   async initializeCourse (courseId, userId) {
     await this.getCourse(courseId);
 
-    const isValid = await CourseUser.findOne({ where: { courseId, userId } });
+    const alreadyInitialized = await this.isInitialized(courseId, userId);
 
-    if (isValid) { 
-      throw new Err.ConflictError('Curso já foi inicializado');
-    }
+    if (alreadyInitialized) return;
 
     const courseUser = await CourseUser.create({ courseId, userId });
     return courseUser;
@@ -110,17 +140,16 @@ class CoursesController {
     return course;
   }
 
-  async deleteCourse (id) {
-    const course = await Course.findByPk(id);
-    if (course === null) throw new Err.NotFoundError('Curso não encontrado');
-    
-    CourseUser.destroy({ where: { courseId: id } });
-
-    await course.destroy();
-  }
-
-  getAllTopics (limit = null, offset = null) {
-    return Topic.findAndCountAll({ limit, offset });
+  getAllTopics (limit = null, offset = null, filter = {}) {
+    return Topic.findAndCountAll({ 
+      where: filter, 
+      limit, 
+      offset,
+      include: {
+        model: Chapter,
+      },
+      attributes: ['id', 'title', 'chapterId', [sequelize.col('chapter."courseId"'), 'courseId']],
+    });
   }
 
   async getTopicById (id) {
@@ -161,8 +190,8 @@ class CoursesController {
     return chapter;
   }
 
-  getAllChapters (limit = null, offset = null) {
-    return Chapter.findAndCountAll({ limit, offset });
+  getAllChapters (limit = null, offset = null, filter = {}) {
+    return Chapter.findAndCountAll({ where: filter, limit, offset });
   }
 
   async createChapter (chapterData) {
@@ -193,18 +222,61 @@ class CoursesController {
     return activity;
   }
 
-  async activityDone (activityId, userId) {
+  async activityDone (activityId, userId, courseId) {
     let activityUser = await ActivityUser.findOne({ where: { activityId, userId } });
 
     if (!activityUser) {
-      activityUser = await ActivityUser.create({ activityId, userId, done: true });
-      return activityUser;
+      activityUser = await ActivityUser.create({ activityId, userId, courseId });
+      return { done: true };
     }
 
-    activityUser.done = !activityUser.done;
-    await activityUser.save();
+    await activityUser.destroy();
 
-    return activityUser;
+    return { done: false };
+  }
+
+  async getLastActivity (userId, courseId) {
+    await this.getCourse(courseId);
+
+    const activityUser = await ActivityUser.findAll({ 
+      where: { userId, courseId }, 
+      order: [['createdAt', 'DESC']],
+      required: true
+    });
+
+    if (activityUser.length === 0) {
+      return { firstActivity: true };
+    }
+
+    const activity = await this.getActivity(activityUser[0].activityId);
+
+    const topic = await this.getTopicById(activity.topicId);
+
+    const chapter = await this.getChapter(topic.chapterId);
+
+    return { 
+      activityId: activity.id, 
+      topicId: topic.id, 
+      chapterId: chapter.id,
+    };
+  }
+
+  getAllTheories (limit = null, offset = null, filter = {}) {
+    return Theory.findAndCountAll({ 
+      where: filter, 
+      limit, 
+      offset,
+      include: {
+        model: Activity,
+        include: {
+          model: Topic,
+          include: {
+            model: Chapter
+          }
+        }
+      },
+      attributes: ['id', 'title', 'chapterId', [sequelize.col('chapter."courseId"'), 'courseId']],
+    });
   }
 }
 

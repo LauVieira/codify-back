@@ -1,6 +1,5 @@
 const router = require('express').Router();
 const CoursesController = require('../controllers/CoursesController');
-const UsersController = require('../controllers/UsersController');
 
 router.get('/suggestions', async (req, res) => {
   const suggestions = await CoursesController.getSuggestions(req.user.id);
@@ -17,17 +16,22 @@ router.get('/initialized', async (req, res) => {
 router.get('/:id', async (req, res) => {
   const id = Number(req.params.id);
 
-  const course = await CoursesController.getCourse(id);
-  const program = await CoursesController.getProgram(course.id);
+  let course = await CoursesController.getCourse(id);
+  const program = await CoursesController.getProgram(req.user.id, id);
+  const progress = await CoursesController.getProgress(req.user.id, id);
+
+  console.log(progress, 'progress');
+  course.dataValues = { ...course.dataValues, progress };
+
   res.status(200).send({ course, program });
 });
 
-router.post('/:id', async (req, res) => {
+router.get('/:id/is-initialized', async (req, res) => {
   const id = +req.params.id;
 
-  const courseUser = await CoursesController.initializeCourse(id, req.user.id);
+  const isInitialized = await CoursesController.isInitialized(id, req.user.id);
 
-  res.status(201).send(courseUser);
+  res.status(200).send({ initialized: isInitialized });
 });
 
 router.get('/chapters/:chapterId/topics/:topicId/activities', async (req, res) => {
@@ -39,11 +43,12 @@ router.get('/chapters/:chapterId/topics/:topicId/activities', async (req, res) =
   res.status(200).send({ topic, chapter });
 });
 
-router.post('/activities/:id', async (req, res) => {
-  const id = +req.params.id;
+router.post('/:id/activities/:activityId', async (req, res) => {
+  const params = req.params;
 
-  const activity = await CoursesController.getActivity(id);
-  const activityDone = await CoursesController.activityDone(activity.id, req.user.id);
+  await CoursesController.getCourse(+params.id);
+  const activity = await CoursesController.getActivity(+params.activityId);
+  const activityDone = await CoursesController.activityDone(activity.id, req.user.id, +params.id);
   
   res.status(201).send(activityDone);
 });
